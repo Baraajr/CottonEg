@@ -1,0 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap');
+@import 'tailwindcss';
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: 'Manrope', sans-serif;
+  margin: 0;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.input {
+  @apply w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500;
+}
+
+.label {
+  @apply mb-1 block text-sm font-medium;
+}
+
+.error {
+  @apply text-xs text-red-500 mt-1;
+}
