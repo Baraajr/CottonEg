@@ -1,19 +1,30 @@
 const mongoose = require('mongoose');
-const { MongoMemoryServer } = require('mongodb-memory-server');
+const { MongoMemoryReplSet } = require('mongodb-memory-server');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const Product = require('../models/productModel');
 const User = require('../models/userModel');
 const Category = require('../models/categoryModel');
 const Subcategory = require('../models/subcategoryModel');
+const Order = require('../models/orderModel');
+const Review = require('../models/reviewModel');
 
 dotenv.config();
+
+let replSet;
 
 let mongod;
 
 beforeAll(async () => {
-  mongod = await MongoMemoryServer.create();
-  const uri = mongod.getUri();
+  // replicaset for createcashorder transaction
+  replSet = await MongoMemoryReplSet.create({
+    replSet: {
+      count: 1,
+    },
+  });
+
+  const uri = replSet.getUri();
+
   await mongoose.connect(uri);
 });
 
@@ -25,9 +36,35 @@ afterEach(async () => {
 afterAll(async () => {
   const collections = await mongoose.connection.db.collections();
   await Promise.all(collections.map((collection) => collection.deleteMany({})));
+
   await mongoose.connection.close();
-  await mongod.stop();
+  await replSet.stop();
 });
+
+const VALID_SHIPPING_ADDRESS = {
+  details: 'Egypt',
+  city: 'Menouf',
+  postalCode: '31734',
+  phone: '01032650872',
+};
+
+exports.VALID_SHIPPING_ADDRESS = VALID_SHIPPING_ADDRESS; // resued in same file
+
+exports.buildOrder = (userId, overrides = {}) =>
+  Order.create({
+    user: userId,
+    cartItems: [
+      {
+        product: new mongoose.Types.ObjectId(),
+        variant: new mongoose.Types.ObjectId(),
+        quantity: 2,
+        price: 100,
+      },
+    ],
+    shippingAddress: VALID_SHIPPING_ADDRESS,
+    totalOrderPrice: 200,
+    ...overrides,
+  });
 
 exports.createAdminUser = async () => {
   const admin = await User.create({
@@ -41,27 +78,17 @@ exports.createAdminUser = async () => {
   return admin;
 };
 
-exports.createReqularUser = async (options) => {
-  if (options) {
-    const user = await User.create({
-      name: options.name,
-      email: options.email,
-      password: options.password,
-      passwordConfirm: options.passwordConfirm,
-      verified: true,
-    });
-    return user;
-  }
+exports.createRegularUser = async (options = {}) => {
   const user = await User.create({
-    name: 'Test User',
-    email: 'test@example.com',
-    password: 'test1234',
+    name: options.name || 'Test User',
+    email: options.email || 'test@example.com',
+    password: options.password || 'test1234',
+    passwordConfirm: options.passwordConfirm || 'test1234',
     verified: true,
   });
 
   return user;
 };
-
 exports.createJWTToken = (id) => {
   const token = jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
@@ -121,20 +148,4 @@ exports.createProduct = async (categoryId, subcategoryId, options = {}) => {
   });
 
   return product;
-};
-
-exports.deleteAllProducts = async () => {
-  await Product.deleteMany({});
-};
-
-exports.deleteAllCategories = async () => {
-  await Category.deleteMany({});
-};
-
-exports.deleteAllSubcategories = async () => {
-  await Subcategory.deleteMany({});
-};
-
-exports.deleteAllUsers = async () => {
-  await User.deleteMany({});
 };
