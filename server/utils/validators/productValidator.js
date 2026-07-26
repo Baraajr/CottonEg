@@ -37,10 +37,7 @@ exports.createProductValidator = [
     .withMessage('Product price must be a number')
     .custom((val) => {
       if (val < 0) {
-        throw new AppError(
-          'Product price must be greater than or equal to 0',
-          400,
-        );
+        throw new AppError('Product price must be greater than or equal to 0');
       }
       return true;
     }),
@@ -52,7 +49,7 @@ exports.createProductValidator = [
     .toFloat()
     .custom((value, { req }) => {
       if (Number(req.body.price) <= value) {
-        throw new AppError('priceAfterDiscount must be lower than price', 400);
+        throw new AppError('priceAfterDiscount must be lower than price');
       }
       return true;
     }),
@@ -93,7 +90,7 @@ exports.createProductValidator = [
     );
 
     if (new Set(combinations).size !== combinations.length) {
-      throw new AppError('Duplicate size/color variant found', 400);
+      throw new AppError('Duplicate size/color variant found');
     }
 
     return true;
@@ -121,7 +118,7 @@ exports.createProductValidator = [
       Category.findById(categoryId).then((category) => {
         if (!category) {
           return Promise.reject(
-            new AppError(`No category for this id: ${categoryId}`, 400),
+            new AppError(`No category for this id: ${categoryId}`),
           );
         }
       }),
@@ -138,7 +135,7 @@ exports.createProductValidator = [
       const subcategory = await Subcategory.findById(subcategoryId);
 
       if (!subcategory) {
-        throw new AppError('Subcategory does not exist.', 400);
+        throw new AppError('Subcategory does not exist.');
       }
 
       return true;
@@ -151,7 +148,7 @@ exports.createProductValidator = [
       });
 
       if (!subcategory) {
-        throw new AppError("Subcategory doesn't belong to this category.", 400);
+        throw new AppError("Subcategory doesn't belong to this category.");
       }
 
       return true;
@@ -207,7 +204,7 @@ exports.updateProductValidator = [
       const category = await Category.findById(req.body.category);
 
       if (!category) {
-        throw new AppError('No category for this id', 400);
+        throw new AppError('No category for this id');
       }
 
       return true;
@@ -240,7 +237,7 @@ exports.updateProductValidator = [
       );
 
       if (new Set(combinations).size !== combinations.length) {
-        throw new AppError('Duplicate size/color variant found', 400);
+        throw new AppError('Duplicate size/color variant found');
       }
 
       return true;
@@ -264,7 +261,7 @@ exports.validateProductId = [
       const product = await Product.findById(val);
 
       if (!product) {
-        throw new AppError(`No product with this id ${val}`, 404);
+        throw new AppError(`No product with this id ${val}`);
       }
 
       return true;

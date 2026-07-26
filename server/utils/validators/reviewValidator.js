@@ -25,7 +25,7 @@ exports.createReviewValidator = [
       // Check if product exists
       const product = await Product.findById(productId);
       if (!product) {
-        throw new AppError(`No product with this id ${val}`, 404);
+        throw new AppError(`No product with this id ${val}`);
       }
 
       // Check if the logged-in user has already created a review for this product
@@ -34,10 +34,7 @@ exports.createReviewValidator = [
         product: productId,
       });
       if (review) {
-        throw new AppError(
-          'You already created a review for this product',
-          400,
-        );
+        throw new AppError('You already created a review for this product');
       }
     }),
   validatorMiddleware,
@@ -65,7 +62,7 @@ exports.updateReviewValidator = [
 
         if (review.user._id.toString() !== req.user._id.toString()) {
           return Promise.reject(
-            new AppError(`Your are not allowed to perform this action`, 400),
+            new AppError(`You do not have permission to perform this action`),
           );
         }
       }),
@@ -80,23 +77,29 @@ exports.deleteReviewValidator = [
     .bail()
 
     .custom((val, { req }) => {
-      // Check review ownership before update
+      // Check review ownership before delete
       if (req.user.role === 'user') {
         return Review.findById(val).then((review) => {
           if (!review) {
             return Promise.reject(
-              new AppError(`There is no review with id ${val}`, 400),
+              new AppError(`There is no review with id ${val}`),
             );
           }
 
-          if (review.user._id.toString() !== req.user._id.toString()) {
+          const reviewUserId = review.user._id || review.user;
+
+          if (reviewUserId.toString() !== req.user._id.toString()) {
             return Promise.reject(
-              new AppError(`Your are not allowed to perform this action`, 400),
+              new AppError('You do not have permission to perform this action'),
             );
           }
+
+          return true;
         });
       }
+
       return true;
     }),
+
   validatorMiddleware,
 ];

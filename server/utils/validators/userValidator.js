@@ -75,7 +75,7 @@ exports.updateUserValidator = [
     .custom((val) =>
       User.findOne({ email: val }).then((user) => {
         if (user) {
-          return Promise.reject(new AppError('E-mail already in user', 400));
+          return Promise.reject(new AppError('E-mail already in user'));
         }
       }),
     ),
@@ -104,18 +104,18 @@ exports.changeUserPasswordValidator = [
       // 1) Verify current password
       const user = await User.findById(req.params.id).select('+password');
       if (!user) {
-        throw new AppError('There is no user for this id', 400);
+        throw new AppError('There is no user for this id');
       }
 
       if (
         !(await user.correctPassword(req.body.currentPassword, user.password))
       ) {
-        throw new AppError('Incorrect current password', 400);
+        throw new AppError('Incorrect current password');
       }
 
       // 2) Verify password confirm
       if (val !== req.body.passwordConfirm) {
-        throw new AppError("Passwords don't match ", 400);
+        throw new AppError("Passwords don't match ");
       }
       return true;
     }),
@@ -141,7 +141,7 @@ exports.updateLoggedUserValidator = [
     .custom((val) =>
       User.findOne({ email: val }).then((user) => {
         if (user) {
-          return Promise.reject(new AppError('E-mail already in user', 400));
+          return Promise.reject(new AppError('E-mail already in user'));
         }
       }),
     ),
