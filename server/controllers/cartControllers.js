@@ -55,14 +55,21 @@ exports.addProductToCart = catchAsync(async (req, res, next) => {
       ],
     });
   } else {
-    const index = cart.cartItems.findIndex(
-      (item) =>
-        item.product.toString() === productId &&
-        item.variant?.id?.toString() === variantId,
-    );
+    const index = cart.cartItems.findIndex((item) => {
+      return (
+        item.product.id.toString() === productId &&
+        item.variant?.id?.toString() === variantId
+      );
+    });
 
     if (index > -1) {
-      cart.cartItems[index].quantity = quantity;
+      const newQuantity = cart.cartItems[index].quantity + quantity;
+
+      if (newQuantity > variant.quantity) {
+        return next(new AppError('Not enough stock', 400));
+      }
+
+      cart.cartItems[index].quantity = newQuantity;
     } else {
       cart.cartItems.push({
         product: productId,
