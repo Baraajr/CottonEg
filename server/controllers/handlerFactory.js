@@ -88,7 +88,7 @@ exports.getOne = (model, populateOptions) =>
 
     if (!doc) {
       return next(
-        new AppError(`No Document with this ID ${req.params.id}`, 404),
+        new AppError(`No document with this ID ${req.params.id}`, 404),
       );
     }
 

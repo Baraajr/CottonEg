@@ -441,7 +441,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
   if (!user)
     return next(
-      new AppError(`there is no user with this email ${req.body.email}`, 400),
+      new AppError(`there is no user with this email ${req.body.email}`, 404),
     );
 
   //2) check if he verified the identity by the code
