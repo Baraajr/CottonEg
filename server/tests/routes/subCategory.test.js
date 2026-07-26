@@ -5,7 +5,7 @@ const {
   createJWTToken,
   createCategory,
   createSubcategory,
-  createReqularUser,
+  createRegularUser,
 } = require('../setup');
 
 let categoryId;
@@ -45,7 +45,7 @@ describe('Testing subcategory routes ', () => {
 
       describe('with regular user token', () => {
         it('Should returns 403 Forbidden', async () => {
-          const regularUser = await createReqularUser();
+          const regularUser = await createRegularUser();
           userToken = createJWTToken(regularUser._id);
 
           const res = await supertest(app)
@@ -142,7 +142,7 @@ describe('Testing subcategory routes ', () => {
           );
           expect(res.status).toBe(404);
           expect(res.body.message).toBe(
-            'No Document with this ID 646f3b0c4d5e8a3d4c8b4567',
+            'No document with this ID 646f3b0c4d5e8a3d4c8b4567',
           );
         });
       });
@@ -193,7 +193,7 @@ describe('Testing subcategory routes ', () => {
 
       describe('with regular user token', () => {
         it('should return 403 Forbidden', async () => {
-          const regularUser = await createReqularUser();
+          const regularUser = await createRegularUser();
           userToken = createJWTToken(regularUser._id);
 
           const res = await supertest(app)
@@ -259,7 +259,7 @@ describe('Testing subcategory routes ', () => {
 
       describe('with regular user token', () => {
         it('should return 403 Forbidden', async () => {
-          const regularUser = await createReqularUser();
+          const regularUser = await createRegularUser();
           userToken = createJWTToken(regularUser._id);
 
           const res = await supertest(app)

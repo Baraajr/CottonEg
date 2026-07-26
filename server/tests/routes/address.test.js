@@ -1,13 +1,13 @@
 const supertest = require('supertest');
 const app = require('../../app');
-const { createJWTToken, createReqularUser } = require('../setup');
+const { createJWTToken, createRegularUser } = require('../setup');
 
 let user;
 let token;
 let addressId;
 
 beforeEach(async () => {
-  user = await createReqularUser();
+  user = await createRegularUser();
   token = createJWTToken(user._id);
 });
 

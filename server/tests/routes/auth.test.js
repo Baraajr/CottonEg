@@ -1,6 +1,6 @@
 const supertest = require('supertest');
 const app = require('../../app');
-const { createReqularUser } = require('../setup');
+const { createRegularUser } = require('../setup');
 
 // mock the sendEmail function
 jest.mock('../../utils/sendEmail', () =>
@@ -56,7 +56,7 @@ describe('Auth Routes', () => {
 
     describe('with existing email', () => {
       it('should return 400 and an error message', async () => {
-        await createReqularUser({
+        await createRegularUser({
           name: 'Jane Doe',
           email: 'johndoe@gmail.com',
           password: 'test1234',
@@ -156,7 +156,7 @@ describe('Auth Routes', () => {
   describe('POST /api/v1/auth/login', () => {
     describe('with valid credentials', () => {
       it('should return 200 and a token', async () => {
-        await createReqularUser({
+        await createRegularUser({
           name: 'Jane Doe',
           email: 'johndoe@gmail.com',
           password: 'test1234',
@@ -222,7 +222,7 @@ describe('Auth Routes', () => {
   describe('POST /api/v1/auth/forgotpassword', () => {
     describe('with valid email', () => {
       it('should return 200', async () => {
-        await createReqularUser({
+        await createRegularUser({
           name: 'Jane Doe',
           email: 'johndoe@gmail.com',
           password: 'test1234',
