@@ -21,8 +21,11 @@ exports.createCashOrder = catchAsync(async (req, res, next) => {
     const taxPrice = 0;
     const shippingPrice = 0;
 
-    const cart = await Cart.findById(req.params.cartId).session(session);
-    if (!cart) throw new Error('Cart not found');
+    const cart = await Cart.findOne({
+      _id: req.params.cartId,
+      user: req.user._id,
+    }).session(session);
+    if (!cart) throw new AppError('Cart not found', 404);
 
     const cartPrice = cart.totalPriceAfterDiscount
       ? cart.totalPriceAfterDiscount
@@ -32,12 +35,22 @@ exports.createCashOrder = catchAsync(async (req, res, next) => {
 
     // 1) VALIDATE STOCK (important fix)
     for (const item of cart.cartItems) {
-      const product = await Product.findById(item.product).session(session);
+      const product = await Product.findById(item.product._id).session(session);
+      const variant = product?.variants.id(item.variant.id);
 
-      const variant = product?.variants.id(item.variant);
+      if (!product) {
+        throw new AppError('Product no longer exists', 404);
+      }
 
-      if (!product || !variant || variant.quantity < item.quantity) {
-        throw new Error('Insufficient stock for one or more items');
+      if (!variant) {
+        throw new AppError('Product variant no longer exists', 404);
+      }
+
+      if (variant.quantity < item.quantity) {
+        throw new AppError(
+          `Insufficient stock. Only ${variant.quantity} item(s) available.`,
+          400,
+        );
       }
     }
 
@@ -47,8 +60,8 @@ exports.createCashOrder = catchAsync(async (req, res, next) => {
         {
           user: req.user._id,
           cartItems: cart.cartItems.map((item) => ({
-            product: item.product,
-            variant: item.variant,
+            product: item.product._id,
+            variant: item.variant.id, // or item.variant._id
             quantity: item.quantity,
             price: item.price,
           })),
@@ -63,8 +76,8 @@ exports.createCashOrder = catchAsync(async (req, res, next) => {
     for (const item of cart.cartItems) {
       const result = await Product.updateOne(
         {
-          _id: item.product,
-          'variants._id': item.variant,
+          _id: item.product._id,
+          'variants._id': item.variant.id,
           'variants.quantity': { $gte: item.quantity },
         },
         {
@@ -77,7 +90,7 @@ exports.createCashOrder = catchAsync(async (req, res, next) => {
       );
 
       if (result.modifiedCount === 0) {
-        throw new Error('Stock conflict detected');
+        throw new AppError('Stock conflict detected', 400);
       }
     }
 
@@ -219,7 +232,7 @@ const createOrder = async (sessionData) => {
       email: sessionData.customer_email,
     }).session(session);
 
-    if (!cart || !user) throw new Error('Missing cart or user');
+    if (!cart || !user) throw new AppError('Missing cart or user', 400);
 
     // OPTIONAL: prevent duplicate orders
     const existing = await Order.findOne({
@@ -238,7 +251,7 @@ const createOrder = async (sessionData) => {
       const variant = product?.variants.id(item.variant);
 
       if (!product || !variant || variant.quantity < item.quantity) {
-        throw new Error('Insufficient stock');
+        throw new AppError('Insufficient stock', 400);
       }
     }
 
@@ -284,7 +297,7 @@ const createOrder = async (sessionData) => {
       );
 
       if (result.modifiedCount === 0) {
-        throw new Error('Stock conflict detected');
+        throw new AppError('Stock conflict detected', 400);
       }
     }
 
