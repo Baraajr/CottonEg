@@ -1,9 +1,14 @@
+import { useNavigate } from 'react-router-dom';
 import CartItem from './CartItem';
+import useCreateCheckoutSession from '../../hooks/useCreateCheckoutSession';
 import useClearCart from './useClearCart';
 import useCart from './useCart';
 import Spinner from '../../ui/Spinner';
 
 function CartItems() {
+  const { checkout, isLoading: isCreatingSession } = useCreateCheckoutSession();
+
+  const navigate = useNavigate();
   const { clearCart, isLoading: isClearing } = useClearCart();
   const { data, isLoading, error } = useCart();
 
@@ -22,8 +27,12 @@ function CartItems() {
       </div>
     );
 
+  const handleStripeCheckout = () => {
+    checkout(cart._id);
+  };
+
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 ">
       {/* ITEMS */}
       <div className="flex flex-col gap-4">
         {items.map((item) => (
@@ -46,16 +55,25 @@ function CartItems() {
         <button
           disabled={isClearing}
           onClick={() => clearCart()}
-          className="flex-1 border border-gray-300 text-gray-700 py-2 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition"
+          className="flex-1 border border-gray-300 text-gray-700 py-2 rounded-lg hover:bg-red-500 hover:text-white disabled:opacity-50 transition"
         >
           Clear cart
         </button>
 
         <button
           disabled={isClearing || !items.length}
+          onClick={() => navigate('/checkout')}
           className="flex-1 bg-black text-white py-2 rounded-lg hover:bg-gray-900 disabled:opacity-50 transition"
         >
-          Checkout
+          create cash order
+        </button>
+        <button
+          type="button"
+          onClick={handleStripeCheckout}
+          disabled={isCreatingSession}
+          className="flex flex-1 h-14 w-full items-center justify-center gap-2 rounded-lg bg-[#10c02d] font-body text-base font-medium text-white transition hover:bg-[#193f32] disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {isCreatingSession ? <SpinnerMini /> : 'Pay with card (Stripe)'}
         </button>
       </div>
     </div>
