@@ -12,15 +12,39 @@ const orderSchema = new mongoose.Schema(
         product: {
           type: mongoose.Schema.ObjectId,
           ref: 'Product',
-        },
-
-        variant: {
-          type: mongoose.Schema.ObjectId,
           required: true,
         },
 
-        quantity: Number,
-        price: Number,
+        variant: {
+          id: {
+            type: mongoose.Schema.Types.ObjectId,
+            required: true,
+          },
+
+          color: {
+            type: String,
+            required: true,
+          },
+
+          size: {
+            type: String,
+            required: true,
+          },
+
+          sku: String,
+        },
+
+        quantity: {
+          type: Number,
+          default: 1,
+          min: 1,
+        },
+
+        price: {
+          type: Number,
+          required: true,
+          min: 0,
+        },
       },
     ],
     taxPrice: {
@@ -39,6 +63,12 @@ const orderSchema = new mongoose.Schema(
     },
     totalOrderPrice: {
       type: Number,
+      required: true,
+    },
+    paymentReference: {
+      type: String,
+      unique: true,
+      sparse: true,
     },
     paymentMethodType: {
       type: String,
@@ -65,7 +95,7 @@ orderSchema.pre(/^find/, function (next) {
     select: 'name profileImg email phone',
   }).populate({
     path: 'cartItems.product',
-    select: 'title imageCover price ',
+    select: 'name imageCover',
   });
 
   next();

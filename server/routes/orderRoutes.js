@@ -8,13 +8,22 @@ router.use(authControllers.protect);
 
 router.post('/checkout-session/:cartId', orderControllers.getCheckoutSession);
 
-router
-  .route('/')
-  .get(
-    authControllers.restrictTo('admin', 'user'),
-    orderControllers.filterOrdersForLoggedUser,
-    orderControllers.getAllOrders,
-  );
+// User account
+router.get(
+  '/my-orders',
+  authControllers.protect,
+  orderControllers.filterOrdersForLoggedUser,
+  orderControllers.getAllOrders,
+);
+
+// Admin
+router.get(
+  '/',
+  authControllers.protect,
+  authControllers.restrictTo('admin'),
+  orderControllers.getAllOrders,
+);
+
 router.get('/:id', orderControllers.getOrder);
 
 router.post(

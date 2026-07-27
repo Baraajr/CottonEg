@@ -14,6 +14,21 @@ const factory = require('./handlerFactory');
    CASH ORDER (TRANSACTION SAFE)
 ========================= */
 exports.createCashOrder = catchAsync(async (req, res, next) => {
+  const { shippingAddress } = req.body;
+  if (!shippingAddress)
+    return next(new AppError('shippingAddress is required', 400));
+
+  const { details, phone, city, postalCode } = shippingAddress;
+
+  if (!details || !phone || !city || !postalCode) {
+    return next(
+      new AppError(
+        'Shipping address must include details, phone, city, and postalCode',
+        400,
+      ),
+    );
+  }
+
   const session = await mongoose.startSession();
   session.startTransaction();
 
@@ -61,7 +76,12 @@ exports.createCashOrder = catchAsync(async (req, res, next) => {
           user: req.user._id,
           cartItems: cart.cartItems.map((item) => ({
             product: item.product._id,
-            variant: item.variant.id, // or item.variant._id
+            variant: {
+              id: item.variant.id,
+              color: item.variant.color,
+              size: item.variant.size,
+              sku: item.variant.sku,
+            },
             quantity: item.quantity,
             price: item.price,
           })),
@@ -187,26 +207,63 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
     payment_method_types: ['card'],
     mode: 'payment',
 
-    line_items: [
-      {
-        price_data: {
-          currency: 'egp',
-          product_data: {
-            name: `Order for ${req.user.name}`,
+    line_items: cart.cartItems.map((item) => ({
+      price_data: {
+        currency: 'egp',
+        product_data: {
+          name: item.product.name,
+          description: `Size: ${item.variant.size} • Color: ${item.variant.color}`,
+          images: [item.product.imageCover],
+          metadata: {
+            productId: item.product.id.toString(),
+            variantSize: item.variant.size,
+            variantColor: item.variant.color,
           },
-          unit_amount: Math.round(totalOrderPrice * 100),
         },
-        quantity: 1,
+        unit_amount: Math.round(item.price * 100),
+      },
+      quantity: item.quantity,
+    })),
+
+    customer_email: req.user.email,
+
+    billing_address_collection: 'required',
+
+    phone_number_collection: {
+      enabled: true,
+    },
+
+    submit_type: 'pay',
+
+    locale: 'auto',
+
+    custom_text: {
+      submit: {
+        message:
+          'Your order will be processed immediately after your payment is confirmed.',
+      },
+    },
+
+    custom_fields: [
+      {
+        key: 'order_notes',
+        label: {
+          type: 'custom',
+          custom: 'Order notes',
+        },
+        type: 'text',
+        optional: true,
       },
     ],
 
     success_url: process.env.SUCCESS_URL,
     cancel_url: process.env.CANCEL_URL,
 
-    customer_email: req.user.email,
     client_reference_id: cart.id,
 
     metadata: {
+      userId: req.user.id,
+      cartId: cart.id,
       shippingAddress: JSON.stringify(req.body.shippingAddress || {}),
     },
   });
@@ -232,6 +289,8 @@ const createOrder = async (sessionData) => {
       email: sessionData.customer_email,
     }).session(session);
 
+    console.log('cart', cart);
+    console.log(user);
     if (!cart || !user) throw new AppError('Missing cart or user', 400);
 
     // OPTIONAL: prevent duplicate orders
@@ -247,8 +306,8 @@ const createOrder = async (sessionData) => {
 
     // 1) VALIDATE STOCK
     for (const item of cart.cartItems) {
-      const product = await Product.findById(item.product).session(session);
-      const variant = product?.variants.id(item.variant);
+      const product = await Product.findById(item.product._id).session(session);
+      const variant = product?.variants.id(item.variant.id);
 
       if (!product || !variant || variant.quantity < item.quantity) {
         throw new AppError('Insufficient stock', 400);
@@ -261,8 +320,13 @@ const createOrder = async (sessionData) => {
         {
           user: user._id,
           cartItems: cart.cartItems.map((item) => ({
-            product: item.product,
-            variant: item.variant,
+            product: item.product._id,
+            variant: {
+              id: item.variant.id,
+              color: item.variant.color,
+              size: item.variant.size,
+              sku: item.variant.sku,
+            },
             quantity: item.quantity,
             price: item.price,
           })),
@@ -283,8 +347,8 @@ const createOrder = async (sessionData) => {
     for (const item of cart.cartItems) {
       const result = await Product.updateOne(
         {
-          _id: item.product,
-          'variants._id': item.variant,
+          _id: item.product._id,
+          'variants._id': item.variant.id,
           'variants.quantity': { $gte: item.quantity },
         },
         {
@@ -328,10 +392,12 @@ exports.webhookCheckout = async (req, res) => {
       process.env.STRIPE_WEBHOOK_SECRET,
     );
   } catch (err) {
+    console.log(err);
     return res.status(400).json({ error: err.message });
   }
 
   if (event.type === 'checkout.session.completed') {
+    console.log('webhootriggered');
     await createOrder(event.data.object);
   }
 

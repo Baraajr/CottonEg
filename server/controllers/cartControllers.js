@@ -5,24 +5,14 @@ const Product = require('../models/productModel');
 const Coupon = require('../models/couponModel');
 
 /* =========================
-   CALCULATE TOTAL PRICE
-========================= */
-const calculateTotalPrice = (cart) => {
-  let total = 0;
-
-  cart.cartItems.forEach((item) => {
-    const price = item.product?.price; // if populated
-    if (!price) return;
-
-    total += item.quantity * price;
-  });
-
-  return total;
-};
+    CALCULATE TOTAL PRICE
+  ========================= */
+const calculateTotalPrice = (cart) =>
+  cart.cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
 
 /* =========================
-   ADD / UPDATE CART ITEM
-========================= */
+    ADD / UPDATE CART ITEM
+  ========================= */
 exports.addProductToCart = catchAsync(async (req, res, next) => {
   const { productId, variantId, quantity = 1 } = req.body;
 
@@ -51,6 +41,7 @@ exports.addProductToCart = catchAsync(async (req, res, next) => {
             sku: variant.sku,
           },
           quantity,
+          price: product.price,
         },
       ],
     });
@@ -58,7 +49,7 @@ exports.addProductToCart = catchAsync(async (req, res, next) => {
     const index = cart.cartItems.findIndex((item) => {
       return (
         item.product.id.toString() === productId &&
-        item.variant?.id?.toString() === variantId
+        item.variant.id.toString() === variantId
       );
     });
 
@@ -80,12 +71,12 @@ exports.addProductToCart = catchAsync(async (req, res, next) => {
           sku: variant.sku,
         },
         quantity,
+        price: product.price,
       });
     }
   }
 
-  // build product map for fast price lookup
-  await cart.populate('cartItems.product', 'price');
+  console.log(cart.cartItems);
   cart.totalCartPrice = calculateTotalPrice(cart);
 
   await cart.save();
@@ -98,8 +89,8 @@ exports.addProductToCart = catchAsync(async (req, res, next) => {
 });
 
 /* =========================
-   GET CART
-========================= */
+    GET CART
+  ========================= */
 exports.getLoggedUserCart = catchAsync(async (req, res, next) => {
   const cart = await Cart.findOne({ user: req.user._id });
   if (!cart) {
@@ -120,8 +111,8 @@ exports.getLoggedUserCart = catchAsync(async (req, res, next) => {
   });
 });
 /* =========================
-   REMOVE ITEM
-========================= */
+    REMOVE ITEM
+  ========================= */
 exports.removeProductFromCart = catchAsync(async (req, res, next) => {
   const cart = await Cart.findOne({ user: req.user._id });
 
@@ -130,8 +121,7 @@ exports.removeProductFromCart = catchAsync(async (req, res, next) => {
   cart.cartItems = cart.cartItems.filter(
     (item) => item._id.toString() !== req.params.itemId,
   );
-
-  await cart.populate('cartItems.product', 'price imageCover');
+  console.log(cart.cartItems);
   cart.totalCartPrice = calculateTotalPrice(cart);
 
   await cart.save();
@@ -144,8 +134,8 @@ exports.removeProductFromCart = catchAsync(async (req, res, next) => {
 });
 
 /* =========================
-   CLEAR CART
-========================= */
+    CLEAR CART
+  ========================= */
 exports.clearLoggedUserCart = catchAsync(async (req, res, next) => {
   await Cart.findOneAndDelete({ user: req.user._id });
 
@@ -153,8 +143,8 @@ exports.clearLoggedUserCart = catchAsync(async (req, res, next) => {
 });
 
 /* =========================
-   UPDATE QUANTITY
-========================= */
+    UPDATE QUANTITY
+  ========================= */
 exports.updateCartItemQuantity = catchAsync(async (req, res, next) => {
   const { quantity } = req.body;
 
@@ -176,7 +166,6 @@ exports.updateCartItemQuantity = catchAsync(async (req, res, next) => {
 
   item.quantity = quantity;
 
-  await cart.populate('cartItems.product', 'price imageCover');
   cart.totalCartPrice = calculateTotalPrice(cart);
 
   await cart.save();
@@ -189,8 +178,8 @@ exports.updateCartItemQuantity = catchAsync(async (req, res, next) => {
 });
 
 /* =========================
-   APPLY COUPON
-========================= */
+    APPLY COUPON
+  ========================= */
 exports.applyCoupon = catchAsync(async (req, res, next) => {
   const coupon = await Coupon.findOne({
     name: req.body.coupon,
@@ -205,14 +194,7 @@ exports.applyCoupon = catchAsync(async (req, res, next) => {
 
   if (!cart) return next(new AppError('Cart not found', 404));
 
-  const productIds = cart.cartItems.map((i) => i.product);
-  const products = await Product.find({ _id: { $in: productIds } }).select(
-    'price',
-  );
-
-  const productsMap = new Map(products.map((p) => [p._id.toString(), p]));
-
-  const total = calculateTotalPrice(cart, productsMap);
+  const total = calculateTotalPrice(cart);
 
   cart.totalCartPrice = total;
   cart.totalPriceAfterDiscount = Number(
