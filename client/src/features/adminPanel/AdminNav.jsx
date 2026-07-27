@@ -19,7 +19,7 @@ function AdminNav() {
     'after:absolute after:left-0 after:bottom-0 after:h-[2px] after:w-full after:bg-black after:origin-left after:scale-x-0 after:transition-transform';
 
   return (
-    <nav className="flex flex-col gap-1">
+    <nav className="flex flex-col gap-6">
       {links.map(({ to, label }) => (
         <NavLink
           key={to}
