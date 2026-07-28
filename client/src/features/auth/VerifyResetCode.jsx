@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { verifyResetCode } from '../../services/auth';
 import SpinnerMini from '../../ui/SpinnerMini';
+import Button from '../../ui/Button';
 
 function VerifyResetCode() {
   const [code, setCode] = useState(['', '', '', '', '', '']);
@@ -138,17 +139,15 @@ function VerifyResetCode() {
           ))}
         </div>
 
-        <button
+        <Button
           type="submit"
-          disabled={verifyMutation.isPending || code.join('').length !== 6}
-          className="group relative w-full overflow-hidden bg-black py-3 text-sm tracking-[0.25em] text-white disabled:opacity-50 disabled:cursor-not-allowed"
+          fullWidth
+          loading={verifyMutation.isPending}
+          disabled={code.join('').length !== 6}
+          className="py-3 tracking-[0.25em]"
         >
-          <span className="absolute inset-0 -translate-x-full bg-white transition-transform duration-500 group-hover:translate-x-0" />
-
-          <span className="relative z-10 group-hover:text-black">
-            {verifyMutation.isPending ? <SpinnerMini /> : 'VERIFY'}
-          </span>
-        </button>
+          VERIFY
+        </Button>
       </form>
     </div>
   );

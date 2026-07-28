@@ -4,6 +4,7 @@ import { toast } from 'react-hot-toast';
 import { createSubCategory } from '../../../services/subcategories';
 import SpinnerMini from '../../../ui/SpinnerMini';
 import { GENDERS } from '../../../constants/constants';
+import Button from '../../../ui/Button';
 
 function AddSubCategoryForm({ categories = [], onCloseModal }) {
   const queryClient = useQueryClient();
@@ -48,7 +49,7 @@ function AddSubCategoryForm({ categories = [], onCloseModal }) {
       )}
 
       <label>
-        Category <span className="text-red-500">*</span>{' '}
+        Category <span className="text-red-500">*</span>
       </label>
       <select
         {...register('categoryId', { required: 'Select a category' })}
@@ -89,21 +90,14 @@ function AddSubCategoryForm({ categories = [], onCloseModal }) {
         <p className="text-red-500 text-xs">{errors.genders.message}</p>
       )}
 
-      <div className="flex justify-end gap-2 mt-4">
-        <button
-          type="button"
-          onClick={onCloseModal}
-          className="px-4 py-2 text-sm border rounded-lg"
-        >
+      <div className="mt-4 flex justify-end gap-2">
+        <Button type="button" variant="secondary" onClick={onCloseModal}>
           Cancel
-        </button>
-        <button
-          type="submit"
-          disabled={isPending}
-          className="px-5 py-2 text-sm bg-black text-white rounded-lg"
-        >
-          {isPending ? <SpinnerMini /> : 'Create'}
-        </button>
+        </Button>
+
+        <Button type="submit" loading={isPending}>
+          Create
+        </Button>
       </div>
     </form>
   );

@@ -3,6 +3,7 @@ import AdminPageLayout from '../AdminPageLayout';
 import DataTable from '../DataTable';
 import useOrders from '../../../hooks/useOrders';
 import Spinner from '../../../ui/Spinner';
+import Button from '../../../ui/Button';
 
 function OrdersTable() {
   const { orders = [], isPending } = useOrders();
@@ -110,12 +111,12 @@ function OrdersTable() {
 
                   {/* Expand */}
                   <td className="px-4 py-3 text-right">
-                    <button
+                    <Button
+                      variant="ghost"
                       onClick={() => setExpandedId(isOpen ? null : order._id)}
-                      className="text-sm text-blue-600 hover:underline"
                     >
                       {isOpen ? 'Hide' : 'View'}
-                    </button>
+                    </Button>
                   </td>
                 </tr>
 

@@ -94,16 +94,15 @@ function ResetPassword() {
           />
         </div>
 
-        <button
+        <Button
           type="submit"
+          fullWidth
+          loading={isLoading}
           disabled={isDisabled}
-          className="group relative w-full overflow-hidden bg-black py-3 text-sm tracking-[0.25em] text-white disabled:opacity-50"
+          className="py-3 tracking-[0.25em]"
         >
-          <span className="absolute inset-0 -translate-x-full bg-white transition-transform duration-500 group-hover:translate-x-0" />
-          <span className="relative z-10 group-hover:text-black">
-            {!isLoading ? 'RESET PASSWORD' : <SpinnerMini />}
-          </span>
-        </button>
+          RESET PASSWORD
+        </Button>
       </form>
     </div>
   );

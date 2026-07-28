@@ -1,6 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
 import { useState, useRef } from 'react';
+import toast from 'react-hot-toast';
+import { FaPlus } from 'react-icons/fa';
 import {
   getProduct,
   deleteVariant,
@@ -9,7 +11,6 @@ import {
 } from '../../../services/products';
 
 import Modal from '../../../ui/Modal';
-import toast from 'react-hot-toast';
 
 import AddImageForm from './AddImageForm';
 import AddVariantForm from './AddVariantForm';
@@ -18,6 +19,8 @@ import ConfirmDelete from '../../../ui/ConfirmDelete';
 import useCategories from '../../../hooks/useCategories';
 import useSubCategories from '../../../hooks/useSubCategories';
 import Spinner from '../../../ui/Spinner';
+import Button from '../../../ui/Button';
+import IconButton from '../../../ui/IconButton';
 
 // ─── Field components ─────────────────────────────────────────────────────────
 function FieldRow({ label, children }) {
@@ -32,7 +35,7 @@ function FieldRow({ label, children }) {
 }
 
 const inputCls =
-  'w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white';
+  'w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white';
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 function UpdateProduct() {
@@ -271,7 +274,7 @@ function UpdateProduct() {
                   className="w-full h-full object-cover"
                 />
                 {coverPreview && (
-                  <span className="absolute top-1 left-1 text-[10px] bg-blue-600 text-white px-1.5 py-0.5 rounded">
+                  <span className="absolute top-1 left-1 text-[10px] bg-green-600 text-white px-1.5 py-0.5 rounded">
                     New
                   </span>
                 )}
@@ -283,24 +286,24 @@ function UpdateProduct() {
                     ? 'New cover selected — will be uploaded on save.'
                     : 'Replace the current cover image.'}
                 </p>
-                <button
+                <Button
                   type="button"
                   onClick={() => coverInputRef.current?.click()}
-                  className="self-start px-4 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 transition"
                 >
                   {coverPreview ? 'Change again' : 'Choose new cover'}
-                </button>
+                </Button>
+
                 {coverPreview && (
-                  <button
+                  <Button
+                    variant="textDanger"
                     type="button"
                     onClick={() => {
                       setCoverFile(null);
                       setCoverPreview(null);
                     }}
-                    className="self-start text-xs text-red-500 hover:underline"
                   >
                     Discard new cover
-                  </button>
+                  </Button>
                 )}
                 <input
                   ref={coverInputRef}
@@ -479,18 +482,17 @@ function UpdateProduct() {
             <SectionTitle>Season</SectionTitle>
             <div className="flex flex-wrap gap-2">
               {SEASONS.map((s) => (
-                <button
+                <Button
                   key={s}
                   type="button"
+                  variant="secondary"
+                  active={fields.season.includes(s)}
+                  activeClassName="!bg-green-600 !border-green-600 !text-white hover:!bg-green-700"
                   onClick={() => handleSeasonToggle(s)}
-                  className={`px-3 py-1.5 text-sm rounded-full border transition ${
-                    fields.season.includes(s)
-                      ? 'bg-blue-600 border-blue-600 text-white'
-                      : 'border-gray-300 text-gray-600 hover:border-gray-400'
-                  }`}
+                  className="rounded-full"
                 >
                   {s.charAt(0).toUpperCase() + s.slice(1)}
-                </button>
+                </Button>
               ))}
             </div>
           </section>
@@ -514,35 +516,27 @@ function UpdateProduct() {
 
           {/* ── SAVE BUTTON ── */}
           <div className="flex justify-end pt-2">
-            <button
-              type="submit"
-              disabled={isUpdating}
-              className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition"
-            >
-              {isUpdating
-                ? 'Saving…'
-                : coverFile
-                  ? 'Save with new cover'
-                  : 'Save changes'}
-            </button>
+            <Button type="submit" loading={isUpdating}>
+              {coverFile ? 'Save with new cover' : 'Save changes'}
+            </Button>
           </div>
         </form>
 
         {/* ── SECTION: Gallery Images ── */}
         <section>
-          <div className="flex justify-between items-center mb-3">
+          <div className="mb-3 flex items-center justify-between">
             <SectionTitle noMargin>Gallery Images</SectionTitle>
+
             <Modal.Open opens="add-image">
-              <button className="px-3 py-1.5 border rounded-lg text-sm hover:bg-gray-50 transition">
-                + Add image
-              </button>
+              <Button variant="secondary">
+                <FaPlus className="h-3.5 w-3.5" />
+                Add image
+              </Button>
             </Modal.Open>
           </div>
-
           <Modal.Window name="add-image">
             <AddImageForm productId={productId} />
           </Modal.Window>
-
           {images.length === 0 ? (
             <p className="text-sm text-gray-400">No gallery images yet.</p>
           ) : (
@@ -558,9 +552,11 @@ function UpdateProduct() {
                     alt=""
                   />
                   <Modal.Open opens={`del-img-${img._id}`}>
-                    <button className="absolute top-1.5 right-1.5 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition text-xs">
-                      ✕
-                    </button>
+                    <div className="absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100">
+                      <IconButton variant="danger" size="sm">
+                        ✕
+                      </IconButton>
+                    </div>
                   </Modal.Open>
                   <Modal.Window name={`del-img-${img._id}`}>
                     <ConfirmDelete
@@ -576,19 +572,19 @@ function UpdateProduct() {
 
         {/* ── SECTION: Variants ── */}
         <section>
-          <div className="flex justify-between items-center mb-3">
+          <div className="mb-3 flex items-center justify-between">
             <SectionTitle noMargin>Variants</SectionTitle>
+
             <Modal.Open opens="add-variant">
-              <button className="px-3 py-1.5 border rounded-lg text-sm hover:bg-gray-50 transition">
-                + Add variant
-              </button>
+              <Button variant="secondary">
+                <FaPlus className="h-3.5 w-3.5" />
+                Add variant
+              </Button>
             </Modal.Open>
           </div>
-
           <Modal.Window name="add-variant">
             <AddVariantForm productId={productId} />
           </Modal.Window>
-
           {variants.length === 0 ? (
             <p className="text-sm text-gray-400">No variants yet.</p>
           ) : (
@@ -633,9 +629,9 @@ function UpdateProduct() {
                       <td className="px-3 py-2.5">
                         <div className="flex justify-end gap-2">
                           <Modal.Open opens={`edit-${v._id}`}>
-                            <button className="text-xs px-2.5 py-1 border rounded-lg hover:bg-gray-100 transition">
+                            <Button variant="secondary" size="sm">
                               Edit
-                            </button>
+                            </Button>
                           </Modal.Open>
 
                           <Modal.Window name={`edit-${v._id}`}>
@@ -646,9 +642,9 @@ function UpdateProduct() {
                           </Modal.Window>
 
                           <Modal.Open opens={`del-variant-${v._id}`}>
-                            <button className="text-xs px-2.5 py-1 border border-red-200 text-red-600 rounded-lg hover:bg-red-50 transition">
+                            <Button size="sm" variant="dangerOutline">
                               Delete
-                            </button>
+                            </Button>
                           </Modal.Open>
 
                           <Modal.Window name={`del-variant-${v._id}`}>
@@ -690,7 +686,7 @@ function Toggle({ label, checked, onChange }) {
       <div
         onClick={() => onChange(!checked)}
         className={`relative w-10 h-5 rounded-full transition-colors ${
-          checked ? 'bg-blue-600' : 'bg-gray-300'
+          checked ? 'bg-green-600' : 'bg-gray-300'
         }`}
       >
         <span

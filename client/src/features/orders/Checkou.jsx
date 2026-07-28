@@ -6,6 +6,7 @@ import useCreateCashOrder from '../../hooks/useCreateCashOrder';
 
 import Spinner from '../../ui/Spinner';
 import SpinnerMini from '../../ui/SpinnerMini';
+import Button from '../../ui/Button';
 
 function Checkout() {
   const navigate = useNavigate();
@@ -67,12 +68,14 @@ function Checkout() {
           Add some products before checking out.
         </p>
 
-        <button
+        <Button
+          variant="primary"
+          size="lg"
           onClick={() => navigate('/products')}
-          className="mt-8 rounded-full bg-[#1C1B19] px-8 py-3 font-body font-medium text-white transition hover:bg-[#1F4D3D]"
+          className="mt-8 rounded-full px-8"
         >
           Continue Shopping
-        </button>
+        </Button>
       </div>
     );
 
@@ -80,7 +83,6 @@ function Checkout() {
     <div className="min-h-screen bg-[#F4F3F0] font-body lg:grid lg:grid-cols-[4fr_5fr]">
       {/* ---------- Order Summary — styled as a paper receipt ---------- */}
       <aside className="bg-[#F4F3F0] px-6 py-10 lg:sticky lg:top-8 lg:flex lg:justify-center lg:self-start lg:px-10">
-        {' '}
         <div className="relative w-full max-w-sm">
           {/* stamp */}
           <div className="pointer-events-none absolute -right-3 top-8 z-10 hidden -rotate-14 rounded-full border-2 border-[#1F4D3D]/70 px-4 py-2 sm:block">
@@ -231,13 +233,17 @@ function Checkout() {
             </div>
 
             <div className="space-y-3 pt-3">
-              <button
+              <Button
                 type="submit"
+                variant="secondary"
+                size="lg"
+                fullWidth
+                loading={isCreatingOrder}
                 disabled={isCreatingOrder}
-                className="flex h-14 w-full items-center justify-center rounded-lg border border-[#1C1B19]/20 font-body text-base font-medium text-[#1C1B19] transition hover:border-[#1C1B19] disabled:cursor-not-allowed disabled:opacity-50"
+                className="h-14 rounded-lg border-[#1C1B19]/20 text-base text-[#1C1B19] hover:border-[#1C1B19]"
               >
-                {isCreatingOrder ? <SpinnerMini /> : 'Place cash order'}
-              </button>
+                Place cash order
+              </Button>
             </div>
           </form>
 

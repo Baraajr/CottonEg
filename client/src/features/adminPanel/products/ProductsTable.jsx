@@ -125,7 +125,7 @@ function ProductsTable() {
                     }`}
                   >
                     {String(product.featured)}
-                  </td>{' '}
+                  </td>
                   <td className="px-4 py-3 text-center">{product.price}</td>
                   <td className="px-4 py-3 text-center">
                     <span
@@ -146,25 +146,23 @@ function ProductsTable() {
                   <td className="px-4 py-3">
                     <div className="flex justify-end gap-2">
                       {/* Edit */}
-                      <NavLink
-                        to={product._id}
-                        className="text-xs text-yellow-600 hover:underline"
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => navigate(`${product._id}`)}
                       >
                         Edit
-                      </NavLink>
+                      </Button>
 
                       {/* Delete — opens confirmation first */}
                       <Modal.Open opens={`delete-product-${product._id}`}>
-                        <button
-                          disabled={deletingId === product._id}
-                          className="text-xs text-red-600 hover:underline disabled:opacity-50"
+                        <Button
+                          variant="dangerOutline"
+                          size="sm"
+                          loading={deletingId === product._id}
                         >
-                          {deletingId === product._id ? (
-                            <SpinnerMini />
-                          ) : (
-                            'Delete'
-                          )}
-                        </button>
+                          Delete
+                        </Button>
                       </Modal.Open>
 
                       <Modal.Window name={`delete-product-${product._id}`}>

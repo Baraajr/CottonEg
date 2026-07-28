@@ -3,6 +3,7 @@ import { FiUser, FiMapPin, FiLock, FiShoppingBag } from 'react-icons/fi';
 import { CiLogout } from 'react-icons/ci';
 
 import useLogout from '../../hooks/useLogout';
+import Button from '../../ui/Button';
 
 const navItems = [
   { to: 'profile', label: 'Profile', icon: FiUser },
@@ -63,13 +64,10 @@ function AccountNav() {
 
       {/* Logout */}
       <div className="mt-3 border-t border-gray-100 pt-3">
-        <button
-          onClick={() => logout()}
-          className="flex w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 md:justify-start"
-        >
+        <Button variant="menuDanger" fullWidth onClick={() => logout()}>
           <CiLogout size={18} />
-          <span>Logout</span>
-        </button>
+          Logout
+        </Button>
       </div>
     </nav>
   );

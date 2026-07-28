@@ -55,9 +55,7 @@ function SubCategoriesTable() {
         title="Subcategories"
         actions={
           <Modal.Open opens="add-subcategory">
-            <Button variant="primary" className="w-full sm:w-auto">
-              Add SubCategory
-            </Button>
+            <Button variant="primary">Add SubCategory</Button>
           </Modal.Open>
         }
       >
@@ -113,9 +111,9 @@ function SubCategoriesTable() {
                     <td className="px-4 py-3">
                       <div className="flex justify-end gap-3">
                         <Modal.Open opens={`edit-${sc._id}`}>
-                          <button className="text-sm text-yellow-600 hover:underline">
+                          <Button variant="secondary" size="sm">
                             Edit
-                          </button>
+                          </Button>
                         </Modal.Open>
 
                         <Modal.Window name={`edit-${sc._id}`}>
@@ -126,12 +124,13 @@ function SubCategoriesTable() {
                         </Modal.Window>
 
                         <Modal.Open opens={`delete-${sc._id}`}>
-                          <button
-                            disabled={deletingId === sc._id}
-                            className="text-sm text-red-600 hover:underline disabled:opacity-50"
+                          <Button
+                            variant="dangerOutline"
+                            size="sm"
+                            loading={deletingId === sc._id}
                           >
-                            {deletingId === sc._id ? <SpinnerMini /> : 'Delete'}
-                          </button>
+                            Delete
+                          </Button>
                         </Modal.Open>
 
                         <Modal.Window name={`delete-${sc._id}`}>
@@ -185,15 +184,15 @@ function SubCategoriesTable() {
                   {/* ACTIONS */}
                   <div className="flex items-center gap-2">
                     <Modal.Open opens={`edit-${sc._id}`}>
-                      <button className="text-xs px-2 py-1 text-yellow-600">
+                      <Button variant="secondary" size="sm">
                         Edit
-                      </button>
+                      </Button>
                     </Modal.Open>
 
                     <Modal.Open opens={`delete-${sc._id}`}>
-                      <button className="text-xs px-2 py-1 text-red-600">
+                      <Button variant="dangerOutline" size="sm">
                         Delete
-                      </button>
+                      </Button>
                     </Modal.Open>
                   </div>
 

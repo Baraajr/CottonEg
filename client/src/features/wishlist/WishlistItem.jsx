@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { FaTrash, FaStar } from 'react-icons/fa';
 
 import useRemoveProduct from './useRemoveProduct';
+import IconButton from '../../ui/IconButton';
 
 function WishlistItem({ product }) {
   const navigate = useNavigate();
@@ -104,13 +105,14 @@ function WishlistItem({ product }) {
       </div>
 
       {/* Delete */}
-      <button
+      <IconButton
+        variant="danger"
         disabled={isRemoving}
         onClick={() => removeProduct(product._id)}
-        className="flex h-10 w-10 items-center justify-center rounded-full text-gray-500 transition hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
+        aria-label="Remove product"
       >
-        <FaTrash size={14} />
-      </button>
+        <FaTrash className="h-3.5 w-3.5" />
+      </IconButton>
     </div>
   );
 }

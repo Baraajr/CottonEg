@@ -4,6 +4,7 @@ import { toast } from 'react-hot-toast';
 import { createCategory } from '../../../services/category';
 import SpinnerMini from '../../../ui/SpinnerMini';
 import { GENDERS } from '../../../constants/constants';
+import Button from '../../../ui/Button';
 
 function AddCategoryForm({ onCloseModal }) {
   const queryClient = useQueryClient();
@@ -70,21 +71,18 @@ function AddCategoryForm({ onCloseModal }) {
       )}
 
       <div className="flex justify-end gap-2 mt-4">
-        <button
+        <Button
+          variant="secondary"
           type="button"
           onClick={onCloseModal}
           disabled={isPending}
-          className="px-4 py-2 text-sm border border-gray-200 rounded-lg hover:bg-gray-50 transition disabled:opacity-50"
         >
           Cancel
-        </button>
-        <button
-          type="submit"
-          disabled={isPending}
-          className="px-5 py-2 text-sm bg-black text-white rounded-lg hover:opacity-80 transition disabled:opacity-50"
-        >
-          {isPending ? <SpinnerMini /> : 'Create'}
-        </button>
+        </Button>
+
+        <Button type="submit" loading={isPending}>
+          Create
+        </Button>
       </div>
     </form>
   );

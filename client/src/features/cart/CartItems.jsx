@@ -4,6 +4,7 @@ import useCreateCheckoutSession from '../../hooks/useCreateCheckoutSession';
 import useClearCart from './useClearCart';
 import useCart from './useCart';
 import Spinner from '../../ui/Spinner';
+import Button from '../../ui/Button';
 
 function CartItems() {
   const { checkout, isLoading: isCreatingSession } = useCreateCheckoutSession();
@@ -51,30 +52,35 @@ function CartItems() {
       </div>
 
       {/* ACTIONS */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <button
+      <div className="flex flex-col gap-3 sm:flex-row">
+        <Button
+          variant="secondary"
+          fullWidth
           disabled={isClearing}
           onClick={() => clearCart()}
-          className="flex-1 border border-gray-300 text-gray-700 py-2 rounded-lg hover:bg-red-500 hover:text-white disabled:opacity-50 transition"
+          className="hover:border-red-500 hover:bg-red-500 hover:text-white"
         >
           Clear cart
-        </button>
+        </Button>
 
-        <button
+        <Button
+          fullWidth
           disabled={isClearing || !items.length}
           onClick={() => navigate('/checkout')}
-          className="flex-1 bg-black text-white py-2 rounded-lg hover:bg-gray-900 disabled:opacity-50 transition"
         >
-          create cash order
-        </button>
-        <button
+          Create Cash Order
+        </Button>
+
+        <Button
           type="button"
+          variant="secondary"
+          fullWidth
+          loading={isCreatingSession}
           onClick={handleStripeCheckout}
-          disabled={isCreatingSession}
-          className="flex flex-1 h-14 w-full items-center justify-center gap-2 rounded-lg bg-[#10c02d] font-body text-base font-medium text-white transition hover:bg-[#193f32] disabled:cursor-not-allowed disabled:opacity-50"
+          className="h-14 hover:bg-violet-800 hover:text-white"
         >
-          {isCreatingSession ? <SpinnerMini /> : 'Pay with card (Stripe)'}
-        </button>
+          Pay with Card (Stripe)
+        </Button>
       </div>
     </div>
   );

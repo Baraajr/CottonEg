@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { signup } from '../../services/auth';
 import SpinnerMini from '../../ui/SpinnerMini';
+import Button from '../../ui/Button';
 
 function SignupForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -121,25 +122,30 @@ function SignupForm() {
         </div>
 
         {/* Signup button (HOVER EFFECT ADDED) */}
-        <button type="submit" disabled={isLoading} className={btnHoverStyle}>
-          <span className="absolute inset-0 -translate-x-full bg-white transition-transform duration-500 group-hover:translate-x-0" />
-          <span className="relative z-10 group-hover:text-black">
-            {!isLoading ? 'SIGN UP' : <SpinnerMini />}
-          </span>
-        </button>
+        {/* Sign Up */}
+        <Button
+          type="submit"
+          fullWidth
+          loading={isLoading}
+          className="py-3 tracking-[0.25em]"
+        >
+          SIGN UP
+        </Button>
 
         {/* Google */}
-        <button
+        <Button
           type="button"
-          className="mt-4 flex w-full items-center justify-center gap-3 border border-gray-300 py-3 text-sm hover:border-black"
+          variant="secondary"
+          fullWidth
+          className="mt-4 justify-center py-3"
         >
           <FcGoogle className="h-5 w-5" />
           Continue with Google
-        </button>
+        </Button>
 
         {/* Login */}
         <p className="mt-6 text-center text-sm text-gray-600">
-          Already have an account?{' '}
+          Already have an account?
           <a href="/login" className="text-black hover:underline">
             Sign in
           </a>

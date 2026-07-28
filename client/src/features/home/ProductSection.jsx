@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import useEmblaCarousel from 'embla-carousel-react';
 import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
@@ -7,6 +7,7 @@ import Button from '../../ui/Button';
 import ProductCard from '../../ui/ProductCard';
 import Spinner from '../../ui/Spinner';
 import useProducts from '../../hooks/useProducts';
+import IconButton from '../../ui/IconButton';
 
 function ProductsSection({
   title,
@@ -26,17 +27,11 @@ function ProductsSection({
     align: 'start',
     dragFree: true,
     loop: false,
+    watchDrag: products.length > 4, // optional
   });
 
   const [canScrollPrev, setCanScrollPrev] = useState(false);
   const [canScrollNext, setCanScrollNext] = useState(false);
-
-  const updateButtons = useCallback(() => {
-    if (!emblaApi) return;
-
-    setCanScrollPrev(emblaApi.canScrollPrev());
-    setCanScrollNext(emblaApi.canScrollNext());
-  }, [emblaApi]);
 
   useEffect(() => {
     if (!emblaApi) return;
@@ -106,21 +101,23 @@ function ProductsSection({
               </div>
 
               {canScrollPrev && (
-                <button
+                <IconButton
+                  size="lg"
                   onClick={() => emblaApi?.scrollPrev()}
-                  className="absolute left-2 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white p-3 shadow-lg transition hover:bg-black hover:text-white"
+                  className="bg-white! absolute! left-4! top-[43%]! z-10! -translate-y-"
                 >
-                  <FaChevronLeft />
-                </button>
+                  <FaChevronLeft className="text-sm" />
+                </IconButton>
               )}
 
               {canScrollNext && (
-                <button
+                <IconButton
+                  size="lg"
                   onClick={() => emblaApi?.scrollNext()}
-                  className="absolute right-2 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white p-3 shadow-lg transition hover:bg-black hover:text-white"
+                  className="!bg-white !absolute !right-4 !top-[43%] z-10! !-translate-y-1/2"
                 >
-                  <FaChevronRight />
-                </button>
+                  <FaChevronRight className="text-sm" />
+                </IconButton>
               )}
             </div>
 

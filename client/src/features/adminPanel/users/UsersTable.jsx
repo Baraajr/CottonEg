@@ -7,6 +7,7 @@ import { activateUser, makeUserAdmin } from '../../../services/users';
 import AdminPageLayout from '../AdminPageLayout';
 import DataTable from '../DataTable';
 import Spinner from '../../../ui/Spinner';
+import Button from '../../../ui/Button';
 
 function UsersTable() {
   const { users = [], isPending } = useUsers();
@@ -113,21 +114,23 @@ function UsersTable() {
               <td className="px-4 py-3">
                 <div className="flex justify-end gap-2">
                   {!user.active && (
-                    <button
+                    <Button
+                      variant="secondary"
+                      size="sm"
                       onClick={() => toggleActive(user._id)}
-                      className="rounded border px-3 py-1 text-sm hover:bg-gray-100"
                     >
                       Activate
-                    </button>
+                    </Button>
                   )}
 
                   {user.role !== 'admin' && (
-                    <button
+                    <Button
+                      variant="secondary"
+                      size="sm"
                       onClick={() => promoteToAdmin(user._id)}
-                      className="rounded border px-3 py-1 text-sm hover:bg-gray-100"
                     >
                       Make Admin
-                    </button>
+                    </Button>
                   )}
                 </div>
               </td>

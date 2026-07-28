@@ -96,9 +96,9 @@ function CategoriesTable() {
               <td className="px-4 py-3">
                 <div className="flex justify-end gap-3">
                   <Modal.Open opens={`update-category-${category._id}`}>
-                    <button className="text-sm text-yellow-600 hover:underline">
+                    <Button variant="secondary" size="sm">
                       Edit
-                    </button>
+                    </Button>
                   </Modal.Open>
 
                   <Modal.Window name={`update-category-${category._id}`}>
@@ -106,12 +106,13 @@ function CategoriesTable() {
                   </Modal.Window>
 
                   <Modal.Open opens={`delete-category-${category._id}`}>
-                    <button
-                      disabled={deletingId === category._id}
-                      className="text-sm text-red-600 hover:underline disabled:opacity-50"
+                    <Button
+                      size="sm"
+                      variant="dangerOutline"
+                      loading={deletingId === category._id}
                     >
-                      {deletingId === category._id ? <SpinnerMini /> : 'Delete'}
-                    </button>
+                      Delete
+                    </Button>
                   </Modal.Open>
 
                   <Modal.Window name={`delete-category-${category._id}`}>

@@ -4,6 +4,7 @@ import AddAddressForm from './AddAddressForm';
 import ConfirmDelete from '../../ui/ConfirmDelete';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getUserAddresses, removeAddress } from '../../services/address';
+import Button from '../../ui/Button';
 
 function Addresses() {
   const queryClient = useQueryClient();
@@ -35,16 +36,7 @@ function Addresses() {
           </h2>
 
           <Modal.Open opens="add-address">
-            <button
-              className="group relative overflow-hidden rounded-lg border
-             border-gray-300 px-4 py-2 text-sm text-gray-900 transition-colors duration-300"
-            >
-              <span className="relative z-10 transition-colors duration-300 group-hover:text-white">
-                Add Address
-              </span>
-
-              <span className="absolute inset-0 -translate-x-full transform bg-black transition-transform duration-300 group-hover:translate-x-0" />
-            </button>
+            <Button>Add Address</Button>
           </Modal.Open>
         </div>
 
@@ -62,9 +54,7 @@ function Addresses() {
                 <Address address={address} />
 
                 <Modal.Open opens={`delete-address-${address._id}`}>
-                  <button className="rounded-lg border border-red-200 px-3 py-1.5 text-xs text-red-600 transition hover:bg-red-50">
-                    Delete
-                  </button>
+                  <Button variant="danger">Delete</Button>
                 </Modal.Open>
 
                 <Modal.Window name={`delete-address-${address._id}`}>

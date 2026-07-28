@@ -1,4 +1,5 @@
 import useUser from '../../hooks/useUser';
+import Button from '../../ui/Button';
 import Modal from '../../ui/Modal';
 import UpdateUserForm from './UpdateUserForm';
 
@@ -12,7 +13,7 @@ function ProfileSection() {
   return (
     <Modal>
       {/* Profile card */}
-      <div className="flex flex-col gap-6 rounded-xl border border-gray-200 bg-white p-6">
+      <div className="flex justify-between gap-6 rounded-xl border border-gray-200 bg-white p-6">
         {/* user info */}
         <div className="flex items-center gap-4">
           <img
@@ -29,20 +30,7 @@ function ProfileSection() {
 
         {/* button */}
         <Modal.Open opens="profile-form">
-          <button
-            className="relative overflow-hidden px-4 py-2 text-sm font-medium rounded-lg
-                       border border-gray-200 text-gray-900 group"
-          >
-            <span className="relative z-10 group-hover:text-white transition-colors duration-300">
-              Update profile
-            </span>
-
-            {/* hover fill animation */}
-            <span
-              className="absolute inset-0 bg-black transform -translate-x-full
-                         group-hover:translate-x-0 transition-transform duration-300"
-            />
-          </button>
+          <Button>Update profile</Button>
         </Modal.Open>
       </div>
 

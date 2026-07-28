@@ -4,6 +4,7 @@ import { useMutation } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 import { forgotPassword } from '../../services/auth';
 import SpinnerMini from '../../ui/SpinnerMini';
+import Button from '../../ui/Button';
 
 function ForgotPassword() {
   const location = useLocation();
@@ -56,16 +57,15 @@ function ForgotPassword() {
           className="mb-6 w-full border border-gray-300 px-4 py-3 text-sm outline-none focus:border-black"
         />
 
-        <button
+        <Button
           type="submit"
-          disabled={isLoading || !email}
-          className="group relative w-full overflow-hidden bg-black py-3 text-sm tracking-[0.25em] text-white disabled:opacity-50"
+          loading={isLoading}
+          disabled={!email}
+          fullWidth
+          className="py-3 tracking-[0.25em]"
         >
-          <span className="absolute inset-0 -translate-x-full bg-white transition-transform duration-500 group-hover:translate-x-0" />
-          <span className="relative z-10 group-hover:text-black">
-            {!isLoading ? 'SEND CODE' : <SpinnerMini />}
-          </span>
-        </button>
+          SEND CODE
+        </Button>
       </form>
     </div>
   );

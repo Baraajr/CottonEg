@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 import { addAddress as addAddressApi } from '../../services/address';
 import SpinnerMini from '../../ui/SpinnerMini';
+import Button from '../../ui/Button';
 
 function AddAddressForm({ onCloseModal }) {
   const {
@@ -103,24 +104,13 @@ function AddAddressForm({ onCloseModal }) {
 
       {/* Actions */}
       <div className="flex justify-end gap-3 pt-2">
-        <button
-          type="button"
-          onClick={onCloseModal}
-          disabled={isPending}
-          className="px-4 py-2 rounded-lg border border-gray-200 text-sm text-gray-700
-                     hover:bg-gray-50 transition disabled:opacity-50"
-        >
+        <Button variant="secondary" onClick={onCloseModal} disabled={isPending}>
           Cancel
-        </button>
+        </Button>
 
-        <button
-          type="submit"
-          disabled={isPending}
-          className="px-4 py-2 rounded-lg bg-black text-white text-sm
-                     hover:bg-gray-800 transition disabled:opacity-50"
-        >
-          {isPending ? <SpinnerMini /> : 'Save Address'}
-        </button>
+        <Button type="submit" loading={isPending}>
+          Save Address
+        </Button>
       </div>
     </form>
   );

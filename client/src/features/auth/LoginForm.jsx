@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { login } from '../../services/auth';
 import SpinnerMini from '../../ui/SpinnerMini';
+import Button from '../../ui/Button';
 
 function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
@@ -96,39 +97,35 @@ function LoginForm() {
 
         {/* Forgot password */}
         <div className="mb-4 text-right">
-          <button
-            type="button"
-            onClick={handleForgotPassword}
-            className="text-xs text-gray-500 hover:text-black"
-          >
+          <Button type="button" variant="ghost" onClick={handleForgotPassword}>
             Forgot your password?
-          </button>
+          </Button>
         </div>
 
-        {/* Login button */}
-        <button
+        {/* Login */}
+        <Button
+          fullWidth
           type="submit"
           disabled={isLoading}
-          className="group relative w-full overflow-hidden bg-black py-3 text-sm tracking-[0.25em] text-white"
+          className="w-full py-3 tracking-[0.25em]"
         >
-          <span className="absolute inset-0 -translate-x-full bg-white transition-transform duration-500 group-hover:translate-x-0" />
-          <span className="relative z-10 group-hover:text-black">
-            {!isLoading ? 'LOGIN' : <SpinnerMini />}
-          </span>
-        </button>
+          {!isLoading ? 'LOGIN' : <SpinnerMini />}
+        </Button>
 
         {/* Google */}
-        <button
+        <Button
           type="button"
-          className="mt-4 flex w-full items-center justify-center gap-3 border border-gray-300 py-3 text-sm hover:border-black"
+          variant="secondary"
+          fullWidth
+          className="mt-4 justify-center py-3"
         >
           <FcGoogle className="h-5 w-5" />
           Continue with Google
-        </button>
+        </Button>
 
         {/* Signup */}
         <p className="mt-6 text-center text-sm text-gray-600">
-          Don't have an account?{' '}
+          Don't have an account?
           <a href="/signup" className="text-black hover:underline">
             Sign up
           </a>

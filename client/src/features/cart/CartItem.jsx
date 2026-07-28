@@ -1,6 +1,7 @@
 import useUpdateQuantity from './useUpdateQuantity';
 import useRemoveItem from './useRemoveItem';
 import { FaTrash } from 'react-icons/fa';
+import IconButton from '../../ui/IconButton';
 
 function CartItem({ item }) {
   const { product, variant } = item;
@@ -48,8 +49,10 @@ function CartItem({ item }) {
 
       {/* CONTROLS */}
       <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-2">
-        <div className="flex items-center gap-2 bg-gray-100 rounded-full px-2 py-1">
-          <button
+        <div className="flex items-center gap-2 rounded-full bg-gray-100 p-1">
+          <IconButton
+            tooltip={'decrease'}
+            size="sm"
             disabled={isUpdating || item.quantity === 1}
             onClick={() =>
               updateQuantity({
@@ -57,14 +60,18 @@ function CartItem({ item }) {
                 quantity: item.quantity - 1,
               })
             }
-            className="w-7 h-7 flex items-center justify-center rounded-full bg-white text-gray-800 disabled:opacity-40"
+            className="rounded-full text-gray-600 hover:bg-white hover:text-black"
           >
-            -
-          </button>
+            −
+          </IconButton>
 
-          <p className="w-6 text-center text-sm font-medium">{item.quantity}</p>
+          <span className="flex h-8 min-w-8 items-center justify-center rounded-full px-2 text-sm font-semibold ">
+            {item.quantity}
+          </span>
 
-          <button
+          <IconButton
+            tooltip={'increase'}
+            size="sm"
             disabled={isUpdating}
             onClick={() =>
               updateQuantity({
@@ -72,19 +79,21 @@ function CartItem({ item }) {
                 quantity: item.quantity + 1,
               })
             }
-            className="w-7 h-7 flex items-center justify-center rounded-full bg-white text-gray-800 disabled:opacity-40"
+            className="rounded-full text-gray-600 hover:bg-white hover:text-black"
           >
             +
-          </button>
-        </div>
+          </IconButton>
 
-        <button
-          disabled={isRemoving}
-          onClick={() => removeItem(item._id)}
-          className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-red-50 text-gray-700 hover:text-red-600 transition"
-        >
-          <FaTrash size={13} />
-        </button>
+          <IconButton
+            tooltip={'remove'}
+            variant="danger"
+            size="sm"
+            disabled={isRemoving}
+            onClick={() => removeItem(item._id)}
+          >
+            <FaTrash className="h-3.5 w-3.5" />
+          </IconButton>
+        </div>
       </div>
     </div>
   );

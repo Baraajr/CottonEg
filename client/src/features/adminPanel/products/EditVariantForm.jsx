@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { editVariant } from '../../../services/products';
 import toast from 'react-hot-toast';
+import Button from '../../../ui/Button';
 
 const SIZES = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
 
@@ -123,20 +124,17 @@ function EditVariantForm({ productId, variant, onCloseModal }) {
       )}
 
       <div className="flex gap-2 pt-1">
-        <button
+        <Button
           onClick={handleSubmit}
-          disabled={!form.colorName.trim() || isPending}
-          className="flex-1 py-2 bg-blue-600 text-white rounded disabled:opacity-50"
+          loading={isPending}
+          disabled={!form.colorName.trim()}
         >
-          {isPending ? 'Saving…' : 'Save Changes'}
-        </button>
+          Save Changes
+        </Button>
 
-        <button
-          onClick={onCloseModal}
-          className="flex-1 py-2 border border-gray-300 rounded"
-        >
+        <Button variant="secondary" onClick={onCloseModal} disabled={isPending}>
           Cancel
-        </button>
+        </Button>
       </div>
     </div>
   );

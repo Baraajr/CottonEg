@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { resendEmail, verifyEmail } from '../../services/auth';
 import SpinnerMini from '../../ui/SpinnerMini';
+import Button from '../../ui/Button';
 
 function VerifyEmailPrompt() {
   const location = useLocation();
@@ -161,27 +162,26 @@ function VerifyEmailPrompt() {
           ))}
         </div>
 
-        <button
+        <Button
           onClick={handleVerify}
-          disabled={verifyMutation.isPending || otp.join('').length !== 6}
-          className="w-full bg-black text-white py-3 rounded-lg mb-4 disabled:opacity-50 disabled:cursor-not-allowed"
+          fullWidth
+          loading={verifyMutation.isPending}
+          disabled={otp.join('').length !== 6}
+          className="mb-4 py-3"
         >
-          {verifyMutation.isPending ? <SpinnerMini /> : 'Verify Email'}
-        </button>
+          Verify Email
+        </Button>
 
-        <button
+        <Button
+          type="button"
+          variant="ghost"
           onClick={() => resendMutation.mutate()}
-          disabled={resendMutation.isPending || countdown > 0}
-          className="text-sm underline text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          loading={resendMutation.isPending}
+          disabled={countdown > 0}
+          className="text-sm"
         >
-          {resendMutation.isPending ? (
-            <SpinnerMini />
-          ) : countdown > 0 ? (
-            `Resend code in ${countdown}s`
-          ) : (
-            'Resend code'
-          )}
-        </button>
+          {countdown > 0 ? `Resend code in ${countdown}s` : 'Resend code'}
+        </Button>
       </div>
     </div>
   );
