@@ -12,7 +12,11 @@ exports.setCategoryIdToBody = (req, res, next) => {
 
 //  route:  GET api/v1/Subcategories
 //  access  public
-exports.getAllSubcategories = factory.getAll(Subcategory, '', 'subcategories');
+exports.getAllSubcategories = factory.getAll(
+  Subcategory,
+  'category',
+  'subcategories',
+);
 
 //  route:  POST api/v1/Subcategories
 //  access  admin
