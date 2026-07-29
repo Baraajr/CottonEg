@@ -153,7 +153,7 @@ function OrdersTable() {
                                   />
                                   <div>
                                     <div className="font-medium">
-                                      {item.product?.title}
+                                      {item.product?.name}
                                     </div>
                                     <div className="text-xs text-gray-500">
                                       Qty: {item.quantity}
