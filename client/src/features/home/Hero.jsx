@@ -59,7 +59,7 @@ function Hero() {
                 <Link
                   key={action.text}
                   to={action.link}
-                  className={`flex h-12 min-w-[160px] items-center justify-center px-8 text-sm font-semibold transition ${
+                  className={`flex h-12 min-w-40 items-center justify-center px-8 text-sm font-semibold transition ${
                     index === 0
                       ? 'bg-white text-black hover:bg-gray-200'
                       : 'border border-white text-white hover:bg-white hover:text-black'

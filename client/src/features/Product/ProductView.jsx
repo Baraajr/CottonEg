@@ -4,9 +4,20 @@ import { getProduct } from '../../services/products';
 import Spinner from '../../ui/Spinner';
 import ProductGallery from './ProductGallery';
 import ProductPurchase from './ProductPurchase';
+import { useEffect, useState } from 'react';
 
 function ProductView({ productId: propId }) {
   const { productId: paramId } = useParams();
+  const [width, setWidth] = useState(
+    typeof window !== 'undefined' ? window.innerWidth : 0,
+  );
+
+  useEffect(() => {
+    const handleResize = () => setWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const productId = propId || paramId;
 
   const { data, isLoading, error } = useQuery({
@@ -22,10 +33,13 @@ function ProductView({ productId: propId }) {
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
       {/* Gallery + Purchase */}
-      <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
-        <ProductGallery product={product} />
-
-        <ProductPurchase product={product} />
+      <div className="flex flex-col gap-10 lg:flex-row">
+        <div className="lg:flex-1">
+          <ProductGallery product={product} compact={width < 1024} />
+        </div>
+        <div className="lg:flex-1">
+          <ProductPurchase product={product} compact={width < 1024} />
+        </div>
       </div>
 
       {/* Product Details */}

@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
+
 import { updateUser } from '../../services/users';
-import SpinnerMini from '../../ui/SpinnerMini';
+import Button from '../../ui/Button';
 
 function UpdateUserForm({ user, onCloseModal }) {
   const queryClient = useQueryClient();
@@ -13,13 +14,13 @@ function UpdateUserForm({ user, onCloseModal }) {
     register,
     handleSubmit,
     setValue,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm({
     defaultValues: {
       name: user.name,
       email: user.email,
       phone: user.phone || '',
-      profileImg: null, // will hold File object
+      profileImg: null,
     },
   });
 
@@ -36,17 +37,26 @@ function UpdateUserForm({ user, onCloseModal }) {
   });
 
   const onSubmit = (data) => {
+    if (!isDirty) return;
+
+    const payload = { ...data };
+
     // Skip sending email if unchanged
-    if (data.email === user.email) delete data.email;
+    if (payload.email === user.email) delete payload.email;
 
     let body;
-    if (data.profileImg instanceof File) {
+
+    if (payload.profileImg instanceof File) {
       body = new FormData();
-      Object.entries(data).forEach(([key, value]) => {
-        if (value !== null) body.append(key, value);
+
+      Object.entries(payload).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) {
+          body.append(key, value);
+        }
       });
     } else {
-      body = data; // JSON
+      delete payload.profileImg;
+      body = payload;
     }
 
     mutation.mutate(body);
@@ -56,16 +66,34 @@ function UpdateUserForm({ user, onCloseModal }) {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setPreviewImg(URL.createObjectURL(file));
-    setValue('profileImg', file, { shouldValidate: true }); // important
+    const url = URL.createObjectURL(file);
+    setPreviewImg(url);
+
+    setValue('profileImg', file, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
   };
+
+  useEffect(() => {
+    return () => {
+      if (previewImg?.startsWith('blob:')) {
+        URL.revokeObjectURL(previewImg);
+      }
+    };
+  }, [previewImg]);
+
+  const { onChange: profileImgOnChange, ...profileImgRegister } =
+    register('profileImg');
 
   return (
     <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
       <div>
         <label className="mb-1 block text-sm font-medium">Name</label>
         <input
-          {...register('name', { required: 'Name is required' })}
+          {...register('name', {
+            required: 'Name is required',
+          })}
           className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
         />
         {errors.name && (
@@ -76,7 +104,13 @@ function UpdateUserForm({ user, onCloseModal }) {
       <div>
         <label className="mb-1 block text-sm font-medium">Email</label>
         <input
-          {...register('email', { required: 'Email is required' })}
+          {...register('email', {
+            required: 'Email is required',
+            pattern: {
+              value: /^\S+@\S+\.\S+$/,
+              message: 'Invalid email',
+            },
+          })}
           className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
         />
         {errors.email && (
@@ -99,6 +133,7 @@ function UpdateUserForm({ user, onCloseModal }) {
         <label className="mb-1 block text-sm font-medium">
           Profile Image (optional)
         </label>
+
         <div className="flex items-center gap-4">
           {previewImg && (
             <img
@@ -107,35 +142,40 @@ function UpdateUserForm({ user, onCloseModal }) {
               className="h-12 w-12 rounded-full object-cover"
             />
           )}
+
           <label className="cursor-pointer rounded-md bg-gray-200 px-3 py-2 text-sm hover:bg-gray-300">
             Choose Image
             <input
               type="file"
               accept="image/*"
-              {...register('profileImg')}
               className="hidden"
-              onChange={handleImageChange}
+              {...profileImgRegister}
+              onChange={(e) => {
+                profileImgOnChange(e);
+                handleImageChange(e);
+              }}
             />
           </label>
         </div>
       </div>
 
       <div className="flex justify-end gap-2">
-        <button
+        <Button
+          variant="secondary"
           type="button"
           onClick={onCloseModal}
-          className="rounded-md border px-4 py-2 text-sm"
           disabled={mutation.isPending}
         >
           Cancel
-        </button>
-        <button
+        </Button>
+
+        <Button
           type="submit"
-          className="rounded-md bg-purple-600 px-4 py-2 text-sm text-white hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={mutation.isPending}
+          loading={mutation.isPending}
+          disabled={!isDirty || mutation.isPending}
         >
-          {mutation.isPending ? <SpinnerMini /> : 'Save'}
-        </button>
+          Update
+        </Button>
       </div>
     </form>
   );

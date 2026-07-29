@@ -1,18 +1,20 @@
 import { useEffect } from 'react';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm, useFieldArray, useWatch } from 'react-hook-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
+import { FaTrash } from 'react-icons/fa';
 
 import { createProduct } from '../../../services/products';
 import useSubCategories from '../../../hooks/useSubCategories';
 import useCategories from '../../../hooks/useCategories';
 import SpinnerMini from '../../../ui/SpinnerMini';
+import Button from '../../../ui/Button';
 
 const SIZES = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'];
 
 const DEFAULT_VARIANT = {
   size: 'M',
-  color: { name: '', hex: '#000000' },
+  color: { name: 'black', hex: '#000000' },
   quantity: 0,
   sku: '',
 };
@@ -52,20 +54,33 @@ const inputClass =
 const selectClass = inputClass;
 
 export default function AddProductForm({ onCloseModal }) {
-  const queryClient = useQueryClient();
-
-  const { categories = [] } = useCategories();
-  const { subcategories = [] } = useSubCategories();
-
   const {
     register,
     handleSubmit,
     control,
     reset,
-    watch,
     formState: { errors },
   } = useForm({
     defaultValues: { variants: [DEFAULT_VARIANT] },
+  });
+
+  const selectedCategory = useWatch({
+    control,
+    name: 'category',
+  });
+
+  const selectedGender = useWatch({
+    control,
+    name: 'gender',
+  });
+
+  const queryClient = useQueryClient();
+
+  const { categories = [] } = useCategories({ gender: selectedGender });
+  console.log('categories', categories);
+  const { subcategories = [] } = useSubCategories({
+    gender: selectedGender,
+    category: selectedCategory,
   });
 
   const { fields, append, remove } = useFieldArray({
@@ -73,8 +88,15 @@ export default function AddProductForm({ onCloseModal }) {
     name: 'variants',
   });
 
-  const imageCover = watch('imageCover');
-  const images = watch('images');
+  const imageCover = useWatch({
+    control,
+    name: 'imageCover',
+  });
+
+  const images = useWatch({
+    control,
+    name: 'images',
+  });
 
   const coverPreview = imageCover?.[0]
     ? URL.createObjectURL(imageCover[0])
@@ -173,26 +195,43 @@ export default function AddProductForm({ onCloseModal }) {
           <div className="grid grid-cols-2 gap-4">
             <Field label="Category" required error={errors.category?.message}>
               <select
+                disabled={!selectedGender}
                 {...register('category', { required: 'Category is required' })}
                 className={selectClass}
               >
-                <option value="">Select category</option>
-                {categories.map((c) => (
-                  <option key={c._id} value={c._id}>
-                    {c.name}
-                  </option>
-                ))}
+                {!selectedGender ? (
+                  <option value="">Select a gender first</option>
+                ) : (
+                  <>
+                    <option value="">Select category</option>
+                    {categories.map((c) => (
+                      <option key={c._id} value={c._id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </>
+                )}
               </select>
             </Field>
 
             <Field label="Subcategory">
-              <select {...register('subcategory')} className={selectClass}>
-                <option value="">Select subcategory</option>
-                {subcategories.map((s) => (
-                  <option key={s._id} value={s._id}>
-                    {s.name}
-                  </option>
-                ))}
+              <select
+                {...register('subcategory')}
+                className={selectClass}
+                disabled={!selectedCategory}
+              >
+                {!selectedCategory ? (
+                  <option value="">Select a category first</option>
+                ) : (
+                  <>
+                    <option value="">Select subcategory</option>
+                    {subcategories.map((s) => (
+                      <option key={s._id} value={s._id}>
+                        {s.name}
+                      </option>
+                    ))}
+                  </>
+                )}
               </select>
             </Field>
           </div>
@@ -371,26 +410,14 @@ export default function AddProductForm({ onCloseModal }) {
                   Variant {index + 1}
                 </span>
                 {fields.length > 1 && (
-                  <button
+                  <Button
+                    variant="textDanger"
                     type="button"
                     onClick={() => remove(index)}
-                    className="text-xs text-gray-400 hover:text-red-500 flex items-center gap-1 transition"
                   >
-                    <svg
-                      className="w-3.5 h-3.5"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-                      />
-                    </svg>
+                    <FaTrash className="h-3.5 w-3.5" />
                     Remove
-                  </button>
+                  </Button>
                 )}
               </div>
 
@@ -450,13 +477,9 @@ export default function AddProductForm({ onCloseModal }) {
             </div>
           ))}
 
-          <button
-            type="button"
-            onClick={() => append(DEFAULT_VARIANT)}
-            className="flex items-center justify-center gap-2 w-full py-3 text-sm font-medium text-gray-500 border-2 border-dashed border-gray-300 rounded-xl hover:bg-gray-50 hover:text-gray-700 hover:border-gray-400 transition"
-          >
+          <Button type="button" onClick={() => append(DEFAULT_VARIANT)}>
             <svg
-              className="w-4 h-4"
+              className="h-4 w-4"
               fill="none"
               stroke="currentColor"
               strokeWidth={2}
@@ -469,27 +492,24 @@ export default function AddProductForm({ onCloseModal }) {
               />
             </svg>
             Add variant
-          </button>
+          </Button>
         </div>
       </section>
 
       {/* ── Actions ── */}
-      <div className="flex justify-end gap-3 pt-4 border-t-2 border-gray-100">
-        <button
+      <div className="flex justify-end gap-3 border-t-2 border-gray-100 pt-4">
+        <Button
           type="button"
+          variant="secondary"
           onClick={onCloseModal}
           disabled={isPending}
-          className="px-5 py-2.5 text-sm font-medium border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition disabled:opacity-50"
         >
           Cancel
-        </button>
-        <button
-          type="submit"
-          disabled={isPending}
-          className="px-6 py-2.5 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-gray-700 transition disabled:opacity-50"
-        >
-          {isPending ? <SpinnerMini /> : 'Create Product'}
-        </button>
+        </Button>
+
+        <Button type="submit" loading={isPending}>
+          Create Product
+        </Button>
       </div>
     </form>
   );
