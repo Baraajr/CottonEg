@@ -46,6 +46,7 @@ export default function Header() {
 
   const { data } = useUser();
   const user = data?.data;
+
   const transparent = isHome && !scrolled;
 
   const textColor = transparent ? 'text-white' : 'text-black';
@@ -60,8 +61,10 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const { data: cartData } = useCart(user?.role === 'user');
-  const { data: wishlistData } = useWishlist(user?.role === 'user');
+  const { data: cartData } = useCart({ enabled: user?.role === 'user' });
+  const { data: wishlistData } = useWishlist({
+    enabled: user?.role === 'user',
+  });
 
   const cartCount = cartData?.data?.cartItems?.length || 0;
   const wishlistCount = wishlistData?.data?.length || 0;
@@ -125,9 +128,13 @@ export default function Header() {
               <div className="h-20 border-b border-gray-200 flex items-center justify-between px-4">
                 <h1 className="text-2xl font-bold">CottonEg.</h1>
 
-                <button onClick={() => setMobileMenuOpen(false)}>
-                  <HiOutlineX className="w-7 h-7" />
-                </button>
+                <IconButton
+                  size="sm"
+                  onClick={() => setMobileMenuOpen(false)}
+                  aria-label="Close menu"
+                >
+                  <HiOutlineX className="h-5 w-5" />
+                </IconButton>
               </div>
 
               <div className="h-[calc(100vh-80px)] overflow-y-auto p-4">
@@ -147,7 +154,6 @@ export default function Header() {
             : 'bg-white border-b border-gray-200 shadow-sm'
         }`}
       >
-        {' '}
         <div className="h-full px-4 md:px-6 flex items-center justify-between">
           <h1
             onClick={() => navigate('/')}
@@ -269,9 +275,13 @@ export default function Header() {
                 <IoIosSearch className={`w-6 h-6 ${iconColor}`} />
               </IconButton>
 
-              <button onClick={() => setMobileMenuOpen(true)} className="p-2">
-                <HiOutlineMenu className="w-7 h-7" />
-              </button>
+              <IconButton
+                size="sm"
+                onClick={() => setMobileMenuOpen(true)}
+                aria-label="Open menu"
+              >
+                <HiOutlineMenu className="h-7 w-7" />
+              </IconButton>
             </div>
           </div>
         </div>
