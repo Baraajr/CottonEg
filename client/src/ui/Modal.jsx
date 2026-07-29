@@ -36,7 +36,7 @@ function Window({ children, name }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
       <div
         ref={ref}
-        className="relative w-full max-w-xl rounded-2xl bg-white shadow-2xl"
+        className="relative w-full md:max-w-130 max-w-[90%] rounded-2xl bg-white shadow-2xl"
       >
         {/* Header */}
         <div className="flex items-center justify-between border-b px-6 py-4">
