@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { FaCheck, FaHeart } from 'react-icons/fa';
 import RatingStars from '../../ui/RatingStars';
 import useAddToCart from '../../hooks/useAddToCart';
 import useAddToWishlist from '../../hooks/useAddToWishlist';
@@ -55,22 +56,38 @@ function ProductPurchase({ product, compact = false, showWishlist = true }) {
     );
   }, [variants, selectedColor, selectedSize]);
 
+  // Pick a readable check-mark color against light vs dark swatches
+  const isLightColor = (hex) => {
+    if (!hex) return true;
+    const c = hex.replace('#', '');
+    const r = parseInt(c.substring(0, 2), 16);
+    const g = parseInt(c.substring(2, 4), 16);
+    const b = parseInt(c.substring(4, 6), 16);
+    return (r * 299 + g * 587 + b * 114) / 1000 > 175;
+  };
+
+  const stockLevel = selectedVariant
+    ? selectedVariant.quantity <= 5
+      ? 'low'
+      : 'high'
+    : null;
+
   return (
     <div className="flex flex-col">
       <h1
-        className={`font-semibold text-gray-900 ${
+        className={`font-semibold tracking-tight text-gray-900 ${
           compact ? 'text-2xl' : 'text-3xl'
         }`}
       >
         {product.name}
       </h1>
 
-      <div className="mt-2">
+      <div className="mt-2.5">
         <RatingStars rating={product.ratingsAverage} />
       </div>
 
       <p
-        className={`font-semibold text-gray-900 ${
+        className={`font-semibold tabular-nums text-gray-900 ${
           compact ? 'text-xl mt-3' : 'text-2xl mt-4'
         }`}
       >
@@ -79,7 +96,7 @@ function ProductPurchase({ product, compact = false, showWishlist = true }) {
 
       {product.description && (
         <p
-          className={`text-gray-600 leading-relaxed ${
+          className={`text-[15px] leading-relaxed text-gray-600 ${
             compact ? 'mt-4 line-clamp-3' : 'mt-4'
           }`}
         >
@@ -89,65 +106,124 @@ function ProductPurchase({ product, compact = false, showWishlist = true }) {
 
       {/* COLORS */}
       <div className={compact ? 'mt-6' : 'mt-8'}>
-        <h3 className="mb-2 text-sm font-semibold text-gray-800">Color</h3>
+        <div className="mb-2.5 flex items-baseline gap-1.5">
+          <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+            Color
+          </h3>
+          {selectedColor && (
+            <span className="text-xs text-gray-400">
+              — {selectedColor.name}
+            </span>
+          )}
+        </div>
 
         <div className="flex flex-wrap gap-3">
-          {colorsWithState.map((color) => (
-            <button
-              key={color.hex}
-              type="button"
-              disabled={color.disabled}
-              onClick={() => {
-                if (color.disabled) return;
+          {colorsWithState.map((color) => {
+            const isSelected = selectedColor?.hex === color.hex;
+            const checkDark = isLightColor(color.hex);
 
-                setSelectedColor(color);
-                setSelectedSize(null);
-              }}
-              className={`h-9 w-9 rounded-full border-2 transition ${
-                selectedColor?.hex === color.hex
-                  ? 'border-black'
-                  : 'border-gray-300'
-              } ${color.disabled ? 'cursor-not-allowed opacity-30' : ''}`}
-              style={{
-                backgroundColor: color.hex,
-              }}
-            />
-          ))}
+            return (
+              <button
+                key={color.hex}
+                type="button"
+                disabled={color.disabled}
+                title={color.name}
+                aria-label={color.name}
+                aria-pressed={isSelected}
+                onClick={() => {
+                  if (color.disabled) return;
+
+                  setSelectedColor(color);
+                  setSelectedSize(null);
+                }}
+                className={`relative h-9 w-9 rounded-full ring-1 ring-inset ring-black/10 transition-all duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 ${
+                  isSelected
+                    ? 'ring-2 ring-gray-900 ring-offset-2'
+                    : 'hover:scale-105'
+                } ${
+                  color.disabled
+                    ? 'cursor-not-allowed opacity-40 saturate-50 hover:scale-100'
+                    : ''
+                }`}
+                style={{ backgroundColor: color.hex }}
+              >
+                {isSelected && (
+                  <FaCheck
+                    className={`absolute inset-0 m-auto h-4 w-4 ${
+                      checkDark ? 'text-gray-900' : 'text-white'
+                    }`}
+                    strokeWidth={2.5}
+                  />
+                )}
+                {color.disabled && (
+                  <span
+                    className="pointer-events-none absolute inset-0 rounded-full"
+                    style={{
+                      background:
+                        'linear-gradient(to top right, transparent calc(50% - 1px), rgba(0,0,0,0.5) 50%, transparent calc(50% + 1px))',
+                    }}
+                  />
+                )}
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* SIZES */}
       <div className="mt-6">
-        <h3 className="mb-2 text-sm font-semibold text-gray-800">Size</h3>
+        <h3 className="mb-2.5 text-xs font-semibold uppercase tracking-wide text-gray-500">
+          Size
+        </h3>
 
         <div className="flex flex-wrap gap-2">
           {availableSizes.length === 0 && (
-            <span className="text-sm text-gray-400">Select a color first</span>
+            <span className="text-sm text-gray-400">
+              Select a color to see available sizes
+            </span>
           )}
 
-          {availableSizes.map((size) => (
-            <button
-              key={size}
-              type="button"
-              onClick={() => setSelectedSize(size)}
-              className={`rounded-md border px-3 py-1.5 text-sm transition ${
-                selectedSize === size
-                  ? 'border-black bg-black text-white'
-                  : 'border-gray-300 bg-white text-gray-700 hover:border-black'
-              }`}
-            >
-              {size}
-            </button>
-          ))}
+          {availableSizes.map((size) => {
+            const isSelected = selectedSize === size;
+
+            return (
+              <button
+                key={size}
+                type="button"
+                aria-pressed={isSelected}
+                onClick={() => setSelectedSize(size)}
+                className={`min-w-[2.75rem] rounded-md border px-3 py-1.5 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 ${
+                  isSelected
+                    ? 'border-gray-900 bg-gray-900 text-white'
+                    : 'border-gray-300 bg-white text-gray-700 hover:border-gray-900'
+                }`}
+              >
+                {size}
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* STOCK */}
-      <div className="mt-5">
+      <div className="mt-5 flex items-center gap-1.5">
         {selectedVariant ? (
-          <p className="text-sm text-green-600">
-            {selectedVariant.quantity} in stock
-          </p>
+          <>
+            <span
+              className={`h-1.5 w-1.5 rounded-full ${
+                stockLevel === 'low' ? 'bg-amber-500' : 'bg-green-500'
+              }`}
+            />
+            <p
+              className={`text-sm ${
+                stockLevel === 'low' ? 'text-amber-600' : 'text-green-600'
+              }`}
+            >
+              {stockLevel === 'low'
+                ? `Only ${selectedVariant.quantity} left in stock`
+                : `${selectedVariant.quantity} in stock`}
+            </p>
+          </>
         ) : (
           <p className="text-sm text-gray-500">Choose a color and size</p>
         )}
@@ -159,10 +235,11 @@ function ProductPurchase({ product, compact = false, showWishlist = true }) {
           <button
             type="button"
             disabled={isAddingToWishlist}
+            aria-label="Add to wishlist"
             onClick={() => addToWishlist(product._id)}
-            className="rounded-lg border border-gray-300 px-5 py-3 text-sm transition hover:border-black"
+            className="flex items-center justify-center rounded-lg border border-gray-300 px-4 py-3 text-gray-700 transition-colors duration-150 hover:border-gray-900 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 disabled:opacity-50"
           >
-            Wishlist
+            <FaHeart className="h-4 w-4" strokeWidth={2} />
           </button>
         )}
 
@@ -176,13 +253,13 @@ function ProductPurchase({ product, compact = false, showWishlist = true }) {
               quantity: 1,
             })
           }
-          className="flex-1 rounded-lg bg-black px-6 py-3 text-sm font-medium text-white shadow-md transition-all duration-200 hover:bg-gray-900 hover:shadow-lg disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none disabled:hover:bg-gray-200 disabled:hover:shadow-none"
+          className="flex-1 rounded-lg bg-gray-900 px-6 py-3 text-sm font-medium text-white shadow-sm transition-all duration-150 ease-out hover:bg-black hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none"
         >
           {isAddingToCart
-            ? 'Adding...'
+            ? 'Adding…'
             : !selectedVariant
               ? 'Select options'
-              : 'Add to Cart'}
+              : 'Add to cart'}
         </button>
       </div>
     </div>
