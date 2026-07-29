@@ -1,11 +1,26 @@
 import { useQuery } from '@tanstack/react-query';
-import { getOrders } from '../../services/orders';
+import { getMyOrders } from '../../services/orders';
+import useUser from '../../hooks/useUser';
 
 function UserOrders() {
+  const { data: user, isLoading } = useUser();
+  const currentUser = user?.data;
+
   const { data, isPending } = useQuery({
     queryKey: ['my-orders'],
-    queryFn: getOrders,
+    queryFn: getMyOrders,
+    enabled: currentUser?.role === 'user',
   });
+
+  if (isLoading) return null;
+
+  if (currentUser?.role === 'admin') {
+    return (
+      <p className="flex h-10 w-full items-center justify-center text-center">
+        Admins cannot order
+      </p>
+    );
+  }
 
   if (isPending) return null;
 
@@ -39,7 +54,17 @@ function UserOrders() {
               </p>
 
               <p className="text-xs text-gray-500">
-                {new Date(order.createdAt).toLocaleDateString()}
+                {new Date(order.createdAt).toLocaleDateString(undefined, {
+                  year: 'numeric',
+                  month: 'short',
+                  day: '2-digit',
+                })}
+              </p>
+              <p className="text-xs text-gray-500">
+                {new Date(order.createdAt).toLocaleTimeString(undefined, {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                })}
               </p>
             </div>
 
@@ -88,7 +113,7 @@ function UserOrders() {
                 </div>
 
                 <p className="font-medium text-gray-900">
-                  {item.product.price * item.quantity} EGP
+                  {item.price * item.quantity} EGP
                 </p>
               </div>
             ))}
