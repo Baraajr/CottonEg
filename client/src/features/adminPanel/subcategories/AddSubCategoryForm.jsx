@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
-import { createSubCategory } from '../../../services/subcategories';
+import { createSubCategory } from '../../../services/subCategories';
 import SpinnerMini from '../../../ui/SpinnerMini';
 import { GENDERS } from '../../../constants/constants';
 import Button from '../../../ui/Button';

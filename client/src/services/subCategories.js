@@ -2,7 +2,7 @@ import api from './api';
 
 const URL = '/subcategories';
 
-// GET all subcategories
+//GET all subcategories
 export const getSubCategories = async (gender = '', category = '') => {
   try {
     const params = new URLSearchParams();

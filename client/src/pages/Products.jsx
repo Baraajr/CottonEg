@@ -3,9 +3,9 @@ import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useSearchParams } from 'react-router-dom';
 
-import ProductList from '../features/products/ProductList';
-import Filter from '../features/products/Filter';
-import ProductsTopBar from '../features/products/ProductsTopBar';
+import ProductList from '../features/Products/ProductList';
+import Filter from '../features/Products/Filter';
+import ProductsTopBar from '../features/Products/ProductsTopBar';
 
 function Products() {
   const [searchParams, setSearchParams] = useSearchParams();

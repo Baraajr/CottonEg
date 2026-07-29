@@ -8,7 +8,7 @@ import Button from '../../../ui/Button';
 import useSubCategories from '../../../hooks/useSubCategories';
 import useCategories from '../../../hooks/useCategories';
 
-import { deleteSubCategory } from '../../../services/subcategories';
+import { deleteSubCategory } from '../../../services/subCategories';
 import AddSubCategoryForm from './AddSubCategoryForm';
 import UpdateSubCategoryForm from './UpdateSubCategoryForm';
 

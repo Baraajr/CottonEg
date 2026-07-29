@@ -21,7 +21,7 @@ import useNavByGender from '../hooks/useMenu';
 import useCart from '../features/cart/useCart';
 import MobileMenu from './MobileMenu';
 import IconButton from './IconButton';
-import SearchBar from '../features/products/SearchBar';
+import SearchBar from '../features/Products/SearchBar';
 import GenderMenu from './Gendermenu';
 
 const MOTION = {
