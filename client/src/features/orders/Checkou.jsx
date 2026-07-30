@@ -7,10 +7,13 @@ import useCreateCashOrder from '../../hooks/useCreateCashOrder';
 import Spinner from '../../ui/Spinner';
 import SpinnerMini from '../../ui/SpinnerMini';
 import Button from '../../ui/Button';
+import useCreateCheckoutSession from '../../hooks/useCreateCheckoutSession';
 
 function Checkout() {
   const navigate = useNavigate();
+  const { checkout, isLoading: isCreatingSession } = useCreateCheckoutSession();
 
+  const [paymentMethod, setPaymentMethod] = useState('cash');
   const { data, isLoading, error } = useCart();
 
   const { createOrder, isLoading: isCreatingOrder } = useCreateCashOrder();
@@ -32,13 +35,20 @@ function Checkout() {
     }));
   };
 
-  const handleCashOrder = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
 
-    createOrder({
-      cartId: cart._id,
-      shippingAddress,
-    });
+    if (paymentMethod === 'cash') {
+      createOrder({
+        cartId: cart._id,
+        shippingAddress,
+      });
+    } else {
+      checkout({
+        cartId: cart._id,
+        shippingAddress,
+      });
+    }
   };
 
   if (isLoading)
@@ -171,7 +181,7 @@ function Checkout() {
             Tell us where to send your order.
           </p>
 
-          <form onSubmit={handleCashOrder} className="mt-6 space-y-2">
+          <form onSubmit={handleSubmit} className="mt-6 space-y-2">
             <div>
               <label className="mb-1.5 block font-body text-sm font-medium text-[#1C1B19]">
                 Address details
@@ -238,11 +248,23 @@ function Checkout() {
                 variant="secondary"
                 size="lg"
                 fullWidth
+                onClick={() => setPaymentMethod('cash')}
                 loading={isCreatingOrder}
-                disabled={isCreatingOrder}
-                className="h-14 rounded-lg border-[#1C1B19]/20 text-base text-[#1C1B19] hover:border-[#1C1B19]"
+                disabled={isCreatingOrder || isCreatingSession}
               >
-                Place cash order
+                Place Cash Order
+              </Button>
+
+              <Button
+                type="submit"
+                variant="primary"
+                size="lg"
+                fullWidth
+                onClick={() => setPaymentMethod('stripe')}
+                loading={isCreatingSession}
+                disabled={isCreatingOrder || isCreatingSession}
+              >
+                Pay with Card (Stripe)
               </Button>
             </div>
           </form>

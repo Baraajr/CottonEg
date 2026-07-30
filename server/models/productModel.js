@@ -61,6 +61,11 @@ const productSchema = new mongoose.Schema(
       min: 0,
     },
 
+    quantity: {
+      type: Number,
+      default: 0,
+    },
+
     price: {
       type: Number,
       required: [true, 'A product must have a price'],
@@ -189,12 +194,10 @@ productSchema.pre('save', function (next) {
   next();
 });
 
-// Total inventory
-productSchema.virtual('quantity').get(function () {
-  return (this.variants ?? []).reduce(
-    (total, variant) => total + (variant?.quantity || 0),
-    0,
-  );
+productSchema.pre('save', function (next) {
+  this.quantity = this.variants.reduce((sum, v) => sum + (v.quantity || 0), 0);
+
+  next();
 });
 
 // Populate category

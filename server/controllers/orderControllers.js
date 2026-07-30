@@ -103,6 +103,7 @@ exports.createCashOrder = catchAsync(async (req, res, next) => {
         {
           $inc: {
             'variants.$.quantity': -item.quantity,
+            quantity: -item.quantity,
             sold: item.quantity,
           },
         },
@@ -194,6 +195,18 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   const taxPrice = 0;
   const shippingPrice = 0;
 
+  const { shippingAddress } = req.body;
+
+  if (
+    !shippingAddress ||
+    !shippingAddress.details ||
+    !shippingAddress.city ||
+    !shippingAddress.postalCode ||
+    !shippingAddress.phone
+  ) {
+    return next(new AppError('Shipping address is required', 400));
+  }
+
   const cart = await Cart.findById(req.params.cartId);
   if (!cart) return next(new AppError('Cart not found', 404));
 
@@ -227,12 +240,6 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 
     customer_email: req.user.email,
 
-    billing_address_collection: 'required',
-
-    phone_number_collection: {
-      enabled: true,
-    },
-
     submit_type: 'pay',
 
     locale: 'auto',
@@ -243,18 +250,6 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
           'Your order will be processed immediately after your payment is confirmed.',
       },
     },
-
-    custom_fields: [
-      {
-        key: 'order_notes',
-        label: {
-          type: 'custom',
-          custom: 'Order notes',
-        },
-        type: 'text',
-        optional: true,
-      },
-    ],
 
     success_url: process.env.SUCCESS_URL,
     cancel_url: process.env.CANCEL_URL,
@@ -354,6 +349,7 @@ const createOrder = async (sessionData) => {
         {
           $inc: {
             'variants.$.quantity': -item.quantity,
+            quantity: -item.quantity,
             sold: item.quantity,
           },
         },

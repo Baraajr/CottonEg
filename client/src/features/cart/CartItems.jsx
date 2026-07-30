@@ -1,14 +1,11 @@
 import { useNavigate } from 'react-router-dom';
 import CartItem from './CartItem';
-import useCreateCheckoutSession from '../../hooks/useCreateCheckoutSession';
 import useClearCart from './useClearCart';
 import useCart from './useCart';
 import Spinner from '../../ui/Spinner';
 import Button from '../../ui/Button';
 
 function CartItems() {
-  const { checkout, isLoading: isCreatingSession } = useCreateCheckoutSession();
-
   const navigate = useNavigate();
   const { clearCart, isLoading: isClearing } = useClearCart();
   const { data, isLoading, error } = useCart();
@@ -27,10 +24,6 @@ function CartItems() {
         <p className="text-gray-500 text-lg">Your cart is empty</p>
       </div>
     );
-
-  const handleStripeCheckout = () => {
-    checkout(cart._id);
-  };
 
   return (
     <div className="flex flex-col gap-6 ">
@@ -68,18 +61,7 @@ function CartItems() {
           disabled={isClearing || !items.length}
           onClick={() => navigate('/checkout')}
         >
-          Create Cash Order
-        </Button>
-
-        <Button
-          type="button"
-          variant="secondary"
-          fullWidth
-          loading={isCreatingSession}
-          onClick={handleStripeCheckout}
-          className="h-14 hover:bg-violet-800 hover:text-white"
-        >
-          Pay with Card (Stripe)
+          Checkout
         </Button>
       </div>
     </div>
