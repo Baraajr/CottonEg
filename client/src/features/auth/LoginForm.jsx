@@ -21,6 +21,7 @@ function LoginForm() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user'] });
       navigate('/', { replace: true });
+      toast.success('Logged in');
     },
     onError: (err) => {
       toast.error(err.message);
