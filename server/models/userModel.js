@@ -38,6 +38,15 @@ const userSchema = new mongoose.Schema(
         message: 'A password is required for local authentication',
       },
     },
+    authProvider: {
+      type: String,
+      default: 'local',
+    },
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
     passwordChangedAt: Date,
     passwordResetCode: String,
     passwordResetExpires: Date,

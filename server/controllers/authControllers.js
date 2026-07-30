@@ -332,6 +332,14 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 
   if (!user) return next(new AppError('Incorrect email', 400));
 
+  if (user.authProvider !== 'local')
+    return next(
+      new AppError(
+        `This account uses ${user.authProvider} sign-in. Password reset is not available. Please sign in with ${user.authProvider}.`,
+        400,
+      ),
+    );
+
   // create the reset code
   const resetCode = user.createPasswordResetCode();
   await user.save({ validateBeforeSave: false });
@@ -438,6 +446,14 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
   //1) get the user by his email
   const user = await User.findOne({ email: req.body.email });
+
+  if (user.authProvider !== 'local')
+    return next(
+      new AppError(
+        `Password changes are not available for ${user.authProvider} accounts. Please manage your password through your ${user.authProvider} account.`,
+        400,
+      ),
+    );
 
   if (!user)
     return next(

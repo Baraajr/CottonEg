@@ -171,6 +171,14 @@ exports.updateLoggedUserPassword = catchAsync(async (req, res, next) => {
 
   if (!user) return next(new AppError('Error, Please login again', 400));
 
+  if (user.authProvider !== 'local')
+    return next(
+      new AppError(
+        `Password changes are not available for ${user.authProvider} accounts. Please manage your password through your ${user.authProvider} account.`,
+        400,
+      ),
+    );
+
   if (!(await user.correctPassword(currentPassword, user.password)))
     return next(new AppError('Incorrect current password', 400));
 

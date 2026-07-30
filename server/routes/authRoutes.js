@@ -54,20 +54,40 @@ passport.use(
     async (accessToken, refreshToken, profile, done) => {
       try {
         const email = profile.emails[0].value;
-        const name = profile.displayName;
 
         let user = await User.findOne({ email });
+
         if (!user) {
           user = await User.create({
             email,
-            name,
-            authProvider: profile.provider,
-            profileImg: profile.photos[0].value,
+            name: profile.displayName,
+            authProvider: 'google',
+            googleId: profile.id,
+            profileImg: profile.photos?.[0]?.value,
+            isEmailVerified: true,
           });
+        } else {
+          if (user.googleId && user.googleId !== profile.id) {
+            return done(new Error('Google account mismatch'), null);
+          }
+
+          // Link Google account if it wasn't linked before
+          if (!user.googleId) {
+            user.googleId = profile.id;
+            user.isEmailVerified = true;
+
+            // Optional: only change provider if the account wasn't local
+            if (user.authProvider !== 'local') {
+              user.authProvider = 'google';
+            }
+
+            await user.save({ validateBeforeSave: false });
+          }
         }
+
         return done(null, user);
       } catch (error) {
-        console.error('Error in Google Strategy:', error.message);
+        console.error('Error in Google Strategy:', error);
         return done(error, null);
       }
     },
