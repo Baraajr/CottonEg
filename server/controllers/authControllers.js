@@ -496,5 +496,6 @@ exports.passportHandler = catchAsync(async (req, res) => {
   res.cookie('JWT', token, cookieOptions);
 
   // Redirect or send a response
-  res.redirect('/');
+  // Backend
+  res.redirect(`${process.env.FRONT_URL}/`);
 });

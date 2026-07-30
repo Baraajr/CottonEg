@@ -50,8 +50,9 @@ function SignupForm() {
     );
   }
 
-  const btnHoverStyle =
-    'group relative w-full overflow-hidden bg-black py-3 text-sm tracking-[0.25em] text-white';
+  function handleGoogleAuth() {
+    navigate(`${import.meta.env.VITE_API_URL}/auth/google`);
+  }
 
   return (
     <div className="flex justify-center px-4 py-16">
@@ -134,6 +135,7 @@ function SignupForm() {
 
         {/* Google */}
         <Button
+          onClick={() => handleGoogleAuth()}
           type="button"
           variant="secondary"
           fullWidth

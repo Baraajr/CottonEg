@@ -49,6 +49,10 @@ function LoginForm() {
     );
   }
 
+  function handleGoogleAuth() {
+    navigate(`${import.meta.env.VITE_API_URL}/auth/google`);
+  }
+
   return (
     <div className="flex justify-center px-4 py-16">
       <form onSubmit={handleSubmit} className="w-full max-w-md">
@@ -114,6 +118,7 @@ function LoginForm() {
 
         {/* Google */}
         <Button
+          onClick={() => handleGoogleAuth()}
           type="button"
           variant="secondary"
           fullWidth
