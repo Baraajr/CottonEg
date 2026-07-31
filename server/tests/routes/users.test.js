@@ -182,7 +182,6 @@ describe('User Routes', () => {
           .patch(`/api/v1/users/${user._id}/activate`)
           .set('Authorization', `Bearer ${adminToken}`);
 
-        console.log(res.body);
         expect(res.statusCode).toBe(200);
         expect(res.body.data.user.active).toBe(true);
       });

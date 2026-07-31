@@ -13,7 +13,6 @@ export const getCategories = async (gender) => {
   }
   try {
     const { data } = await api.get(`${CATEGORY_URL}?${params.toString()}`);
-    console.log('data.data', data.data);
     return data.data;
   } catch (err) {
     throw new Error(err.message || 'Failed to fetch categories');

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useForm, useFieldArray, useWatch } from 'react-hook-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
@@ -77,7 +77,7 @@ export default function AddProductForm({ onCloseModal }) {
   const queryClient = useQueryClient();
 
   const { categories = [] } = useCategories({ gender: selectedGender });
-  console.log('categories', categories);
+
   const { subcategories = [] } = useSubCategories({
     gender: selectedGender,
     category: selectedCategory,
@@ -102,10 +102,11 @@ export default function AddProductForm({ onCloseModal }) {
     ? URL.createObjectURL(imageCover[0])
     : null;
 
-  const galleryPreviews = images
-    ? Array.from(images).map((file) => URL.createObjectURL(file))
-    : [];
+  const galleryPreviews = useMemo(() => {
+    if (!images) return [];
 
+    return Array.from(images).map((file) => URL.createObjectURL(file));
+  }, [images]);
   useEffect(() => {
     return () => {
       if (coverPreview) URL.revokeObjectURL(coverPreview);

@@ -46,13 +46,11 @@ exports.addProductToCart = catchAsync(async (req, res, next) => {
       ],
     });
   } else {
-    const index = cart.cartItems.findIndex((item) => {
-      return (
+    const index = cart.cartItems.findIndex(
+      (item) =>
         item.product.id.toString() === productId &&
-        item.variant.id.toString() === variantId
-      );
-    });
-
+        item.variant.id.toString() === variantId,
+    );
     if (index > -1) {
       const newQuantity = cart.cartItems[index].quantity + quantity;
 
@@ -76,7 +74,6 @@ exports.addProductToCart = catchAsync(async (req, res, next) => {
     }
   }
 
-  console.log(cart.cartItems);
   cart.totalCartPrice = calculateTotalPrice(cart);
 
   await cart.save();
@@ -121,7 +118,6 @@ exports.removeProductFromCart = catchAsync(async (req, res, next) => {
   cart.cartItems = cart.cartItems.filter(
     (item) => item._id.toString() !== req.params.itemId,
   );
-  console.log(cart.cartItems);
   cart.totalCartPrice = calculateTotalPrice(cart);
 
   await cart.save();

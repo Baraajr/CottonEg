@@ -36,8 +36,6 @@ export async function getFilteredProducts({
   }
   if (search) params.append('search', search);
 
-  console.log(params.toString());
-
   try {
     const { data } = await api.get(`${PRODUCTS_URL}?${params.toString()}`);
     return data;

@@ -217,7 +217,7 @@ function ProductGallery({ product, compact = true }) {
 
   const goTo = useCallback(
     (i) => {
-      setActiveIndex((prev) => {
+      setActiveIndex(() => {
         const len = productImages.length || 1;
         return (i + len) % len;
       });

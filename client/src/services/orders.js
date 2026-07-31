@@ -6,9 +6,6 @@ export async function getMyOrders() {
   try {
     const res = await api.get('/orders/my-orders?sort=-createdAt');
 
-    console.log('res:', res);
-    console.log('data:', res.data);
-
     return res.data;
   } catch (err) {
     throw new Error(err.message || 'Failed to fetch orders');

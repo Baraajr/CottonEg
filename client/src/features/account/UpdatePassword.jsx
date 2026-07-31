@@ -9,7 +9,7 @@ function UpdatePassword() {
   const {
     register,
     handleSubmit,
-    watch,
+    getValues,
     formState: { errors, isSubmitting },
     reset,
   } = useForm();
@@ -91,7 +91,7 @@ function UpdatePassword() {
             {...register('passwordConfirm', {
               required: 'Please confirm your new password',
               validate: (value) =>
-                value === watch('newPassword') || 'Passwords do not match',
+                value === getValues('newPassword') || 'Passwords do not match',
             })}
             className={inputClass}
           />

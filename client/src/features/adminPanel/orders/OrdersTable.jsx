@@ -139,6 +139,7 @@ function OrdersTable() {
                         <Button
                           size="sm"
                           variant="secondary"
+                          disabled={isPaying}
                           onClick={() => handlePay(order._id)}
                         >
                           Mark Paid
@@ -147,6 +148,7 @@ function OrdersTable() {
                       {!order.isDelivered && (
                         <Button
                           size="sm"
+                          disabled={isDelivering}
                           onClick={() => handleDeliver(order._id)}
                         >
                           Deliver

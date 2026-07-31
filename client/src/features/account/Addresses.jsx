@@ -11,8 +11,6 @@ import useUser from '../../hooks/useUser';
 function Addresses() {
   const { data: user, isPending: isUserLoading } = useUser();
 
-  console.log(isUserLoading);
-
   const currentUser = user?.data;
   const queryClient = useQueryClient();
 
@@ -24,7 +22,6 @@ function Addresses() {
     enabled: currentUser?.role === 'user',
   });
 
-  console.log('isLoading', isLoading);
   const { mutate: deleteAddress, isPending: isDeleting } = useMutation({
     mutationFn: removeAddress,
     onSuccess: (_, deletedId) => {
@@ -40,6 +37,8 @@ function Addresses() {
       });
     },
   });
+
+  if (isLoading) return <Spinner />;
 
   if (isUserLoading) return <Spinner />;
 

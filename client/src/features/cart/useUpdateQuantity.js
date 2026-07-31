@@ -9,7 +9,7 @@ function useUpdateQuantity() {
     mutationFn: ({ itemId, quantity }) =>
       updateItemQuantity({ itemId, quantity }),
 
-    onSuccess: (data) => {
+    onSuccess: () => {
       // backend already returns updated cart
       queryClient.invalidateQueries(['cart']);
 

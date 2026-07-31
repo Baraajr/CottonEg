@@ -27,39 +27,42 @@ function AccountNav() {
 
       {/* Navigation */}
       <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide md:flex-col md:gap-1 md:overflow-visible md:pb-0">
-        {navItems.map(({ to, label, icon: Icon }) => (
-          <NavLink
-            key={to}
-            to={to}
-            className={({ isActive }) =>
-              `${baseItem} ${
-                isActive
-                  ? 'bg-gray-100 text-gray-900'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-              }`
-            }
-          >
-            {({ isActive }) => (
-              <>
-                {/* Active indicator */}
-                <span
-                  className={`absolute transition-colors duration-200
+        {navItems.map(({ to, label, icon }) => {
+          const Icon = icon;
+          return (
+            <NavLink
+              key={to}
+              to={to}
+              className={({ isActive }) =>
+                `${baseItem} ${
+                  isActive
+                    ? 'bg-gray-100 text-gray-900'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                }`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  {/* Active indicator */}
+                  <span
+                    className={`absolute transition-colors duration-200
                     left-2 right-2 bottom-0 h-1 rounded-t-full
                     md:left-0 md:right-auto md:top-2 md:bottom-2 md:h-auto md:w-1 md:rounded-r-full md:rounded-t-none
                     ${isActive ? 'bg-black' : 'bg-transparent'}
                   `}
-                />
+                  />
 
-                <Icon
-                  size={18}
-                  className={isActive ? 'text-black' : 'text-gray-500'}
-                />
+                  <Icon
+                    size={18}
+                    className={isActive ? 'text-black' : 'text-gray-500'}
+                  />
 
-                <span>{label}</span>
-              </>
-            )}
-          </NavLink>
-        ))}
+                  <span>{label}</span>
+                </>
+              )}
+            </NavLink>
+          );
+        })}
       </div>
 
       {/* Logout */}

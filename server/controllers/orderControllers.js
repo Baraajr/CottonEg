@@ -284,8 +284,6 @@ const createOrder = async (sessionData) => {
       email: sessionData.customer_email,
     }).session(session);
 
-    console.log('cart', cart);
-    console.log(user);
     if (!cart || !user) throw new AppError('Missing cart or user', 400);
 
     // OPTIONAL: prevent duplicate orders
@@ -388,12 +386,10 @@ exports.webhookCheckout = async (req, res) => {
       process.env.STRIPE_WEBHOOK_SECRET,
     );
   } catch (err) {
-    console.log(err);
     return res.status(400).json({ error: err.message });
   }
 
   if (event.type === 'checkout.session.completed') {
-    console.log('webhootriggered');
     await createOrder(event.data.object);
   }
 

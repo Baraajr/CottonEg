@@ -46,24 +46,28 @@ function WhyChooseUs() {
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
-          {features.map(({ icon: Icon, title, description, bg }) => (
-            <div
-              key={title}
-              className="group rounded-2xl border border-gray-200 bg-white p-8 transition-all duration-300 hover:-translate-y-1 hover:border-black hover:shadow-xl"
-            >
+          {features.map((feature) => {
+            const Icon = feature.icon;
+
+            return (
               <div
-                className={`mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl ${bg}`}
+                key={feature.title}
+                className="group rounded-2xl border border-gray-200 bg-white p-8 transition-all duration-300 hover:-translate-y-1 hover:border-black hover:shadow-xl"
               >
-                <Icon size={26} />
+                <div
+                  className={`mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl ${feature.bg}`}
+                >
+                  <Icon size={26} />
+                </div>
+
+                <h3 className="mb-3 text-xl font-semibold text-gray-900">
+                  {feature.title}
+                </h3>
+
+                <p className="leading-7 text-gray-600">{feature.description}</p>
               </div>
-
-              <h3 className="mb-3 text-xl font-semibold text-gray-900">
-                {title}
-              </h3>
-
-              <p className="leading-7 text-gray-600">{description}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>

@@ -47,8 +47,6 @@ function ProductsTable() {
     category: selectedCategory,
   });
 
-  console.log(categories);
-
   // const filtersKey = useMemo(() => ({ category, sort }), [category, sort]);
 
   const { data, isLoading } = useQuery({
