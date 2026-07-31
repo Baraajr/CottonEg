@@ -3,6 +3,7 @@ import { FaCheck, FaHeart } from 'react-icons/fa';
 import RatingStars from '../../ui/RatingStars';
 import useAddToCart from '../../hooks/useAddToCart';
 import useAddToWishlist from '../../hooks/useAddToWishlist';
+import Button from '../../ui/Button';
 
 function ProductPurchase({ product, compact = false, showWishlist = true }) {
   const { addToCart, isLoading: isAddingToCart } = useAddToCart();
@@ -192,7 +193,7 @@ function ProductPurchase({ product, compact = false, showWishlist = true }) {
                 type="button"
                 aria-pressed={isSelected}
                 onClick={() => setSelectedSize(size)}
-                className={`min-w-[2.75rem] rounded-md border px-3 py-1.5 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 ${
+                className={`min-w-11 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 ${
                   isSelected
                     ? 'border-gray-900 bg-gray-900 text-white'
                     : 'border-gray-300 bg-white text-gray-700 hover:border-gray-900'
@@ -243,9 +244,12 @@ function ProductPurchase({ product, compact = false, showWishlist = true }) {
           </button>
         )}
 
-        <button
+        <Button
           type="button"
-          disabled={!selectedVariant || isAddingToCart}
+          variant="primary"
+          className="flex-1 rounded-lg"
+          disabled={!selectedVariant}
+          loading={isAddingToCart}
           onClick={() =>
             addToCart({
               productId: product._id,
@@ -253,14 +257,9 @@ function ProductPurchase({ product, compact = false, showWishlist = true }) {
               quantity: 1,
             })
           }
-          className="flex-1 rounded-lg bg-gray-900 px-6 py-3 text-sm font-medium text-white shadow-sm transition-all duration-150 ease-out hover:bg-black hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-500 disabled:shadow-none"
         >
-          {isAddingToCart
-            ? 'Adding…'
-            : !selectedVariant
-              ? 'Select options'
-              : 'Add to cart'}
-        </button>
+          {!selectedVariant ? 'Select options' : 'Add to cart'}
+        </Button>
       </div>
     </div>
   );

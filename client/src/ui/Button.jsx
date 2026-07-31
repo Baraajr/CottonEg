@@ -15,8 +15,7 @@ function Button({
   const state = active ? activeClassName : '';
 
   const base =
-    'inline-flex items-center justify-center gap-2 rounded-md font-medium transition-all duration-200 disabled:pointer-events-none disabled:opacity-50';
-
+    'inline-flex items-center justify-center gap-2 rounded-md font-medium transition-all duration-200 disabled:pointer-events-none';
   const variants = {
     primary:
       'relative overflow-hidden border border-black bg-black text-white  ' +
