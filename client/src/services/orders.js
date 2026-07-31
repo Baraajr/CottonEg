@@ -51,3 +51,13 @@ export async function createCheckoutSession({ cartId, shippingAddress }) {
     );
   }
 }
+
+export async function markOrderPaid(orderId) {
+  const { data } = await api.patch(`/orders/${orderId}/pay`);
+  return data;
+}
+
+export async function markOrderDelivered(orderId) {
+  const { data } = await api.patch(`/orders/${orderId}/deliver`);
+  return data;
+}

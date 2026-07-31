@@ -1,13 +1,31 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import AdminPageLayout from '../AdminPageLayout';
 import DataTable from '../DataTable';
 import useOrders from '../../../hooks/useOrders';
 import Spinner from '../../../ui/Spinner';
 import Button from '../../../ui/Button';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { markOrderDelivered, markOrderPaid } from '../../../services/orders';
 
 function OrdersTable() {
   const { orders = [], isPending } = useOrders();
   const [expandedId, setExpandedId] = useState(null);
+
+  const queryClient = useQueryClient();
+
+  const { mutate: handleDeliver, isPending: isDelivering } = useMutation({
+    mutationFn: markOrderDelivered,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+    },
+  });
+
+  const { mutate: handlePay, isPending: isPaying } = useMutation({
+    mutationFn: markOrderPaid,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
+    },
+  });
 
   return (
     <AdminPageLayout title="Orders">
@@ -24,12 +42,14 @@ function OrdersTable() {
               <th className="px-4 py-3 text-center">Status</th>
               <th className="px-4 py-3 text-center">Total</th>
               <th className="px-4 py-3 text-right">Details</th>
+              <th className="px-4 py-3 text-center">Actions</th>
             </>
           }
         >
           {orders.length === 0 && (
             <tr>
-              <td colSpan={6} className="py-8 text-center text-gray-500">
+              <td colSpan={7} className="py-8 text-center text-gray-500">
+                {' '}
                 No orders found
               </td>
             </tr>
@@ -39,9 +59,9 @@ function OrdersTable() {
             const isOpen = expandedId === order._id;
 
             return (
-              <>
+              <React.Fragment key={order._id}>
                 {/* Main Row */}
-                <tr key={order._id} className="border-b hover:bg-gray-50">
+                <tr className="border-b hover:bg-gray-50">
                   {/* Order ID + Date */}
                   <td className="px-4 py-3">
                     <div className="font-medium">#{order._id.slice(-6)}</div>
@@ -49,7 +69,6 @@ function OrdersTable() {
                       {new Date(order.createdAt).toLocaleDateString()}
                     </div>
                   </td>
-
                   {/* User */}
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">
@@ -65,7 +84,6 @@ function OrdersTable() {
                       </div>
                     </div>
                   </td>
-
                   {/* Payment */}
                   <td className="px-4 py-3 text-center">
                     <span
@@ -78,7 +96,6 @@ function OrdersTable() {
                       {order.paymentMethodType}
                     </span>
                   </td>
-
                   {/* Status */}
                   <td className="px-4 py-3 text-center">
                     <div className="flex flex-col gap-1">
@@ -99,16 +116,14 @@ function OrdersTable() {
                             : 'bg-yellow-100 text-yellow-700'
                         }`}
                       >
-                        {order.isDelivered ? 'Delivered' : 'Pending'}
+                        {order.isDelivered ? 'Delivered' : 'Delvering'}
                       </span>
                     </div>
                   </td>
-
                   {/* Total */}
                   <td className="px-4 py-3 text-center font-semibold">
                     ${order.totalOrderPrice}
                   </td>
-
                   {/* Expand */}
                   <td className="px-4 py-3 text-right">
                     <Button
@@ -118,8 +133,34 @@ function OrdersTable() {
                       {isOpen ? 'Hide' : 'View'}
                     </Button>
                   </td>
-                </tr>
+                  <td className="px-4 py-3">
+                    <div className="flex justify-end gap-2">
+                      {order.paymentMethodType !== 'card' && !order.isPaid && (
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => handlePay(order._id)}
+                        >
+                          Mark Paid
+                        </Button>
+                      )}
+                      {!order.isDelivered && (
+                        <Button
+                          size="sm"
+                          onClick={() => handleDeliver(order._id)}
+                        >
+                          Deliver
+                        </Button>
+                      )}
 
+                      {order.isPaid && order.isDelivered && (
+                        <span className="rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-600">
+                          Completed
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                </tr>
                 {/* Expanded Row */}
                 {isOpen && (
                   <tr className="bg-gray-50">
@@ -172,7 +213,7 @@ function OrdersTable() {
                     </td>
                   </tr>
                 )}
-              </>
+              </React.Fragment>
             );
           })}
         </DataTable>
