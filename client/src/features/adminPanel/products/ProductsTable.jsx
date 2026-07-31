@@ -18,7 +18,7 @@ import Spinner from '../../../ui/Spinner';
 import SpinnerMini from '../../../ui/SpinnerMini';
 import { IoIosSearch } from 'react-icons/io';
 import useDebounce from '../../../hooks/useDebounce';
-import Pagination from '../../products/pagination';
+import Pagination from '../../Products/pagination';
 import { GENDERS } from '../../../constants/constants';
 import useSubCategories from '../../../hooks/useSubCategories';
 
