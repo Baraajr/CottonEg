@@ -5,13 +5,7 @@ const User = require('../models/userModel');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const sendEmail = require('../utils/sendEmail');
-
-const getCookieOptions = (expireDate) => ({
-  expires: expireDate,
-  httpOnly: true,
-  sameSite: 'none',
-  secure: true, // Secure flag for production
-});
+const getCookieOptions = require('./CookieSettings');
 
 const createJWTToken = (id) => {
   const token = jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -24,15 +18,16 @@ const createAndSendToken = (user, status, req, res) => {
   // 1) create the token
   const token = createJWTToken(user._id);
 
-  const cookieOptions = getCookieOptions(
-    new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
+  //2) save the token to the cookies
+  res.cookie(
+    'JWT',
+    token,
+    getCookieOptions(
+      new Date(
+        Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
+      ),
     ),
   );
-
-  //2) save the token to the cookies
-  res.cookie('JWT', token, cookieOptions);
-
   //3) send the token in the response
   res.status(status).json({
     status: 'success',
@@ -255,15 +250,15 @@ exports.login = catchAsync(async (req, res, next) => {
 });
 
 exports.logout = catchAsync(async (req, res, next) => {
-  // 1) Clear the cookie by setting its expiration to a date in the past
+  res.set('Cache-Control', 'no-store');
+
   res.cookie('JWT', '', getCookieOptions(new Date(Date.now() - 1000)));
 
-  //2) send the result
-  res
-    .status(200)
-    .json({ status: 'success', message: 'Logged out successfully' });
+  res.status(200).json({
+    status: 'success',
+    message: 'Logged out successfully',
+  });
 });
-
 // to check if the user logged in by checking the user token
 exports.protect = catchAsync(async (req, res, next) => {
   let token;
@@ -476,16 +471,16 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
   // 5) sign the user in
   const token = createJWTToken(user._id);
-  const cookieOptions = {
-    expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
+
+  res.cookie(
+    'JWT',
+    token,
+    getCookieOptions(
+      new Date(
+        Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
+      ),
     ),
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-  };
-
-  res.cookie('JWT', token, cookieOptions);
-
+  );
   res.status(200).json({
     status: 'success',
     message: 'Password has been reset successfully',
@@ -501,16 +496,16 @@ exports.passportHandler = catchAsync(async (req, res) => {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
   // Store the JWT in an HTTP-only cookie
-  const cookieOptions = {
-    expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
+
+  res.cookie(
+    'JWT',
+    token,
+    getCookieOptions(
+      new Date(
+        Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
+      ),
     ),
-    httpOnly: true,
-    secure: req.secure === true || req.headers['x-forwarded-proto'] === 'https',
-  };
-
-  res.cookie('JWT', token, cookieOptions);
-
+  );
   // Redirect or send a response
   // Backend
   res.redirect(`${process.env.FRONT_URL}/`);

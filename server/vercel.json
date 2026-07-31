@@ -8,6 +8,13 @@
   ],
   "routes": [
     {
+      "src": "/api/(.*)",
+      "dest": "server.js",
+      "headers": {
+        "Cache-Control": "no-store"
+      }
+    },
+    {
       "src": "/(.*)",
       "dest": "server.js"
     }

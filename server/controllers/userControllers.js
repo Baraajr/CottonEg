@@ -7,6 +7,7 @@ const factory = require('./handlerFactory');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 const cloudinary = require('../utils/imageUpload');
+const getCookieOptions = require('./CookieSettings');
 
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
@@ -193,15 +194,15 @@ exports.updateLoggedUserPassword = catchAsync(async (req, res, next) => {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 
-  const cookieOptions = {
-    expires: new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
+  res.cookie(
+    'JWT',
+    token,
+    getCookieOptions(
+      new Date(
+        Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000,
+      ),
     ),
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-  };
-
-  res.cookie('JWT', token, cookieOptions);
+  );
 
   res.status(200).json({
     status: 'success',
