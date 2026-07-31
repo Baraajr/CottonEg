@@ -32,7 +32,7 @@ function Admin() {
             fixed md:static
             top-20 left-0
             h-[calc(100vh-80px)] md:h-auto
-            w-64
+            w-54
             bg-white md:bg-transparent
             border-r md:border-r-0
             z-50 md:z-auto
@@ -53,7 +53,7 @@ function Admin() {
         </aside>
 
         {/* Content */}
-        <main className="flex-1 min-w-0 w-full">
+        <main className="flex-2 min-w-0 w-full">
           <Outlet />
         </main>
       </div>

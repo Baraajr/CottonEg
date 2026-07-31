@@ -9,7 +9,7 @@ function ConfirmDelete({ resourceName, onConfirm, disabled, onCloseModal }) {
 
       <p className="mb-6 text-sm leading-6 text-gray-600">
         Are you sure you want to permanently delete this
-        <span className="font-semibold">{resourceName}</span>? This action
+        <span className="font-semibold"> {resourceName}</span>? This action
         cannot be undone.
       </p>
 

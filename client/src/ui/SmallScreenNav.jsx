@@ -48,7 +48,7 @@ function SmallScreenNav() {
   return (
     <div
       className="
-          sm:hidden fixed bottom-0 inset-x-0 z-50
+          md:hidden fixed bottom-0 inset-x-0 z-50
           bg-white/90 backdrop-blur-xl
           border-t border-gray-200
           shadow-[0_-10px_25px_rgba(0,0,0,0.06)]
