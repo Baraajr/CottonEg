@@ -1,5 +1,5 @@
+import { Fragment, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
 import { toast } from 'react-hot-toast';
 
 import Modal from '../../../ui/Modal';
@@ -16,7 +16,6 @@ import AdminPageLayout from '../AdminPageLayout';
 import DataTable from '../DataTable';
 import ConfirmDelete from '../../../ui/ConfirmDelete';
 import Spinner from '../../../ui/Spinner';
-import SpinnerMini from '../../../ui/SpinnerMini';
 
 const GENDER_STYLES = {
   men: 'bg-blue-100 text-blue-800',
@@ -116,13 +115,6 @@ function SubCategoriesTable() {
                           </Button>
                         </Modal.Open>
 
-                        <Modal.Window name={`edit-${sc._id}`}>
-                          <UpdateSubCategoryForm
-                            subcategory={sc}
-                            categories={categories}
-                          />
-                        </Modal.Window>
-
                         <Modal.Open opens={`delete-${sc._id}`}>
                           <Button
                             variant="dangerOutline"
@@ -132,15 +124,6 @@ function SubCategoriesTable() {
                             Delete
                           </Button>
                         </Modal.Open>
-
-                        <Modal.Window name={`delete-${sc._id}`}>
-                          <ConfirmDelete
-                            resourceName="subcategory"
-                            disabled={deletingId === sc._id}
-                            onCloseModal={() => {}}
-                            onConfirm={() => handleDelete(sc._id)}
-                          />
-                        </Modal.Window>
                       </div>
                     </td>
                   </tr>
@@ -195,26 +178,30 @@ function SubCategoriesTable() {
                       </Button>
                     </Modal.Open>
                   </div>
-
-                  {/* MODALS */}
-                  <Modal.Window name={`edit-${sc._id}`}>
-                    <UpdateSubCategoryForm
-                      subcategory={sc}
-                      categories={categories}
-                    />
-                  </Modal.Window>
-
-                  <Modal.Window name={`delete-${sc._id}`}>
-                    <ConfirmDelete
-                      resourceName="subcategory"
-                      disabled={deletingId === sc._id}
-                      onCloseModal={() => {}}
-                      onConfirm={() => handleDelete(sc._id)}
-                    />
-                  </Modal.Window>
                 </div>
               ))}
             </div>
+
+            {/* ================= SHARED MODAL WINDOWS (rendered once per row) ================= */}
+            {subcategories.map((sc) => (
+              <Fragment key={sc._id}>
+                <Modal.Window name={`edit-${sc._id}`}>
+                  <UpdateSubCategoryForm
+                    subcategory={sc}
+                    categories={categories}
+                  />
+                </Modal.Window>
+
+                <Modal.Window name={`delete-${sc._id}`}>
+                  <ConfirmDelete
+                    resourceName="subcategory"
+                    disabled={deletingId === sc._id}
+                    onCloseModal={() => {}}
+                    onConfirm={() => handleDelete(sc._id)}
+                  />
+                </Modal.Window>
+              </Fragment>
+            ))}
           </>
         )}
       </AdminPageLayout>
