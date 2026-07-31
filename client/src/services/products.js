@@ -9,9 +9,11 @@ export async function getFilteredProducts({
   maxPrice,
   page,
   sort,
+  search,
   gender,
   limit = 20,
   featured,
+  stock,
 } = {}) {
   const params = new URLSearchParams();
 
@@ -20,14 +22,21 @@ export async function getFilteredProducts({
     params.append('sort', order === 'asc' ? field : `-${field}`);
   }
 
-  if (category) params.append('category', category);
-  if (subcategory) params.append('subcategory', subcategory);
+  if (category && category != 'all') params.append('category', category);
+  if (subcategory && subcategory !== 'all')
+    params.append('subcategory', subcategory);
   if (minPrice !== undefined) params.append('price[gte]', minPrice);
   if (maxPrice !== undefined) params.append('price[lte]', maxPrice);
   if (page !== undefined) params.append('page', page);
-  if (gender) params.append('gender', gender);
+  if (gender && gender !== 'all') params.append('gender', gender);
   if (limit !== undefined) params.append('limit', limit);
-  if (featured !== undefined) params.append('featured', featured);
+  if (featured && featured != 'all') params.append('featured', featured);
+  if (stock && stock != 'all') {
+    params.append('quantity', stock);
+  }
+  if (search) params.append('search', search);
+
+  console.log(params.toString());
 
   try {
     const { data } = await api.get(`${PRODUCTS_URL}?${params.toString()}`);
