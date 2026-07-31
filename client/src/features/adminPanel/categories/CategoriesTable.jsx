@@ -50,7 +50,7 @@ function CategoriesTable() {
     <Modal>
       <AdminPageLayout
         title="Categories"
-        actions={
+        headerActions={
           <Modal.Open opens="add-category">
             <Button variant="primary">Add Category</Button>
           </Modal.Open>

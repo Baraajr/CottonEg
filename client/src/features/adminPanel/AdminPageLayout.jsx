@@ -1,15 +1,26 @@
-function AdminPageLayout({ title, actions, children }) {
+function AdminPageLayout({ title, headerActions, tableActions, children }) {
   return (
-    <div className="space-y-4 relative">
-      {/* Header */}
+    <div className="relative space-y-4">
+      {/* Page Header */}
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-semibold">{title}</h1>
-        <div className="flex items-center gap-2">{actions}</div>
+        <h1 className="text-2xl font-semibold">{title}</h1>
+
+        {headerActions && (
+          <div className="flex items-center gap-2">{headerActions}</div>
+        )}
       </div>
 
-      {/* Content */}
-      <div className="overflow-x-auto rounded-lg border bg-white">
-        {children}
+      {/* Table/Card */}
+      <div className="overflow-hidden rounded-lg ">
+        {tableActions && (
+          <div className=" p-4">
+            <div className="flex justify-between items-center gap-5">
+              {tableActions}
+            </div>
+          </div>
+        )}
+
+        <div className=" border overflow-x-auto">{children}</div>
       </div>
     </div>
   );
