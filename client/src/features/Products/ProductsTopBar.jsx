@@ -16,7 +16,7 @@ function ProductsTopBar({
   const countLabel = `${count} ${count === 1 ? 'product' : 'products'}`;
 
   return (
-    <div className="px-2 mb-3 sm:mb-5 w-full">
+    <div className="absolut  top-20 px-2 mb-3 sticky bg-white z-50 sm:mb-5 w-full">
       {/* MOBILE ONLY */}
       <div className="flex sm:hidden items-stretch w-full border border-gray-200 rounded-md h-12">
         <div className="flex items-center px-2 flex-1 border-r border-gray-200">
