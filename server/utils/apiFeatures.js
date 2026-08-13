@@ -9,6 +9,14 @@ class ApiFeatures {
     const excludesFields = ['page', 'sort', 'limit', 'fields', 'search'];
     excludesFields.forEach((field) => delete queryStringObj[field]);
     // Apply filtration using [gte, gt, lte, lt]
+    if (queryStringObj.size) {
+      queryStringObj['variants.size'] = queryStringObj.size;
+      delete queryStringObj.size;
+    }
+    if (queryStringObj.color) {
+      queryStringObj['variants.color.name'] = queryStringObj.color;
+      delete queryStringObj.color;
+    }
     let queryStr = JSON.stringify(queryStringObj);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
 

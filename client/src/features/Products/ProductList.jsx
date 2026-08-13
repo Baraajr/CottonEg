@@ -6,7 +6,17 @@ import Spinner from '../../ui/Spinner';
 import Pagination from './pagination';
 
 function ProductList({ filters, sort, setTotalResults, view = 4 }) {
-  const { category, priceRange, rating, gender, subcategory } = filters;
+  const {
+    category,
+    priceRange,
+    rating,
+    gender,
+    subcategory,
+    featured,
+    stock,
+    size,
+    color,
+  } = filters;
 
   const [page, setPage] = useState(1);
 
@@ -31,6 +41,10 @@ function ProductList({ filters, sort, setTotalResults, view = 4 }) {
         gender,
         sort,
         page,
+        featured,
+        stock,
+        size,
+        color,
       }),
   });
 

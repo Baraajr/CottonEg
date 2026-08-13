@@ -14,6 +14,8 @@ export async function getFilteredProducts({
   limit = 20,
   featured,
   stock,
+  size,
+  color,
 } = {}) {
   const params = new URLSearchParams();
 
@@ -31,8 +33,14 @@ export async function getFilteredProducts({
   if (gender && gender !== 'all') params.append('gender', gender);
   if (limit !== undefined) params.append('limit', limit);
   if (featured && featured != 'all') params.append('featured', featured);
-  if (stock && stock != 'all') {
-    params.append('quantity', stock);
+  if (size && size != 'all') params.append('size', size);
+  if (color && color != 'all') params.append('color', color);
+  if (stock && stock !== 'all') {
+    if (stock === 'inStock') {
+      params.append('quantity[gt]', '0');
+    } else if (stock === 'outOfStock') {
+      params.append('quantity', '0');
+    }
   }
   if (search) params.append('search', search);
 

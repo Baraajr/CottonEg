@@ -9,12 +9,40 @@ import ProductsTopBar from '../features/Products/ProductsTopBar';
 
 function Products() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [filters, setFilters] = useState({
+    priceRange: [100, 3000],
+    featured: 'all',
+    stock: 'all',
+    size: '',
+    color: '',
+  });
+
   const [showFilter, setShowFilter] = useState(false);
   const [view, setView] = useState(4);
 
   const [sort, setSort] = useState('createdAt');
   const [totalResults, setTotalResults] = useState(0);
 
+  const gender = searchParams.get('gender') || '';
+  const category = searchParams.get('category') || '';
+  const subcategory = searchParams.get('subcategory') || '';
+
+  const filtersFromUrl = {
+    ...filters,
+    subcategory,
+    category,
+    gender,
+  };
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setFilters({
+      priceRange: [100, 3000],
+      featured: 'all',
+      stock: 'all',
+      size: '',
+      color: '',
+    });
+  }, [gender, category, subcategory]);
   useEffect(() => {
     if (showFilter) {
       document.body.style.overflow = 'hidden';
@@ -27,35 +55,25 @@ function Products() {
     };
   }, [showFilter]);
 
-  const filters = {
-    subcategory: searchParams.get('subcategory') || '',
-    category: searchParams.get('category') || '',
-    priceRange: [
-      Number(searchParams.get('priceGte')) || 100,
-      Number(searchParams.get('priceLte')) || 3000,
-    ],
-    gender: searchParams.get('gender') || '',
-  };
-
   function handleFilterChange(updatedFilters) {
-    const params = {
-      subcategory: updatedFilters.subcategory,
+    setFilters(updatedFilters);
+
+    setSearchParams({
+      gender: updatedFilters.gender,
       category: updatedFilters.category,
-      priceGte: updatedFilters.priceRange[0],
-      priceLte: updatedFilters.priceRange[1],
-    };
+      subcategory: updatedFilters.subcategory,
+    });
 
-    // only add gender if exists
-    if (updatedFilters.gender) {
-      params.gender = updatedFilters.gender;
-    }
-
-    setSearchParams(params);
     setShowFilter(false);
   }
 
   return (
     <div className="py-4">
+      <div className="py-15 flex justify-center">
+        <h1 className="text-4xl font-semibold uppercase tracking-[0.3em]">
+          {filtersFromUrl.gender} Clothes
+        </h1>
+      </div>
       {/* TOP BAR */}
       <ProductsTopBar
         count={totalResults}
@@ -72,7 +90,7 @@ function Products() {
           <>
             {/* OVERLAY */}
             <motion.div
-              className="fixed inset-0 bg-black/40 z-50"
+              className="fixed inset-0 bg-black/40 z-60"
               onClick={() => setShowFilter(false)}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -82,14 +100,14 @@ function Products() {
 
             {/* DRAWER */}
             <motion.div
-              className="fixed top-0 right-0 h-screen w-[320px] sm:w-[360px] bg-white z-50 flex flex-col"
+              className="fixed top-0 right-0 h-screen w-[320px] sm:w-90 bg-white z-60 flex flex-col"
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ duration: 0.25, ease: 'easeInOut' }}
             >
               <Filter
-                filters={filters}
+                filters={filtersFromUrl}
                 onFilterChange={handleFilterChange}
                 onClose={() => setShowFilter(false)}
               />
@@ -100,7 +118,7 @@ function Products() {
 
       {/* PRODUCTS */}
       <ProductList
-        filters={filters}
+        filters={filtersFromUrl}
         sort={sort}
         view={view}
         setTotalResults={setTotalResults}

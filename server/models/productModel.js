@@ -13,6 +13,7 @@ const variantSchema = new mongoose.Schema(
         type: String,
         required: true,
         trim: true,
+        lowercase: true,
       },
       hex: {
         type: String,

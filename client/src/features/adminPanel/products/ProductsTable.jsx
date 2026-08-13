@@ -291,8 +291,8 @@ function ProductsTable() {
                   className="w-full rounded border p-2"
                 >
                   <option value="all">All</option>
-                  <option value=">0">In Stock</option>
-                  <option value="=0">Out of Stock</option>
+                  <option value=">inStock">In Stock</option>
+                  <option value="outOfStock">Out of Stock</option>
                 </select>
               </div>
             </div>
