@@ -68,10 +68,10 @@ function ProductCard({ product }) {
           <Modal.Open opens={product.name}>
             <button
               onClick={(e) => e.stopPropagation()}
-              className="absolute bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-2 rounded-full bg-black px-5 py-2.5 text-sm font-medium text-white shadow-lg opacity-95 transition-all duration-300 hover:-translate-x-1/2 hover:-translate-y-1 hover:bg-gray-900 hover:shadow-2xl active:translate-y-0 md:opacity-0 md:group-hover:opacity-100"
+              className="absolute bottom-4 left-1/2 flex  -translate-x-1/2 items-center gap-2 rounded-full bg-black px-5 py-2.5 text-sm font-medium text-white shadow-lg opacity-95 transition-all duration-300 hover:-translate-x-1/2 hover:-translate-y-1 hover:bg-gray-900 hover:shadow-2xl active:translate-y-0 md:opacity-0 md:group-hover:opacity-100"
             >
               <FaCartPlus className="text-base" />
-              <span>Add to Cart</span>
+              <span className="hidden lg:block">Add to Cart</span>
             </button>
           </Modal.Open>
           <Modal.Window name={product.name}>

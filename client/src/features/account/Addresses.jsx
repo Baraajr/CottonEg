@@ -14,7 +14,7 @@ function Addresses() {
   const currentUser = user?.data;
   const queryClient = useQueryClient();
 
-  const { data, isPending: isLoading } = useQuery({
+  const { data } = useQuery({
     queryKey: ['addresses'],
     queryFn: getUserAddresses,
     staleTime: 1000 * 120,
@@ -37,8 +37,6 @@ function Addresses() {
       });
     },
   });
-
-  if (isLoading) return <Spinner />;
 
   if (isUserLoading) return <Spinner />;
 

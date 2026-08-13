@@ -26,7 +26,7 @@ function AccountNav() {
       </div>
 
       {/* Navigation */}
-      <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide md:flex-col md:gap-1 md:overflow-visible md:pb-0">
+      <div className="flex gap-1 overflow-x-auto pb-1 md:flex-col lg:gap-2 md:overflow-visible md:pb-0">
         {navItems.map(({ to, label, icon }) => {
           const Icon = icon;
           return (
@@ -54,7 +54,7 @@ function AccountNav() {
 
                   <Icon
                     size={18}
-                    className={isActive ? 'text-black' : 'text-gray-500'}
+                    className={`${isActive ? 'text-black' : 'text-gray-500'} hidden lg:block `}
                   />
 
                   <span>{label}</span>
