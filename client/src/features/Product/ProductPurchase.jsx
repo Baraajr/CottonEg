@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import { FaCheck, FaHeart } from 'react-icons/fa';
-import RatingStars from '../../ui/RatingStars';
 import useAddToCart from '../../hooks/useAddToCart';
 import useAddToWishlist from '../../hooks/useAddToWishlist';
 import Button from '../../ui/Button';
@@ -83,18 +82,30 @@ function ProductPurchase({ product, compact = false, showWishlist = true }) {
         {product.name}
       </h1>
 
-      <div className="mt-2.5">
-        <RatingStars rating={product.ratingsAverage} />
+      <div className="mt-4 flex items-baseline gap-3">
+        <p
+          className={`font-semibold tabular-nums text-gray-900 ${
+            compact ? 'text-xl' : 'text-2xl'
+          }`}
+        >
+          $
+          {product.priceAfterDiscount &&
+          product.priceAfterDiscount < product.price
+            ? product.priceAfterDiscount
+            : product.price}
+        </p>
+
+        {product.priceAfterDiscount &&
+          product.priceAfterDiscount < product.price && (
+            <p
+              className={`tabular-nums text-gray-400 line-through ${
+                compact ? 'text-sm' : 'text-base'
+              }`}
+            >
+              ${product.price}
+            </p>
+          )}
       </div>
-
-      <p
-        className={`font-semibold tabular-nums text-gray-900 ${
-          compact ? 'text-xl mt-3' : 'text-2xl mt-4'
-        }`}
-      >
-        ${product.price}
-      </p>
-
       {product.description && (
         <p
           className={`text-[15px] leading-relaxed text-gray-600 ${

@@ -87,9 +87,25 @@ function ProductCard({ product }) {
           <h3 className="text-sm font-medium text-gray-900 line-clamp-2">
             {product.name}
           </h3>
-          <p className="mt-1 text-base font-semibold text-black">
-            ${product.price}
-          </p>
+
+          <div className="mt-1 flex items-center justify-center gap-2">
+            {product.priceAfterDiscount &&
+            product.priceAfterDiscount < product.price ? (
+              <>
+                <p className="text-base font-semibold text-black">
+                  ${product.priceAfterDiscount}
+                </p>
+
+                <p className="text-sm text-gray-400 line-through">
+                  ${product.price}
+                </p>
+              </>
+            ) : (
+              <p className="text-base font-semibold text-black">
+                ${product.price}
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </Modal>
