@@ -40,6 +40,7 @@ import Cookies from './pages/Cookies';
 import Search from './pages/Search';
 import ScrollToTop from './ui/ScrollTop';
 import CheckoutPage from './pages/CheckoutPage';
+import Dashboard from './features/adminPanel/dashboard/Dashboard';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -139,7 +140,7 @@ function App() {
             <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
               <Route path="/admin" element={<Admin />}>
                 <Route index element={<Navigate to="dashboard" replace />} />
-                <Route path="dashboard" element={<h1>dashboard</h1>} />
+                <Route path="dashboard" element={<Dashboard />} />
                 <Route path="products" element={<ProductsTable />} />
                 <Route path="products/:productId" element={<UpdateProduct />} />
                 <Route path="categories" element={<CategoriesTable />} />
