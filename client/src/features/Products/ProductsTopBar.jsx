@@ -16,7 +16,7 @@ function ProductsTopBar({
   const countLabel = `${count} ${count === 1 ? 'product' : 'products'}`;
 
   return (
-    <div className="absolut  top-20 px-2 mb-3 sticky bg-white z-50 sm:mb-5 w-full">
+    <div className="absolut  top-20 px-2 mb-3 sticky bg-white z-40 sm:mb-5 w-full">
       {/* MOBILE ONLY */}
       <div className="flex sm:hidden items-stretch w-full border border-gray-200 rounded-md h-12">
         <div className="flex items-center px-2 flex-1 border-r border-gray-200">
@@ -25,11 +25,17 @@ function ProductsTopBar({
             onChange={(e) => onSortChange(e.target.value)}
             className="w-full h-full text-sm text-gray-700 px-2 appearance-none focus:outline-none cursor-pointer"
           >
-            <option value="">Default</option>
-            <option value="name-asc">A → Z</option>
-            <option value="name-desc">Z → A</option>
-            <option value="price-asc">Price ↑</option>
-            <option value="price-desc">Price ↓</option>
+            <option value="createdAt-desc">Newest</option>
+            <option value="createdAt-asc">Oldest</option>
+
+            <option value="name-asc">Name (A–Z)</option>
+            <option value="name-desc">Name (Z–A)</option>
+
+            <option value="price-asc">Price (Low → High)</option>
+            <option value="price-desc">Price (High → Low)</option>
+
+            <option value="sold-desc">Best Selling</option>
+
             <option value="ratingsAverage-desc">Top Rated</option>
           </select>
         </div>
@@ -78,17 +84,23 @@ function ProductsTopBar({
 
         {/* SORT + FILTER */}
         <div className="flex items-stretch w-auto">
-          <div className="flex items-center px-3 border-r border-gray-200 w-44">
+          <div className="flex items-center px-3 border-r border-gray-200 w-66">
             <select
               value={sort}
               onChange={(e) => onSortChange(e.target.value)}
               className="w-full text-sm text-gray-700 px-2 appearance-none focus:outline-none"
             >
-              <option value="">Default</option>
-              <option value="name-asc">A → Z</option>
-              <option value="name-desc">Z → A</option>
-              <option value="price-asc">Price ↑</option>
-              <option value="price-desc">Price ↓</option>
+              <option value="createdAt-desc">Newest</option>
+              <option value="createdAt-asc">Oldest</option>
+
+              <option value="name-asc">Name (A–Z)</option>
+              <option value="name-desc">Name (Z–A)</option>
+
+              <option value="price-asc">Price (Low → High)</option>
+              <option value="price-desc">Price (High → Low)</option>
+
+              <option value="sold-desc">Best Selling</option>
+
               <option value="ratingsAverage-desc">Top Rated</option>
             </select>
           </div>
