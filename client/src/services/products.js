@@ -178,3 +178,12 @@ export async function searchProducts(text) {
     throw new Error(err.message || 'Failed to search');
   }
 }
+
+export const createProductReview = async (productId, data) => {
+  const response = await api.post(
+    `${PRODUCTS_URL}/${productId}/reviews/`,
+    data,
+  );
+
+  return response.data;
+};
