@@ -12,11 +12,11 @@ function UpdateCategoryForm({ category, onCloseModal }) {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm({
     defaultValues: {
       name: category.name,
-      genders: category.genders, // pre-checks the saved genders
+      genders: category.genders,
     },
   });
 
@@ -81,7 +81,11 @@ function UpdateCategoryForm({ category, onCloseModal }) {
           Cancel
         </Button>
 
-        <Button type="submit" loading={isPending}>
+        <Button
+          type="submit"
+          loading={isPending}
+          disabled={!isDirty || isPending}
+        >
           Update
         </Button>
       </div>

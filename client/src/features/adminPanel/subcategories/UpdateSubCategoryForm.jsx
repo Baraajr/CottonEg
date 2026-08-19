@@ -2,7 +2,6 @@ import { useForm } from 'react-hook-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
 import { updateSubCategory } from '../../../services/subCategories';
-import SpinnerMini from '../../../ui/SpinnerMini';
 import { GENDERS } from '../../../constants/constants';
 import Button from '../../../ui/Button';
 
@@ -12,12 +11,12 @@ function UpdateSubCategoryForm({ subcategory, categories = [], onCloseModal }) {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isDirty },
   } = useForm({
     defaultValues: {
       name: subcategory.name,
       category: subcategory.category?._id,
-      genders: subcategory.genders, // pre-checks the saved genders
+      genders: subcategory.genders,
     },
   });
 
@@ -59,12 +58,14 @@ function UpdateSubCategoryForm({ subcategory, categories = [], onCloseModal }) {
         className="input"
       >
         <option value="">Select category</option>
+
         {categories.map((cat) => (
           <option key={cat._id} value={cat._id}>
             {cat.name}
           </option>
         ))}
       </select>
+
       {errors.category && (
         <p className="text-xs text-red-500">{errors.category.message}</p>
       )}
@@ -72,6 +73,7 @@ function UpdateSubCategoryForm({ subcategory, categories = [], onCloseModal }) {
       <label>
         Genders <span className="text-red-500">*</span>
       </label>
+
       <div className="flex gap-4">
         {GENDERS.map((gender) => (
           <label
@@ -89,6 +91,7 @@ function UpdateSubCategoryForm({ subcategory, categories = [], onCloseModal }) {
           </label>
         ))}
       </div>
+
       {errors.genders && (
         <p className="text-xs text-red-500">{errors.genders.message}</p>
       )}
@@ -103,7 +106,7 @@ function UpdateSubCategoryForm({ subcategory, categories = [], onCloseModal }) {
           Cancel
         </Button>
 
-        <Button type="submit" loading={isPending}>
+        <Button type="submit" loading={isPending} disabled={!isDirty}>
           Update
         </Button>
       </div>

@@ -17,6 +17,13 @@ function EditVariantForm({ productId, variant, onCloseModal }) {
     sku: variant.sku || '',
   });
 
+  const hasChanges =
+    form.size !== variant.size ||
+    form.colorName.trim() !== (variant.color?.name || '') ||
+    form.colorHex !== (variant.color?.hex || '#000000') ||
+    Number(form.quantity) !== Number(variant.quantity) ||
+    form.sku.trim() !== (variant.sku || '');
+
   const { mutate, isPending } = useMutation({
     mutationFn: (body) =>
       editVariant({
@@ -50,7 +57,7 @@ function EditVariantForm({ productId, variant, onCloseModal }) {
 
   const field = (label, input) => (
     <div className="flex flex-col gap-1">
-      <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">
+      <label className="text-xs font-medium uppercase tracking-wide text-gray-600">
         {label}
       </label>
       {input}
@@ -58,7 +65,7 @@ function EditVariantForm({ productId, variant, onCloseModal }) {
   );
 
   return (
-    <div className="p-6 w-80 flex flex-col gap-4">
+    <div className="flex w-80 flex-col gap-4 p-6">
       <h2 className="text-lg font-semibold">Edit Variant</h2>
 
       {field(
@@ -66,7 +73,7 @@ function EditVariantForm({ productId, variant, onCloseModal }) {
         <select
           value={form.size}
           onChange={(e) => setForm((f) => ({ ...f, size: e.target.value }))}
-          className="border border-gray-300 rounded px-3 py-2 text-sm"
+          className="rounded border border-gray-300 px-3 py-2 text-sm"
         >
           {SIZES.map((s) => (
             <option key={s} value={s}>
@@ -84,7 +91,7 @@ function EditVariantForm({ productId, variant, onCloseModal }) {
           onChange={(e) =>
             setForm((f) => ({ ...f, colorName: e.target.value }))
           }
-          className="border border-gray-300 rounded px-3 py-2 text-sm"
+          className="rounded border border-gray-300 px-3 py-2 text-sm"
         />,
       )}
 
@@ -98,7 +105,7 @@ function EditVariantForm({ productId, variant, onCloseModal }) {
               setForm((f) => ({ ...f, colorHex: e.target.value }))
             }
           />
-          <span className="text-sm font-mono">{form.colorHex}</span>
+          <span className="font-mono text-sm">{form.colorHex}</span>
         </div>,
       )}
 
@@ -109,7 +116,7 @@ function EditVariantForm({ productId, variant, onCloseModal }) {
           min={0}
           value={form.quantity}
           onChange={(e) => setForm((f) => ({ ...f, quantity: e.target.value }))}
-          className="border border-gray-300 rounded px-3 py-2 text-sm"
+          className="rounded border border-gray-300 px-3 py-2 text-sm"
         />,
       )}
 
@@ -119,7 +126,7 @@ function EditVariantForm({ productId, variant, onCloseModal }) {
           type="text"
           value={form.sku}
           onChange={(e) => setForm((f) => ({ ...f, sku: e.target.value }))}
-          className="border border-gray-300 rounded px-3 py-2 text-sm"
+          className="rounded border border-gray-300 px-3 py-2 text-sm"
         />,
       )}
 
@@ -127,7 +134,7 @@ function EditVariantForm({ productId, variant, onCloseModal }) {
         <Button
           onClick={handleSubmit}
           loading={isPending}
-          disabled={!form.colorName.trim()}
+          disabled={!hasChanges || !form.colorName.trim()}
         >
           Save Changes
         </Button>
