@@ -1,5 +1,6 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const mongoose = require('mongoose');
+const redis = require('../config/redis');
 
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
@@ -10,11 +11,27 @@ const Cart = require('../models/cartModel');
 const User = require('../models/userModel');
 const factory = require('./handlerFactory');
 
+const invalidateOrdersCache = async () => {
+  const keys = [];
+
+  // Upstash Redis doesn't support scanIterator().
+  // Get the known order cache keys instead.
+  for (const key of ['orders:*']) {
+    const matchingKeys = await redis.keys(key);
+    keys.push(...matchingKeys);
+  }
+
+  if (keys.length) {
+    await redis.del(...keys);
+  }
+};
+
 /* =========================
-   CASH ORDER (TRANSACTION SAFE)
-========================= */
+    CASH ORDER (TRANSACTION SAFE)
+  ========================= */
 exports.createCashOrder = catchAsync(async (req, res, next) => {
   const { shippingAddress } = req.body;
+
   if (!shippingAddress)
     return next(new AppError('shippingAddress is required', 400));
 
@@ -40,6 +57,7 @@ exports.createCashOrder = catchAsync(async (req, res, next) => {
       _id: req.params.cartId,
       user: req.user._id,
     }).session(session);
+
     if (!cart) throw new AppError('Cart not found', 404);
 
     const cartPrice = cart.totalPriceAfterDiscount
@@ -48,7 +66,7 @@ exports.createCashOrder = catchAsync(async (req, res, next) => {
 
     const totalOrderPrice = cartPrice + taxPrice + shippingPrice;
 
-    // 1) VALIDATE STOCK (important fix)
+    // 1) VALIDATE STOCK
     for (const item of cart.cartItems) {
       const product = await Product.findById(item.product._id).session(session);
       const variant = product?.variants.id(item.variant.id);
@@ -92,7 +110,7 @@ exports.createCashOrder = catchAsync(async (req, res, next) => {
       { session },
     );
 
-    // 3) ATOMIC STOCK UPDATE (variant level safe)
+    // 3) ATOMIC STOCK UPDATE
     for (const item of cart.cartItems) {
       const result = await Product.updateOne(
         {
@@ -121,6 +139,8 @@ exports.createCashOrder = catchAsync(async (req, res, next) => {
     await session.commitTransaction();
     session.endSession();
 
+    await invalidateOrdersCache();
+
     res.status(200).json({
       status: 'success',
       data: order[0],
@@ -133,36 +153,39 @@ exports.createCashOrder = catchAsync(async (req, res, next) => {
 });
 
 /* =========================
-   FILTER ORDERS
-========================= */
+    FILTER ORDERS
+  ========================= */
 exports.filterOrdersForLoggedUser = (req, res, next) => {
   if (req.user.role === 'user') {
     req.filterObj = { user: req.user._id };
   }
+
   next();
 };
 
 /* =========================
-   GET ALL ORDERS
-========================= */
-exports.getAllOrders = factory.getAll(Order);
+    GET ALL ORDERS
+  ========================= */
+exports.getAllOrders = factory.getAll(Order, '', 'orders');
 
 /* =========================
-   GET SINGLE ORDER
-========================= */
+    GET SINGLE ORDER
+  ========================= */
 exports.getOrder = factory.getOne(Order);
 
 /* =========================
-   UPDATE PAID STATUS
-========================= */
+    UPDATE PAID STATUS
+  ========================= */
 exports.updateOrderPaidStatus = catchAsync(async (req, res, next) => {
   const order = await Order.findById(req.params.id);
+
   if (!order) return next(new AppError('Order not found', 404));
 
   order.isPaid = true;
   order.paidAt = Date.now();
 
   await order.save();
+  await invalidateOrdersCache();
 
   res.status(200).json({
     status: 'success',
@@ -171,16 +194,18 @@ exports.updateOrderPaidStatus = catchAsync(async (req, res, next) => {
 });
 
 /* =========================
-   UPDATE DELIVERY STATUS
-========================= */
+    UPDATE DELIVERY STATUS
+  ========================= */
 exports.updateOrderDeliveredStatus = catchAsync(async (req, res, next) => {
   const order = await Order.findById(req.params.id);
+
   if (!order) return next(new AppError('Order not found', 404));
 
   order.isDelivered = true;
   order.deliveredAt = Date.now();
 
   await order.save();
+  await invalidateOrdersCache();
 
   res.status(200).json({
     status: 'success',
@@ -189,8 +214,8 @@ exports.updateOrderDeliveredStatus = catchAsync(async (req, res, next) => {
 });
 
 /* =========================
-   STRIPE CHECKOUT SESSION
-========================= */
+    STRIPE CHECKOUT SESSION
+  ========================= */
 exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   const taxPrice = 0;
   const shippingPrice = 0;
@@ -208,6 +233,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   }
 
   const cart = await Cart.findById(req.params.cartId);
+
   if (!cart) return next(new AppError('Cart not found', 404));
 
   const cartPrice = cart.totalPriceAfterDiscount
@@ -270,8 +296,9 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 });
 
 /* =========================
-   STRIPE ORDER CREATION (TRANSACTION SAFE + ID EMPOTENT)
-========================= */
+    STRIPE ORDER CREATION
+    (TRANSACTION SAFE + IDEMPOTENT)
+  ========================= */
 const createOrder = async (sessionData) => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -280,13 +307,16 @@ const createOrder = async (sessionData) => {
     const cartId = sessionData.client_reference_id;
 
     const cart = await Cart.findById(cartId).session(session);
+
     const user = await User.findOne({
       email: sessionData.customer_email,
     }).session(session);
 
-    if (!cart || !user) throw new AppError('Missing cart or user', 400);
+    if (!cart || !user) {
+      throw new AppError('Missing cart or user', 400);
+    }
 
-    // OPTIONAL: prevent duplicate orders
+    // Prevent duplicate orders
     const existing = await Order.findOne({
       paymentReference: sessionData.id,
     }).session(session);
@@ -308,7 +338,7 @@ const createOrder = async (sessionData) => {
     }
 
     // 2) CREATE ORDER
-    const order = await Order.create(
+    await Order.create(
       [
         {
           user: user._id,
@@ -364,16 +394,18 @@ const createOrder = async (sessionData) => {
 
     await session.commitTransaction();
     session.endSession();
+
+    await invalidateOrdersCache();
   } catch (err) {
     await session.abortTransaction();
     session.endSession();
-    console.error(err);
+    throw err;
   }
 };
 
 /* =========================
-   STRIPE WEBHOOK
-========================= */
+    STRIPE WEBHOOK
+  ========================= */
 exports.webhookCheckout = async (req, res) => {
   const sig = req.headers['stripe-signature'];
 
@@ -389,9 +421,18 @@ exports.webhookCheckout = async (req, res) => {
     return res.status(400).json({ error: err.message });
   }
 
-  if (event.type === 'checkout.session.completed') {
-    await createOrder(event.data.object);
-  }
+  try {
+    if (event.type === 'checkout.session.completed') {
+      await createOrder(event.data.object);
+    }
 
-  res.status(200).json({ received: true });
+    res.status(200).json({ received: true });
+  } catch (err) {
+    console.error('Stripe webhook order creation failed:', err);
+
+    res.status(500).json({
+      received: false,
+      error: err.message,
+    });
+  }
 };

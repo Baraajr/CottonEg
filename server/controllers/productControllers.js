@@ -6,6 +6,15 @@ const catchAsync = require('../utils/catchAsync');
 const cloudinary = require('../utils/imageUpload');
 const AppError = require('../utils/appError');
 const { default: mongoose } = require('mongoose');
+const redis = require('../config/redis');
+
+const invalidateProductsCache = async () => {
+  const keys = await redis.keys('products:*');
+
+  if (keys.length) {
+    await redis.del(...keys);
+  }
+};
 
 const multerStorage = multer.memoryStorage();
 
@@ -13,12 +22,12 @@ const upload = multer({ storage: multerStorage });
 
 exports.uploadProductImages = upload.fields([
   { name: 'imageCover', maxCount: 1 },
-  { name: 'images', maxCount: 5 }, // used for create + replace cover/gallery
-  { name: 'addImage', maxCount: 5 }, // used only in update
+  { name: 'images', maxCount: 5 },
+  { name: 'addImage', maxCount: 5 },
 ]);
 
 exports.processProductImages = catchAsync(async (req, res, next) => {
-  if (req.validationError) return next(); // optional safeguard
+  if (req.validationError) return next();
   if (!req.files) return next();
 
   const uploadFolder = 'products';
@@ -28,7 +37,9 @@ exports.processProductImages = catchAsync(async (req, res, next) => {
   if (req.files.imageCover?.[0]) {
     const file = req.files.imageCover[0];
 
-    const base64 = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
+    const base64 = `data:${file.mimetype};base64,${file.buffer.toString(
+      'base64',
+    )}`;
 
     const result = await cloudinary.uploader.upload(base64, {
       folder: uploadFolder,
@@ -43,7 +54,9 @@ exports.processProductImages = catchAsync(async (req, res, next) => {
   if (req.files.images?.length) {
     const uploadedImages = await Promise.all(
       req.files.images.map(async (file, i) => {
-        const base64 = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
+        const base64 = `data:${file.mimetype};base64,${file.buffer.toString(
+          'base64',
+        )}`;
 
         const result = await cloudinary.uploader.upload(base64, {
           folder: uploadFolder,
@@ -51,7 +64,10 @@ exports.processProductImages = catchAsync(async (req, res, next) => {
           format: 'jpg',
         });
 
-        return { _id: new mongoose.Types.ObjectId(), url: result.secure_url };
+        return {
+          _id: new mongoose.Types.ObjectId(),
+          url: result.secure_url,
+        };
       }),
     );
 
@@ -62,7 +78,9 @@ exports.processProductImages = catchAsync(async (req, res, next) => {
   if (req.files.addImage?.[0]) {
     const file = req.files.addImage[0];
 
-    const base64 = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
+    const base64 = `data:${file.mimetype};base64,${file.buffer.toString(
+      'base64',
+    )}`;
 
     const result = await cloudinary.uploader.upload(base64, {
       folder: uploadFolder,
@@ -123,6 +141,8 @@ exports.updateProduct = catchAsync(async (req, res, next) => {
 
   await product.save();
 
+  await invalidateProductsCache();
+
   res.status(200).json({
     status: 'success',
     data: product,
@@ -154,6 +174,8 @@ exports.addVariant = catchAsync(async (req, res, next) => {
 
   await product.save();
 
+  await invalidateProductsCache();
+
   res.status(201).json({
     status: 'success',
     data: {
@@ -181,6 +203,8 @@ exports.editVariant = catchAsync(async (req, res, next) => {
 
   await product.save();
 
+  await invalidateProductsCache();
+
   res.status(200).json({
     status: 'success',
     data: {
@@ -195,6 +219,7 @@ exports.deleteVariant = catchAsync(async (req, res, next) => {
   if (!product) {
     return next(new AppError('Product not found', 404));
   }
+
   if (product.variants.length === 1) {
     return next(new AppError('Product must have at least one variant', 400));
   }
@@ -204,6 +229,8 @@ exports.deleteVariant = catchAsync(async (req, res, next) => {
   );
 
   await product.save();
+
+  await invalidateProductsCache();
 
   res.status(204).json({
     status: 'success',
@@ -228,6 +255,8 @@ exports.addImage = catchAsync(async (req, res, next) => {
 
   await product.save();
 
+  await invalidateProductsCache();
+
   res.status(201).json({
     status: 'success',
     data: {
@@ -249,6 +278,8 @@ exports.deleteImage = catchAsync(async (req, res, next) => {
 
   await product.save();
 
+  await invalidateProductsCache();
+
   res.status(204).json({
     status: 'success',
     data: null,
@@ -257,6 +288,7 @@ exports.deleteImage = catchAsync(async (req, res, next) => {
 
 exports.setBodySlug = (req, res, next) => {
   if (req.body.name) req.body.slug = slugify(req.body.name);
+
   next();
 };
 
@@ -268,11 +300,14 @@ exports.parseVariants = (req, res, next) => {
       return next(new AppError('Invalid variants format', 400));
     }
   }
+
   next();
 };
 
 exports.getAllProducts = factory.getAll(Product, '', 'products');
+
 exports.createProduct = factory.createOne(Product);
+
 exports.getProduct = factory.getOne(Product, 'reviews');
 
 exports.deleteProduct = factory.deleteOne(Product);
@@ -284,7 +319,6 @@ exports.search = catchAsync(async (req, res, next) => {
     return next(new AppError('Search text is required', 400));
   }
 
-  // Build the query object
   const query = {
     $or: [
       { name: { $regex: text, $options: 'i' } },
@@ -292,8 +326,10 @@ exports.search = catchAsync(async (req, res, next) => {
     ],
   };
 
-  // Perform the search
   const products = await Product.find(query);
 
-  res.status(200).json({ status: 'success', data: products });
+  res.status(200).json({
+    status: 'success',
+    data: products,
+  });
 });
