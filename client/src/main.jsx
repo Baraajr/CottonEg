@@ -1,11 +1,17 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { ErrorBoundary } from 'react-error-boundary';
+import ErrorFallback from './ui/ErrorFallback';
 import App from './App.jsx';
 import './index.css';
-import ScrollToTop from './ui/ScrollTop.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <ErrorBoundary
+      FallbackComponent={ErrorFallback}
+      onReset={() => window.location.replace('/')}
+    >
+      <App />
+    </ErrorBoundary>
   </StrictMode>,
 );
