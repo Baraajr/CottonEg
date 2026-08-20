@@ -52,9 +52,9 @@ function SubCategoriesTable() {
     <Modal>
       <AdminPageLayout
         title="Subcategories"
-        actions={
+        headerActions={
           <Modal.Open opens="add-subcategory">
-            <Button variant="primary">Add SubCategory</Button>
+            <Button variant="primary">Add Category</Button>
           </Modal.Open>
         }
       >
