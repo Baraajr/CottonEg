@@ -185,14 +185,14 @@ function ProductView({ productId: propId }) {
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-center gap-3">
                     <img
-                      src={review.user.profileImg}
-                      alt={review.user.name}
+                      src={review.user?.profileImg || '/default-avatar.png'}
+                      alt={review.user?.name || 'Deleted User'}
                       className="h-12 w-12 rounded-full object-cover ring-2 ring-white"
                     />
 
                     <div>
                       <p className="text-sm font-semibold text-gray-900">
-                        {review.user.name}
+                        {review.user?.name || 'Deleted User'}
                       </p>
 
                       <p className="mt-1 text-xs text-gray-500">
