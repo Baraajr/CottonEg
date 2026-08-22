@@ -374,7 +374,7 @@ function Filter({ filters, onFilterChange, onClose }) {
   ];
 
   return (
-    <div className="flex h-full w-full flex-col bg-white">
+    <div className="flex h-dvh w-full flex-col bg-white">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-gray-100 px-6 py-5 sm:px-8">
         <div>
