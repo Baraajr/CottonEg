@@ -1,10 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { FaCartPlus, FaHeart, FaRegHeart } from 'react-icons/fa';
-import { CiHeart } from 'react-icons/ci';
 import useWishlist from '../features/wishlist/useWishlist';
 import useAddToWishlist from '../hooks/useAddToWishlist';
 import Modal from './Modal';
-import ProductView from '../features/Product/ProductView';
 import ProductGallery from '../features/Product/ProductGallery';
 import ProductPurchase from '../features/Product/ProductPurchase';
 import useUser from '../hooks/useUser';
@@ -75,7 +73,7 @@ function ProductCard({ product }) {
             </button>
           </Modal.Open>
           <Modal.Window name={product.name}>
-            <div className="grid max-w-5xl gap-8 md:grid-cols-2">
+            <div className="flex flex-col gap-6">
               <ProductGallery product={product} compact />
               <ProductPurchase product={product} compact showWishlist={false} />
             </div>
