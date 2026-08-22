@@ -1,8 +1,6 @@
 # CottonEg
 
-A full-stack clothing e-commerce platform built with the MERN stack.
-
-CottonEg provides a complete shopping experience for customers and a management dashboard for administrators, with product variants, authentication, cart and wishlist management, orders, reviews, coupons, payments, and more.
+CottonEg is a production-oriented full-stack fashion e-commerce platform built with the MERN stack, featuring secure authentication, real-world checkout and payment workflows, product variants, order management, administration, automated API testing, and integrations with Redis, Stripe, Cloudinary, and Google OAuth.
 
 ## Live Demo
 
