@@ -269,7 +269,7 @@ function ProductPurchase({ product, compact = false, showWishlist = true }) {
             })
           }
         >
-          {!selectedVariant ? 'Select options' : 'Add to cart'}
+          {!selectedVariant ? 'Select Color And Size First' : 'Add to cart'}
         </Button>
       </div>
     </div>
