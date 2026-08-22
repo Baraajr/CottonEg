@@ -13,7 +13,7 @@ function ProfileSection() {
   return (
     <Modal>
       {/* Profile card */}
-      <div className="flex justify-between gap-6 rounded-xl border border-gray-200 bg-white p-6">
+      <div className="flex sm:flex-row flex-col justify-between gap-6 rounded-xl border border-gray-200 bg-white p-6">
         {/* user info */}
         <div className="flex items-center gap-4">
           <img
