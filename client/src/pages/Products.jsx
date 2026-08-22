@@ -69,8 +69,8 @@ function Products() {
 
   return (
     <div className="py-4">
-      <div className="py-15 flex justify-center">
-        <h1 className="text-4xl font-semibold uppercase tracking-[0.3em]">
+      <div className="py-15 flex justify-center px-4">
+        <h1 className="text-4xl font-semibold uppercase tracking-[0.3em] break-words text-center">
           {filtersFromUrl.gender} Clothes
         </h1>
       </div>
