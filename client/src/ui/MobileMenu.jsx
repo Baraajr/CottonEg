@@ -1,5 +1,4 @@
 import { HiOutlineChevronLeft } from 'react-icons/hi';
-// eslint-disable-next-line no-unused-vars
 import { AnimatePresence, motion } from 'framer-motion';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';

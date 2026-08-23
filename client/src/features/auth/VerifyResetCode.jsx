@@ -3,7 +3,6 @@ import { useMutation } from '@tanstack/react-query';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { verifyResetCode } from '../../services/auth';
-import SpinnerMini from '../../ui/SpinnerMini';
 import Button from '../../ui/Button';
 
 function VerifyResetCode() {

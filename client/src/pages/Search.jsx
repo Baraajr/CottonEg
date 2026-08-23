@@ -15,7 +15,9 @@ function Search() {
 
   return (
     <div className="container mx-auto py-8">
-      <h1 className="mb-6 text-2xl font-semibold">Results for "{text}"</h1>
+      <h1 className="mb-6 text-2xl font-semibold">
+        Results for &quot;{text}&quot;
+      </h1>
 
       {products.length === 0 ? (
         <p>No products found.</p>

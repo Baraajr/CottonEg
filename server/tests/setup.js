@@ -7,13 +7,10 @@ const User = require('../models/userModel');
 const Category = require('../models/categoryModel');
 const Subcategory = require('../models/subcategoryModel');
 const Order = require('../models/orderModel');
-const Review = require('../models/reviewModel');
 
 dotenv.config();
 
 let replSet;
-
-let mongod;
 
 beforeAll(async () => {
   // replicaset for createcashorder transaction

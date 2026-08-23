@@ -1,6 +1,5 @@
 const request = require('supertest');
 const app = require('../../app');
-const Product = require('../../models/productModel');
 const User = require('../../models/userModel');
 const {
   createRegularUser,

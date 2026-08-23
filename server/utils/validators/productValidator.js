@@ -1,4 +1,3 @@
-const mongoose = require('mongoose');
 const slugify = require('slugify');
 const { check, body, param } = require('express-validator');
 const validatorMiddleware = require('../../middlewares/validatorMiddleware');

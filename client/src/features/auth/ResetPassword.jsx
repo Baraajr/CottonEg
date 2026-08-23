@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { resetPassword } from '../../services/auth';
-import SpinnerMini from '../../ui/SpinnerMini';
 import { FaRegEye } from 'react-icons/fa';
+import Button from '../../components/ui/Button';
 
 function ResetPassword() {
   const [show, setShow] = useState(false);

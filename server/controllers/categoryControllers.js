@@ -1,10 +1,10 @@
+const slugify = require('slugify');
 const Category = require('../models/categoryModel');
 const Product = require('../models/productModel');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 const factory = require('./handlerFactory');
 const redis = require('../config/redis');
-const slugify = require('slugify');
 
 exports.createFilterObject = (req, res, next) => {
   let filterObj;
@@ -129,7 +129,7 @@ exports.deleteCategory = catchAsync(async (req, res, next) => {
     return next(new AppError(`No document with this ID ${id}`, 404));
   }
 
-  const genders = category.genders;
+  const { genders } = category;
 
   await Category.deleteOne({ _id: id });
 
@@ -137,7 +137,6 @@ exports.deleteCategory = catchAsync(async (req, res, next) => {
 
   res.status(204).send();
 });
-``;
 //  route:  POST api/v1/categories
 //  access  admin
 exports.createCategory = catchAsync(async (req, res, next) => {

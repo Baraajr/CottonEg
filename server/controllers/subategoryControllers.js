@@ -70,7 +70,7 @@ exports.deleteSubcategory = catchAsync(async (req, res, next) => {
 
   if (relatedProductsCount > 0) {
     return next(
-      new AppErr(
+      new AppError(
         'Cannot delete subcategory because products are assigned to it',
         400,
       ),

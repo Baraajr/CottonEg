@@ -3,7 +3,6 @@ const express = require('express');
 require('dotenv').config();
 const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
-const bodyParser = require('body-parser');
 const cors = require('cors');
 const compression = require('compression');
 const rateLimit = require('express-rate-limit');

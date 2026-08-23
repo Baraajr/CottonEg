@@ -217,9 +217,6 @@ exports.updateOrderDeliveredStatus = catchAsync(async (req, res, next) => {
     STRIPE CHECKOUT SESSION
   ========================= */
 exports.getCheckoutSession = catchAsync(async (req, res, next) => {
-  const taxPrice = 0;
-  const shippingPrice = 0;
-
   const { shippingAddress } = req.body;
 
   if (
@@ -234,13 +231,9 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
 
   const cart = await Cart.findById(req.params.cartId);
 
-  if (!cart) return next(new AppError('Cart not found', 404));
-
-  const cartPrice = cart.totalPriceAfterDiscount
-    ? cart.totalPriceAfterDiscount
-    : cart.totalCartPrice;
-
-  const totalOrderPrice = cartPrice + taxPrice + shippingPrice;
+  if (!cart) {
+    return next(new AppError('Cart not found', 404));
+  }
 
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
@@ -285,7 +278,7 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
     metadata: {
       userId: req.user.id,
       cartId: cart.id,
-      shippingAddress: JSON.stringify(req.body.shippingAddress || {}),
+      shippingAddress: JSON.stringify(shippingAddress),
     },
   });
 

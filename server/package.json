@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
+    "lint": "eslint .",
     "start": "node ./server",
     "dev": "nodemon server",
     "prod": "set NODE_ENV=production&& node ./server",

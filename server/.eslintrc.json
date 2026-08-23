@@ -6,7 +6,13 @@
   },
   "extends": ["airbnb", "prettier", "plugin:node/recommended"],
   "plugins": ["prettier"],
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "script"
+  },
   "rules": {
+    "no-restricted-syntax": "off",
+    "no-await-in-loop": "off",
     "prettier/prettier": "off",
     "spaced-comment": "off",
     "no-console": "off",

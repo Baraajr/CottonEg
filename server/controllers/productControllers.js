@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const multer = require('multer');
 const slugify = require('slugify');
 const Product = require('../models/productModel');
@@ -5,7 +6,6 @@ const factory = require('./handlerFactory');
 const catchAsync = require('../utils/catchAsync');
 const cloudinary = require('../utils/imageUpload');
 const AppError = require('../utils/appError');
-const { default: mongoose } = require('mongoose');
 const redis = require('../config/redis');
 
 const invalidateProductsCache = async () => {
