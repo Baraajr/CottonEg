@@ -1,5 +1,4 @@
 const express = require('express');
-const rateLimit = require('express-rate-limit');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const authControllers = require('../controllers/authControllers');
@@ -8,27 +7,22 @@ const {
   signupValidator,
   loginValidator,
 } = require('../utils/validators/authValidator');
-
-const loginLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 5,
-
-  handler: (req, res) => {
-    res.status(429).json({
-      message: 'Too many requests, try later',
-    });
-  },
-
-  standardHeaders: true,
-  legacyHeaders: false,
-});
+const {
+  loginLimiter,
+  signupLimiter,
+  verificationLimiter,
+  passwordResetLimiter,
+  resendEmailLimiter,
+  googleLimiter,
+} = require('../middlewares/rateLimiters');
 
 const router = express.Router();
 
-router.post('/signup', signupValidator, authControllers.signup);
-router.post('/verify-email', authControllers.verifyEmail);
+router.post('/signup', signupLimiter, signupValidator, authControllers.signup);
+router.post('/verify-email', verificationLimiter, authControllers.verifyEmail);
 router.post(
   '/resend-verification-email',
+  resendEmailLimiter,
   authControllers.resendVerificationEmail,
 );
 
@@ -36,11 +30,23 @@ router.post('/login', loginLimiter, loginValidator, authControllers.login);
 
 router.get('/logout', authControllers.logout);
 
-router.post('/forgotPassword', authControllers.forgotPassword);
+router.post(
+  '/forgotPassword',
+  passwordResetLimiter,
+  authControllers.forgotPassword,
+);
 
-router.post('/verifyResetCode', authControllers.verifyPasswordResetCode);
+router.post(
+  '/verifyResetCode',
+  verificationLimiter,
+  authControllers.verifyPasswordResetCode,
+);
 
-router.patch('/resetPassword', authControllers.resetPassword);
+router.patch(
+  '/resetPassword',
+  passwordResetLimiter,
+  authControllers.resetPassword,
+);
 
 // Configure Google OAuth Strategy
 const url = `${process.env.BASE_URL}/api/v1/auth/google/callback`;
@@ -97,15 +103,14 @@ passport.use(
 // Serialize user into session (not needed for JWT, but required by Passport)
 passport.serializeUser((user, done) => done(null, user));
 passport.deserializeUser((user, done) => done(null, user));
-
 router.get(
   '/google',
+  googleLimiter,
   passport.authenticate('google', {
     scope: ['profile', 'email'],
     prompt: 'select_account', // Forces account selection on each login
   }),
 );
-
 router.get(
   '/google/callback',
   passport.authenticate('google', { session: false }),
