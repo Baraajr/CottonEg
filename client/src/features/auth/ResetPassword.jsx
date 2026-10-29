@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { resetPassword } from '../../services/auth';
 import { FaRegEye } from 'react-icons/fa';
-import Button from '../../components/ui/Button';
+import Button from '../../ui/Button';
 
 function ResetPassword() {
   const [show, setShow] = useState(false);

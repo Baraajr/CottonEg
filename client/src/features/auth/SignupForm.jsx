@@ -21,7 +21,8 @@ function SignupForm() {
     mutationFn: ({ email, password, passwordConfirm, name }) =>
       signup({ email, password, passwordConfirm, name }),
     onSuccess: (res) => {
-      toast.success(res.message);
+      // toast.success(res.message);
+      toast.success('signed up');
 
       localStorage.setItem('pendingVerificationEmail', email);
 

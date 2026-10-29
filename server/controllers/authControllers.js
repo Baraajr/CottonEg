@@ -44,51 +44,54 @@ exports.signup = catchAsync(async (req, res, next) => {
     name,
     email,
     password,
-    verified: false,
+    verified: true,
   });
 
-  // 2) generate verification code (plain returned)
-  const verificationCode = user.createEmailVerificationCode();
+  // // 2) generate verification code (plain returned)
+  // const verificationCode = user.createEmailVerificationCode();
 
-  // 3) save user with hashed code
-  await user.save({ validateBeforeSave: false });
+  // // 3) save user with hashed code
+  // await user.save({ validateBeforeSave: false });
 
-  // 4) email content
-  const textMessage = `Your verification code is: ${verificationCode}`;
+  // // 4) email content
+  // const textMessage = `Your verification code is: ${verificationCode}`;
 
-  const htmlMessage = `
-    <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
-      <div style="max-width: 600px; margin: auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
-        <h2 style="color: #333;">Hi ${user.name},</h2>
+  // const htmlMessage = `
+  //   <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 20px;">
+  //     <div style="max-width: 600px; margin: auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.05);">
+  //       <h2 style="color: #333;">Hi ${user.name},</h2>
 
-        <p style="font-size: 16px; color: #555;">
-          Use the following code to verify your email:
-        </p>
+  //       <p style="font-size: 16px; color: #555;">
+  //         Use the following code to verify your email:
+  //       </p>
 
-        <div style="font-size: 28px; letter-spacing: 6px; font-weight: bold; margin: 20px 0; color: #007bff;">
-          ${verificationCode}
-        </div>
+  //       <div style="font-size: 28px; letter-spacing: 6px; font-weight: bold; margin: 20px 0; color: #007bff;">
+  //         ${verificationCode}
+  //       </div>
 
-        <p style="font-size: 12px; color: #999;">
-          This code expires in 10 minutes.
-        </p>
-      </div>
-    </div>
-  `;
+  //       <p style="font-size: 12px; color: #999;">
+  //         This code expires in 10 minutes.
+  //       </p>
+  //     </div>
+  //   </div>
+  // `;
 
-  // 5) send email
-  await sendEmail({
-    to: user.email,
-    subject: 'Email verification code (valid for 10 minutes)',
-    text: textMessage,
-    html: htmlMessage,
-  });
+  // // 5) send email
+  // await sendEmail({
+  //   to: user.email,
+  //   subject: 'Email verification code (valid for 10 minutes)',
+  //   text: textMessage,
+  //   html: htmlMessage,
+  // });
 
   // 6) response
-  res.status(201).json({
-    status: 'success',
-    message: 'User created. Please check your email for the verification code.',
-  });
+  // res.status(201).json({
+  //   status: 'success',
+  //   message: 'User created. Please check your email for the verification code.',
+  // });
+
+    createAndSendToken(user, 201, req, res);
+
 });
 
 exports.resendVerificationEmail = catchAsync(async (req, res) => {
