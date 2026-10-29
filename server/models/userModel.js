@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema(
     },
     verified: {
       type: Boolean,
-      default: false,
+      default: true, // make false once we use real email service
     },
     phone: String,
     profileImg: { type: String, default: process.env.USER_DEFAULT_PHOTO },
