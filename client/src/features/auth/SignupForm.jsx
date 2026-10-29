@@ -25,7 +25,7 @@ function SignupForm() {
 
       localStorage.setItem('pendingVerificationEmail', email);
 
-      navigate('/verifyEmailPrompt', {
+      navigate('/', {
         state: { email },
       });
     },
