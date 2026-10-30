@@ -398,9 +398,10 @@ function ProductsTable() {
                         onClick={() => navigate(`${product._id}`)}
                       >
                         Edit
-                      </Button>
-
-                      <Modal.Open opens={`delete-product-${product._id}`}>
+                      </Button>{' '}
+                      <Modal.Open
+                        opens={`delete-product-mobile-${product._id}`}
+                      >
                         <Button
                           variant="dangerOutline"
                           size="sm"
@@ -410,12 +411,13 @@ function ProductsTable() {
                           Delete
                         </Button>
                       </Modal.Open>
-
-                      <Modal.Window name={`delete-product-${product._id}`}>
+                      <Modal.Window
+                        name={`delete-product-mobile-${product._id}`}
+                      >
                         <ConfirmDelete
+                          onCloseModal={() => {}}
                           resourceName="product"
                           disabled={deletingId === product._id}
-                          onCloseModal={() => {}}
                           onConfirm={() => handleDelete(product._id)}
                         />
                       </Modal.Window>
@@ -512,8 +514,9 @@ function ProductsTable() {
                           >
                             Edit
                           </Button>
-
-                          <Modal.Open opens={`delete-product-${product._id}`}>
+                          <Modal.Open
+                            opens={`delete-product-desktop-${product._id}`}
+                          >
                             <Button
                               variant="dangerOutline"
                               size="sm"
@@ -523,11 +526,13 @@ function ProductsTable() {
                             </Button>
                           </Modal.Open>
 
-                          <Modal.Window name={`delete-product-${product._id}`}>
+                          <Modal.Window
+                            name={`delete-product-desktop-${product._id}`}
+                          >
                             <ConfirmDelete
+                              onCloseModal={() => {}}
                               resourceName="product"
                               disabled={deletingId === product._id}
-                              onCloseModal={() => {}}
                               onConfirm={() => handleDelete(product._id)}
                             />
                           </Modal.Window>
