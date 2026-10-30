@@ -306,11 +306,11 @@ exports.parseVariants = (req, res, next) => {
 
 exports.getAllProducts = factory.getAll(Product, '', 'products');
 
-exports.createProduct = factory.createOne(Product);
+exports.createProduct = factory.createOne(Product, 'products');
 
 exports.getProduct = factory.getOne(Product, 'reviews');
 
-exports.deleteProduct = factory.deleteOne(Product);
+exports.deleteProduct = factory.deleteOne(Product, 'products');
 
 exports.search = catchAsync(async (req, res, next) => {
   const { text } = req.body;

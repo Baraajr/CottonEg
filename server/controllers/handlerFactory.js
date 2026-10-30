@@ -95,7 +95,7 @@ exports.getAll = (model, populateOptions, modelName = '') =>
     });
   });
 
-exports.createOne = (model) =>
+exports.createOne = (model, modelName = '') =>
   catchAsync(async (req, res, next) => {
     // Case: nested route
     // api/v1/categories/categoryId/subcategories
@@ -116,7 +116,7 @@ exports.createOne = (model) =>
 
     const newDoc = await model.create(req.body);
 
-    await invalidateCache(model.modelName.toLowerCase());
+    await invalidateCache(modelName.toLowerCase());
 
     res.status(201).json({
       status: 'success',
@@ -124,7 +124,7 @@ exports.createOne = (model) =>
     });
   });
 
-exports.deleteOne = (model) =>
+exports.deleteOne = (model, modelName = '') =>
   catchAsync(async (req, res, next) => {
     // Use findOneAndDelete to trigger the post deleteOne middleware
     // to calculate average ratings after deleting a review
@@ -138,7 +138,7 @@ exports.deleteOne = (model) =>
       );
     }
 
-    await invalidateCache(model.modelName.toLowerCase());
+    await invalidateCache(modelName.toLowerCase());
 
     res.status(204).json({
       status: 'deleted',
@@ -170,7 +170,7 @@ exports.getOne = (model, populateOptions) =>
     });
   });
 
-exports.updateOne = (model) =>
+exports.updateOne = (model, modelName = '') =>
   catchAsync(async (req, res, next) => {
     // Case: updating title or name
     if (req.body.name) {
@@ -190,7 +190,7 @@ exports.updateOne = (model) =>
     // To be able to use the post save middleware
     const updatedDoc = await oldDoc.save();
 
-    await invalidateCache(model.modelName.toLowerCase());
+    await invalidateCache(modelName.toLowerCase());
 
     res.status(200).json({
       status: 'success',
