@@ -23,7 +23,15 @@ function ConfirmDelete({ resourceName, onConfirm, disabled, onCloseModal }) {
           Cancel
         </Button>
 
-        <Button variant="danger" loading={disabled} onClick={onConfirm}>
+        <Button
+          variant="danger"
+          loading={disabled}
+          onClick={() => {
+            onConfirm();
+            // Optionally close right away, or let the mutation success handle it.
+            // Calling onCloseModal() here closes the modal as soon as delete is clicked.
+          }}
+        >
           Delete
         </Button>
       </div>

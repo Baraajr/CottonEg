@@ -1,6 +1,8 @@
+import { FiTrash2 } from 'react-icons/fi';
+import { HiExclamationTriangle } from 'react-icons/hi2';
+
 import useUpdateQuantity from './useUpdateQuantity';
 import useRemoveItem from './useRemoveItem';
-import { FaTrash } from 'react-icons/fa';
 import IconButton from '../../ui/IconButton';
 
 function CartItem({ item }) {
@@ -9,93 +11,147 @@ function CartItem({ item }) {
   const { updateQuantity, isLoading: isUpdating } = useUpdateQuantity();
   const { removeItem, isLoading: isRemoving } = useRemoveItem();
 
+  // Handle case where admin deleted the product
+  if (!product) {
+    return (
+      <article className="my-2 flex items-center justify-between gap-3 border border-border bg-surface px-3 py-4 sm:px-4">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center border border-border bg-background text-muted-foreground">
+            <HiExclamationTriangle size={18} />
+          </div>
+
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-foreground">
+              This product is no longer available
+            </p>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              Please remove it from your cart to proceed.
+            </p>
+          </div>
+        </div>
+
+        <button
+          onClick={() => removeItem(item?._id)}
+          disabled={isRemoving}
+          aria-label="Remove unavailable item"
+          className="flex h-9 w-9 shrink-0 items-center justify-center text-muted-foreground transition-colors hover:bg-background hover:text-foreground disabled:opacity-50"
+        >
+          <FiTrash2 size={16} />
+        </button>
+      </article>
+    );
+  }
+
   const totalPrice = product.price * item.quantity;
 
   return (
-    <div className="flex flex-col sm:flex-row gap-4 p-4 bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition">
-      {/* IMAGE */}
-      <div className="w-full sm:w-24 flex justify-center sm:justify-start">
+    <article className="flex min-w-0 gap-3 py-4 sm:gap-5 sm:py-5">
+      {/* Product image */}
+      <div className="w-20 shrink-0 overflow-hidden border border-border bg-background sm:w-32">
         <img
           src={product.imageCover}
           alt={product.name}
-          className="w-24 h-24 object-cover rounded-lg"
+          className="aspect-3/4 w-full object-cover transition-transform duration-500 hover:scale-[1.04]"
         />
       </div>
 
-      {/* INFO */}
-      <div className="flex-1 flex flex-col gap-1 min-w-0">
-        <h1 className="text-base font-semibold text-gray-900 truncate">
-          {product.name}
-        </h1>
+      {/* Product details */}
+      <div className="flex min-w-0 flex-1 flex-col">
+        <div className="flex min-w-0 justify-between gap-2">
+          <div className="min-w-0 flex-1">
+            {product?.brand?.name && (
+              <p className="section-label truncate text-[10px]">
+                {product.brand.name}
+              </p>
+            )}
 
-        <p className="text-sm text-gray-500">{product.brand?.name}</p>
+            <h3 className="mt-1 wrap-break-word font-display text-sm font-medium text-foreground sm:text-lg">
+              {product.name}
+            </h3>
+          </div>
 
-        <p className="text-xs text-gray-500 flex items-center gap-2">
-          Size: {variant?.size} | Color:
-          <span
-            className="w-3 h-3 rounded-full border border-gray-200"
-            style={{ backgroundColor: variant?.color?.hex }}
-          />
-        </p>
-
-        <p className="text-sm font-semibold text-gray-900 mt-1">
-          {item.quantity} × {product.price} EGP
-        </p>
-
-        <p className="text-sm font-bold text-gray-900">
-          Total: {totalPrice} EGP
-        </p>
-      </div>
-
-      {/* CONTROLS */}
-      <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-2">
-        <div className="flex items-center gap-2 rounded-full bg-gray-100 p-1">
-          <IconButton
-            tooltip={'decrease'}
-            size="sm"
-            disabled={isUpdating || item.quantity === 1}
-            onClick={() =>
-              updateQuantity({
-                itemId: item._id,
-                quantity: item.quantity - 1,
-              })
-            }
-            className="rounded-full text-gray-600 hover:bg-white hover:text-black"
-          >
-            −
-          </IconButton>
-
-          <span className="flex h-8 min-w-8 items-center justify-center rounded-full px-2 text-sm font-semibold ">
-            {item.quantity}
-          </span>
-
-          <IconButton
-            tooltip={'increase'}
-            size="sm"
-            disabled={isUpdating}
-            onClick={() =>
-              updateQuantity({
-                itemId: item._id,
-                quantity: item.quantity + 1,
-              })
-            }
-            className="rounded-full text-gray-600 hover:bg-white hover:text-black"
-          >
-            +
-          </IconButton>
-
-          <IconButton
-            tooltip={'remove'}
-            variant="danger"
-            size="sm"
+          <button
+            onClick={() => removeItem(item?._id)}
             disabled={isRemoving}
-            onClick={() => removeItem(item._id)}
+            aria-label="Remove item"
+            className="flex h-8 w-8 shrink-0 items-center justify-center text-muted-foreground transition-colors hover:bg-background hover:text-foreground disabled:opacity-50"
           >
-            <FaTrash className="h-3.5 w-3.5" />
-          </IconButton>
+            <FiTrash2 size={15} />
+          </button>
+        </div>
+
+        {/* Variant */}
+        <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs text-muted-foreground">
+          {variant?.size && <span>Size: {variant.size}</span>}
+
+          {variant?.size && variant?.color?.hex && (
+            <span className="h-3 w-px bg-border" />
+          )}
+
+          {variant?.color?.hex && (
+            <span className="flex items-center gap-2">
+              Color
+              <span
+                className="h-3.5 w-3.5 rounded-full border border-border"
+                style={{ backgroundColor: variant.color.hex }}
+              />
+            </span>
+          )}
+        </div>
+
+        {/* Price */}
+        <div className="mt-2 sm:mt-3">
+          <p className="text-[10px] text-muted-foreground sm:text-[11px]">
+            {product.price} EGP × {item.quantity}
+          </p>
+
+          <p className="mt-0.5 font-display text-base font-semibold text-foreground sm:text-lg">
+            {totalPrice} EGP
+          </p>
+        </div>
+
+        {/* Quantity */}
+        <div className="mt-auto flex flex-wrap items-center justify-between gap-2 pt-3">
+          <span className="text-[11px] text-muted-foreground">Quantity</span>
+
+          <div className="flex shrink-0 items-center border border-border">
+            <IconButton
+              tooltip="Decrease quantity"
+              size="sm"
+              disabled={isUpdating || item.quantity === 1}
+              onClick={() =>
+                updateQuantity({
+                  itemId: item._id,
+                  quantity: item.quantity - 1,
+                })
+              }
+              className="rounded-none text-foreground transition-colors hover:bg-background"
+            >
+              −
+            </IconButton>
+
+            <span className="min-w-8 text-center text-sm font-medium tabular-nums text-foreground">
+              {item.quantity}
+            </span>
+
+            <IconButton
+              tooltip="Increase quantity"
+              size="sm"
+              disabled={isUpdating}
+              onClick={() =>
+                updateQuantity({
+                  itemId: item._id,
+                  quantity: item.quantity + 1,
+                })
+              }
+              className="rounded-none text-foreground transition-colors hover:bg-background"
+            >
+              +
+            </IconButton>
+          </div>
         </div>
       </div>
-    </div>
+    </article>
   );
 }
 

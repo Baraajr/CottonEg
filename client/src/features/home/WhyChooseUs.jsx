@@ -5,66 +5,72 @@ const features = [
     icon: FiTruck,
     title: 'Fast Delivery',
     description: 'Quick and reliable shipping across Egypt.',
-    bg: 'bg-blue-50',
   },
   {
     icon: FiRefreshCw,
     title: 'Easy Returns',
     description: 'Hassle-free returns and exchanges.',
-    bg: 'bg-emerald-50',
   },
   {
     icon: FiShield,
     title: 'Secure Payments',
-    description: 'Protected checkout.',
-    bg: 'bg-violet-50',
+    description: 'A safe and protected checkout experience.',
   },
   {
     icon: FiAward,
     title: 'Premium Quality',
-    description: 'Selected with care.',
-    bg: 'bg-amber-50',
+    description: 'Thoughtfully selected pieces made to last.',
   },
 ];
+
 function WhyChooseUs() {
   return (
-    <section className="bg-gray-50 py-20">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto mb-14 max-w-2xl text-center">
-          <span className="text-sm font-semibold uppercase tracking-[0.3em] text-gray-500">
-            Why Choose Us
-          </span>
+    <section className="bg-surface py-14 sm:py-18 lg:py-20">
+      <div className="mx-auto max-w-400 px-5 sm:px-8 lg:px-12">
+        {/* Heading */}
+        <div className="mb-9 max-w-xl">
+          <div className="mb-3 flex items-center gap-3">
+            <span className="h-px w-7 bg-foreground" />
+            <span className="section-label">The Cotton experience</span>
+          </div>
 
-          <h2 className="mt-3 text-3xl font-bold tracking-tight text-gray-900 md:text-4xl">
-            Shopping Made Simple
+          <h2 className="font-display text-3xl font-medium tracking-tight text-foreground sm:text-4xl lg:text-5xl">
+            More than just <span className="italic">shopping.</span>
           </h2>
 
-          <p className="mt-4 text-gray-600">
-            Everything you need for a smooth shopping experience, from checkout
-            to delivery.
+          <p className="mt-3 max-w-md text-sm leading-6 text-muted-foreground">
+            From carefully selected pieces to your doorstep, every detail is
+            designed around you.
           </p>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
-          {features.map((feature) => {
+        {/* Features */}
+        <div className="grid grid-cols-1 border-y border-border sm:grid-cols-2 lg:grid-cols-4">
+          {features.map((feature, index) => {
             const Icon = feature.icon;
 
             return (
               <div
                 key={feature.title}
-                className="group rounded-2xl border border-gray-200 bg-white p-8 transition-all duration-300 hover:-translate-y-1 hover:border-black hover:shadow-xl"
+                className={`group flex gap-4 px-4 py-6 transition-colors duration-300 hover:bg-background sm:px-6 lg:flex-col lg:gap-5 lg:px-6 lg:py-8 ${
+                  index !== 0
+                    ? 'border-t border-border sm:border-t-0 lg:border-l'
+                    : ''
+                } ${index === 1 || index === 3 ? 'sm:border-l' : ''}`}
               >
-                <div
-                  className={`mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl ${feature.bg}`}
-                >
-                  <Icon size={26} />
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center border border-border text-foreground transition-all duration-300 group-hover:bg-foreground group-hover:text-background">
+                  <Icon size={18} strokeWidth={1.5} />
                 </div>
 
-                <h3 className="mb-3 text-xl font-semibold text-gray-900">
-                  {feature.title}
-                </h3>
+                <div>
+                  <h3 className="font-display text-lg font-medium text-foreground">
+                    {feature.title}
+                  </h3>
 
-                <p className="leading-7 text-gray-600">{feature.description}</p>
+                  <p className="mt-1.5 max-w-52 text-xs leading-5 text-muted-foreground sm:text-sm sm:leading-6">
+                    {feature.description}
+                  </p>
+                </div>
               </div>
             );
           })}

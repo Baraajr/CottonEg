@@ -2,11 +2,12 @@ import { HiOutlineChevronLeft } from 'react-icons/hi';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import { GENDERS } from '../constants/constants';
 
 const MOTION = {
   duration: 0.18,
-  ease: [0.4, 0, 0.2, 1], // smooth standard ease
+  ease: [0.4, 0, 0.2, 1],
 };
 
 export default function MobileMenu({ menus, onClose }) {
@@ -14,6 +15,9 @@ export default function MobileMenu({ menus, onClose }) {
   const navigate = useNavigate();
 
   const categories = menus?.[selectedGender]?.data || [];
+
+  const menuItemClass =
+    'flex w-full items-center justify-between rounded-lg p-3 text-sm font-semibold text-foreground transition-colors hover:bg-accent';
 
   return (
     <AnimatePresence mode="wait" initial={false}>
@@ -24,32 +28,27 @@ export default function MobileMenu({ menus, onClose }) {
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: -20, opacity: 0 }}
           transition={{ duration: MOTION.duration, ease: MOTION.ease }}
-          className="bg-white rounded-xl p-3 min-h-75"
+          className="min-h-75 rounded-xl bg-surface p-3 text-foreground"
         >
-          <div className="space-y-2">
+          <div className="space-y-1">
             <button
               onClick={() => {
                 onClose();
                 navigate('/');
               }}
-              className="w-full flex items-center justify-between rounded-lg p-3
-                         hover:bg-gray-50 transition"
+              className={menuItemClass}
             >
-              <span className="font-semibold text-sm text-gray-900">Home</span>
+              <span>Home</span>
             </button>
 
             {GENDERS.map((gender) => (
               <button
                 key={gender}
                 onClick={() => setSelectedGender(gender)}
-                className="w-full flex items-center justify-between rounded-lg p-3
-                           hover:bg-gray-50 transition"
+                className={menuItemClass}
               >
-                <span className="font-semibold text-sm text-gray-900 capitalize">
-                  {gender}
-                </span>
-
-                <span className="text-gray-400 text-lg">›</span>
+                <span className="capitalize">{gender}</span>
+                <span className="text-lg text-muted-foreground">›</span>
               </button>
             ))}
           </div>
@@ -61,28 +60,27 @@ export default function MobileMenu({ menus, onClose }) {
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: 20, opacity: 0 }}
           transition={{ duration: MOTION.duration, ease: MOTION.ease }}
-          className="bg-white rounded-xl p-3 min-h-75"
+          className="min-h-75 rounded-xl bg-surface p-3 text-foreground"
         >
           <button
             onClick={() => setSelectedGender(null)}
-            className="flex items-center gap-2 mb-5 text-sm font-medium text-gray-600
-                       hover:text-black transition"
+            className="mb-4 flex items-center gap-2 text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
-            <HiOutlineChevronLeft className="w-5 h-5" />
+            <HiOutlineChevronLeft className="h-5 w-5" />
             <span className="capitalize">{selectedGender}</span>
           </button>
 
-          <div className="space-y-5">
+          <div className="space-y-3">
             {categories.map((category) => (
               <div
                 key={category._id}
-                className="rounded-lg p-3 hover:bg-gray-50 transition"
+                className="rounded-lg p-3 transition-colors hover:bg-accent"
               >
-                <h3 className="font-semibold text-sm text-gray-900 mb-3 tracking-wide">
+                <h3 className="mb-3 text-sm font-semibold tracking-wide text-foreground">
                   {category.name}
                 </h3>
 
-                <div className="pl-3 border-l border-gray-200">
+                <div className="border-l border-border pl-3">
                   <div className="flex flex-col gap-2">
                     {category.subcategories?.map((sub) => (
                       <button
@@ -93,8 +91,7 @@ export default function MobileMenu({ menus, onClose }) {
                             `/products?gender=${selectedGender}&category=${category._id}&subcategory=${sub._id}`,
                           );
                         }}
-                        className="text-left text-sm text-gray-500 hover:text-black
-                                   hover:translate-x-1 transition"
+                        className="text-left text-sm text-muted-foreground transition-all hover:translate-x-1 hover:text-foreground"
                       >
                         {sub.name}
                       </button>

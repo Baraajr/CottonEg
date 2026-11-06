@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+
 import { createProductReview } from '../../services/products';
 import RatingStars from '../../ui/RatingStars';
 import Button from '../../ui/Button';
@@ -42,9 +43,26 @@ function AddReviewForm({ productId, onCloseModal }) {
 
   return (
     <form onSubmit={handleSubmit} className="relative space-y-6">
+      {/* Heading */}
+      <div>
+        <span className="text-[10px] font-medium uppercase tracking-[0.25em] text-muted-foreground">
+          Customer feedback
+        </span>
+
+        <h2 className="mt-2 font-display text-2xl font-medium text-foreground">
+          Write a Review
+        </h2>
+
+        <p className="mt-1 text-xs text-muted-foreground">
+          Share your experience with this product.
+        </p>
+      </div>
+
       {/* Rating */}
       <div>
-        <label className="mb-3 block text-sm font-medium">Your rating</label>
+        <label className="mb-3 block text-[11px] font-semibold uppercase tracking-wider text-foreground">
+          Your rating
+        </label>
 
         <RatingStars
           rating={formData.ratings}
@@ -56,15 +74,21 @@ function AddReviewForm({ productId, onCloseModal }) {
             }))
           }
         />
+
+        {!formData.ratings && (
+          <p className="mt-2 text-xs text-muted-foreground">
+            Select a rating from 1 to 5 stars.
+          </p>
+        )}
       </div>
 
-      {/* Title */}
+      {/* Review */}
       <div>
         <label
           htmlFor="review-title"
-          className="mb-3 block text-sm font-medium"
+          className="mb-2 block text-[11px] font-semibold uppercase tracking-wider text-foreground"
         >
-          Review
+          Your review
         </label>
 
         <input
@@ -79,18 +103,23 @@ function AddReviewForm({ productId, onCloseModal }) {
           }
           placeholder="Share your experience"
           maxLength={100}
-          className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none transition focus:border-black"
+          className="w-full border border-border bg-background px-3 py-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-primary"
         />
+
+        <p className="mt-1.5 text-right text-[10px] text-muted-foreground">
+          {formData.title.length}/100
+        </p>
       </div>
 
+      {/* Error */}
       {error && (
-        <p className="text-sm text-red-500">
+        <p className="border-l-2 border-primary bg-accent px-3 py-2 text-xs text-foreground">
           {error.message || 'Failed to submit review'}
         </p>
       )}
 
       {/* Actions */}
-      <div className="flex justify-end gap-2 pt-2">
+      <div className="flex justify-end gap-2 border-t border-border pt-4">
         <Button
           type="button"
           variant="secondary"
@@ -103,8 +132,9 @@ function AddReviewForm({ productId, onCloseModal }) {
         <Button
           type="submit"
           disabled={isPending || !formData.title.trim() || !formData.ratings}
+          loading={isPending}
         >
-          {isPending ? 'Submitting...' : 'Submit review'}
+          Submit review
         </Button>
       </div>
     </form>

@@ -1,4 +1,5 @@
-import SpinnerMinni from './SpinnerMini';
+import SpinnerMini from './SpinnerMini';
+
 function Button({
   children,
   variant = 'primary',
@@ -15,29 +16,35 @@ function Button({
   const state = active ? activeClassName : '';
 
   const base =
-    'inline-flex items-center justify-center gap-2 rounded-md font-medium transition-all duration-200 ' +
+    'inline-flex items-center justify-center gap-2 rounded-md font-sans font-medium ' +
+    'transition-all duration-200 ' +
     'disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50';
+
   const variants = {
     primary:
-      'relative overflow-hidden border border-black bg-black text-white  ' +
-      'before:absolute before:inset-0 before:origin-left before:scale-x-0 before:bg-white ' +
-      'before:transition-transform before:duration-300 hover:before:scale-x-100 hover:text-black',
+      'relative overflow-hidden border border-primary bg-primary text-primary-foreground ' +
+      'before:absolute before:inset-0 before:origin-left before:scale-x-0 before:bg-primary-foreground ' +
+      'before:transition-transform before:duration-300 ' +
+      'hover:before:scale-x-100 hover:border-accent hover:text-primary',
 
     secondary:
-      'border border-gray-300 bg-white text-gray-900 hover:border-gray-400 hover:bg-gray-100',
+      'border border-border bg-surface text-foreground ' +
+      'hover:border-accent hover:bg-surface-hover',
 
-    danger: 'bg-red-600 text-white hover:bg-red-700',
+    danger:
+      'border border-danger bg-danger text-white dark:text-background hover:bg-danger/90',
 
-    ghost: 'bg-transparent text-gray-700 hover:bg-gray-100 ',
+    ghost:
+      'bg-transparent text-muted-foreground hover:bg-surface-hover hover:text-foreground',
 
     dangerOutline:
-      'border border-red-300 bg-white text-red-600 hover:bg-red-50',
+      'border border-danger/40 bg-transparent text-danger hover:bg-danger/10',
 
     textDanger:
-      'bg-transparent p-0 text-xs text-gray-500 hover:bg-transparent hover:text-red-600',
+      'bg-transparent p-0 text-xs text-muted-foreground hover:bg-transparent hover:text-danger',
 
     menuDanger:
-      'w-full rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 md:justify-start',
+      'w-full rounded-lg text-sm font-medium text-danger hover:bg-danger/10 md:justify-start',
   };
 
   const sizes = {
@@ -52,6 +59,7 @@ function Button({
     <button
       type={type}
       disabled={disabled || loading}
+      aria-busy={loading || undefined}
       className={[
         base,
         variants[variant],
@@ -65,7 +73,7 @@ function Button({
       {...props}
     >
       <span className="relative z-10 flex items-center justify-center gap-2">
-        {loading ? <SpinnerMinni /> : children}
+        {loading ? <SpinnerMini /> : children}
       </span>
     </button>
   );

@@ -2,8 +2,9 @@ import { useMutation } from '@tanstack/react-query';
 import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
+import { FiMail } from 'react-icons/fi';
+
 import { resendEmail, verifyEmail } from '../../services/auth';
-import SpinnerMini from '../../ui/SpinnerMini';
 import Button from '../../ui/Button';
 
 function VerifyEmailPrompt() {
@@ -134,17 +135,27 @@ function VerifyEmailPrompt() {
   if (!email) return null;
 
   return (
-    <div className="flex items-center justify-center px-4">
-      <div className="w-full max-w-md text-center py-10">
-        <h3 className="text-lg font-medium mb-2">Verify your email</h3>
+    <section className="flex min-h-[65vh] items-center justify-center bg-background px-4 py-10 text-foreground">
+      <div className="w-full max-w-md border border-border bg-surface px-5 py-8 text-center sm:px-8">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center border border-border bg-background">
+          <FiMail size={23} className="text-foreground" />
+        </div>
 
-        <p className="text-sm text-gray-500 mb-1">
-          Enter the 6-digit code sent to:
+        <span className="section-label mt-6 block">Account verification</span>
+
+        <h1 className="mt-2 font-display text-3xl sm:text-4xl">
+          Verify your email
+        </h1>
+
+        <p className="mx-auto mt-3 max-w-xs text-sm leading-6 text-muted-foreground">
+          Enter the 6-digit verification code we sent to your email address.
         </p>
 
-        <p className="text-sm font-medium mb-6 break-all">{email}</p>
+        <p className="mt-3 break-all text-sm font-semibold text-foreground">
+          {email}
+        </p>
 
-        <div className="flex justify-center gap-2 mb-6">
+        <div className="my-7 flex justify-center gap-2 sm:gap-3">
           {otp.map((digit, index) => (
             <input
               key={index}
@@ -157,7 +168,7 @@ function VerifyEmailPrompt() {
               onChange={(e) => handleChange(e.target.value, index)}
               onKeyDown={(e) => handleKeyDown(e, index)}
               onPaste={handlePaste}
-              className="w-12 h-12 border border-gray-300 rounded-md text-center text-lg font-medium focus:outline-none focus:ring-2 focus:ring-black"
+              className="h-11 w-10 border border-border bg-background text-center text-lg font-semibold text-foreground outline-none transition-colors focus:border-foreground sm:h-13 sm:w-12"
             />
           ))}
         </div>
@@ -167,23 +178,29 @@ function VerifyEmailPrompt() {
           fullWidth
           loading={verifyMutation.isPending}
           disabled={otp.join('').length !== 6}
-          className="mb-4 py-3"
+          className="mb-5"
         >
           Verify Email
         </Button>
 
-        <Button
-          type="button"
-          variant="ghost"
-          onClick={() => resendMutation.mutate()}
-          loading={resendMutation.isPending}
-          disabled={countdown > 0}
-          className="text-sm"
-        >
-          {countdown > 0 ? `Resend code in ${countdown}s` : 'Resend code'}
-        </Button>
+        <div className="border-t border-border pt-5">
+          <p className="text-xs text-muted-foreground">
+            Didn&apos;t receive the code?
+          </p>
+
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => resendMutation.mutate()}
+            loading={resendMutation.isPending}
+            disabled={countdown > 0}
+            className="mt-1 text-sm"
+          >
+            {countdown > 0 ? `Resend code in ${countdown}s` : 'Resend code'}
+          </Button>
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
 

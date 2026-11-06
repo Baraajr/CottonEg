@@ -1,9 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
-import { FaRegEye } from 'react-icons/fa';
+import { Link, useNavigate } from 'react-router-dom';
 import { FcGoogle } from 'react-icons/fc';
-import { useNavigate } from 'react-router-dom';
+import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
+
 import { login } from '../../services/auth';
 import SpinnerMini from '../../ui/SpinnerMini';
 import Button from '../../ui/Button';
@@ -16,125 +17,165 @@ function LoginForm() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  const { mutate, isLoading } = useMutation({
-    mutationFn: ({ email, password }) => login({ email, password }),
+  const { mutate, isPending } = useMutation({
+    mutationFn: login,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user'] });
+      toast.success('Welcome back!');
       navigate('/', { replace: true });
-      toast.success('Logged in');
     },
     onError: (err) => {
-      toast.error(err.message);
+      toast.error(err.message || 'Unable to sign in');
     },
   });
 
-  function handleForgotPassword() {
-    if (email) {
-      localStorage.setItem('resetEmail', email);
-    }
-    navigate('/forgot-password', { state: { email } });
-  }
-
   function handleSubmit(e) {
     e.preventDefault();
-    if (!email || !password) return;
 
-    mutate(
-      { email, password },
-      {
-        onSettled: () => {
-          setEmail('');
-          setPassword('');
-        },
-      },
-    );
+    if (!email.trim() || !password) return;
+
+    mutate({ email: email.trim(), password });
   }
 
   function handleGoogleAuth() {
-    navigate(`${import.meta.env.VITE_API_URL}/auth/google`);
+    window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
   }
 
   return (
-    <div className="flex justify-center px-4 py-16">
-      <form onSubmit={handleSubmit} className="w-full max-w-md">
-        <h1 className="mb-3 text-center text-3xl font-light tracking-[0.3em]">
-          LOGIN
-        </h1>
+    <div className="flex w-full justify-center px-4 py-8 sm:py-10">
+      <form onSubmit={handleSubmit} className="w-full max-w-md space-y-5">
+        {/* Heading */}
+        <div className="space-y-2">
+          <p className="section-label">Welcome back</p>
 
-        <p className="mb-8 text-center text-sm text-gray-600">
-          Enter your email and password to login
-        </p>
+          <h1 className="font-serif text-3xl font-medium text-foreground">
+            Sign in.
+          </h1>
+
+          <p className="text-sm text-muted-foreground">
+            Enter your details to access your account.
+          </p>
+        </div>
 
         {/* Email */}
-        <div className="mb-4">
+        <div>
+          <label htmlFor="login-email" className="label">
+            Email address
+          </label>
+
           <input
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            id="login-email"
             type="email"
             name="email"
-            autoComplete="email"
-            placeholder="E-mail"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="name@example.com"
+            autoComplete="username"
             required
-            disabled={isLoading}
-            className="w-full border border-gray-300 px-4 py-3 text-sm outline-none focus:border-black"
+            disabled={isPending}
+            className="input"
           />
         </div>
 
         {/* Password */}
-        <div className="relative mb-2">
-          <input
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            type={showPassword ? 'text' : 'password'}
-            name="password"
-            autoComplete="current-password"
-            placeholder="Password"
-            required
-            disabled={isLoading}
-            className="w-full border border-gray-300 px-4 py-3 pr-12 text-sm outline-none focus:border-black"
-          />
+        <div>
+          <div className="mb-1 flex items-center justify-between">
+            <label htmlFor="login-password" className="label mb-0">
+              Password
+            </label>
 
-          <FaRegEye
-            onClick={() => setShowPassword((s) => !s)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500 hover:text-black"
-          />
+            <button
+              type="button"
+              onClick={() =>
+                navigate('/forgot-password', {
+                  state: { email: email.trim() },
+                })
+              }
+              className="text-xs text-muted-foreground transition-colors hover:text-foreground"
+            >
+              Forgot password?
+            </button>
+          </div>
+
+          <div className="relative">
+            <input
+              id="login-password"
+              type={showPassword ? 'text' : 'password'}
+              name="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Enter your password"
+              autoComplete="current-password"
+              required
+              disabled={isPending}
+              className="input pr-11"
+            />
+
+            <button
+              type="button"
+              onClick={() => setShowPassword((s) => !s)}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
+            >
+              {showPassword ? (
+                <FaRegEyeSlash size={15} />
+              ) : (
+                <FaRegEye size={15} />
+              )}
+            </button>
+          </div>
         </div>
 
-        {/* Forgot password */}
-        <div className="mb-4 text-right">
-          <Button type="button" variant="ghost" onClick={handleForgotPassword}>
-            Forgot your password?
-          </Button>
-        </div>
-
-        {/* Login */}
+        {/* Sign in */}
         <Button
-          fullWidth
           type="submit"
-          disabled={isLoading}
-          className="w-full py-3 tracking-[0.25em]"
+          fullWidth
+          disabled={isPending || !email.trim() || !password}
+          className="py-3 text-xs tracking-[0.15em]"
         >
-          {!isLoading ? 'LOGIN' : <SpinnerMini />}
+          {isPending ? (
+            <span className="flex items-center justify-center gap-2">
+              <SpinnerMini />
+              SIGNING IN...
+            </span>
+          ) : (
+            'SIGN IN'
+          )}
         </Button>
+
+        {/* Divider */}
+        <div className="flex items-center gap-3">
+          <div className="h-px flex-1 bg-border" />
+
+          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+            Or continue with
+          </span>
+
+          <div className="h-px flex-1 bg-border" />
+        </div>
 
         {/* Google */}
         <Button
-          onClick={() => handleGoogleAuth()}
           type="button"
           variant="secondary"
           fullWidth
-          className="mt-4 justify-center py-3"
+          disabled={isPending}
+          onClick={handleGoogleAuth}
+          className="justify-center gap-2 py-3 text-xs"
         >
-          <FcGoogle className="h-5 w-5" />
+          <FcGoogle size={17} />
           Continue with Google
         </Button>
 
         {/* Signup */}
-        <p className="mt-6 text-center text-sm text-gray-600">
-          Don&apos;t have an account?
-          <a href="/signup" className="text-black hover:underline">
-            Sign up
-          </a>
+        <p className="pt-1 text-center text-sm text-muted-foreground">
+          Don&apos;t have an account?{' '}
+          <Link
+            to="/signup"
+            className="font-semibold text-foreground underline underline-offset-4 hover:text-muted-foreground"
+          >
+            Create account
+          </Link>
         </p>
       </form>
     </div>

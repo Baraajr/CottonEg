@@ -25,8 +25,8 @@ import IconButton from '../../../ui/IconButton';
 // ─── Field components ─────────────────────────────────────────────────────────
 function FieldRow({ label, children }) {
   return (
-    <div className="flex flex-col gap-1">
-      <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+    <div className="flex flex-col gap-2">
+      <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
         {label}
       </label>
       {children}
@@ -35,7 +35,7 @@ function FieldRow({ label, children }) {
 }
 
 const inputCls =
-  'w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500 bg-white';
+  'w-full rounded-lg border border-border bg-surface px-3 py-2.5 text-sm text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-1 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50';
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 function UpdateProduct() {
@@ -47,9 +47,9 @@ function UpdateProduct() {
   const coverInputRef = useRef(null);
 
   // local form state
-  const [fields, setFields] = useState(null); // null = not yet initialised
-  const [coverPreview, setCoverPreview] = useState(null); // new cover preview url
-  const [coverFile, setCoverFile] = useState(null); // new cover File object
+  const [fields, setFields] = useState(null);
+  const [coverPreview, setCoverPreview] = useState(null);
+  const [coverFile, setCoverFile] = useState(null);
 
   // ── FETCH PRODUCT ──
   const { data, isLoading, error } = useQuery({
@@ -57,7 +57,6 @@ function UpdateProduct() {
     queryFn: () => getProduct(productId),
     onSuccess: (res) => {
       const p = res?.data || {};
-      // Initialise form fields from product only once
       setFields((prev) =>
         prev
           ? prev
@@ -84,7 +83,6 @@ function UpdateProduct() {
   const images = product.images || [];
   const variants = product.variants || [];
 
-  // Keep fields in sync with first load
   const initFields = () => {
     if (fields) return;
     setFields({
@@ -175,7 +173,6 @@ function UpdateProduct() {
       .filter(Boolean);
 
     if (coverFile) {
-      // Send as FormData so multer can handle imageCover
       const fd = new FormData();
       fd.append('imageCover', coverFile);
       fd.append('name', fields.name);
@@ -194,7 +191,6 @@ function UpdateProduct() {
       fd.append('subcategory', fields.subcategory);
       runUpdate(fd);
     } else {
-      // No new cover → send plain JSON
       runUpdate({
         name: fields.name,
         description: fields.description,
@@ -222,7 +218,9 @@ function UpdateProduct() {
 
   if (error) {
     return (
-      <div className="p-6 text-red-600 text-sm">Failed to load product</div>
+      <div className="p-6 text-sm text-muted-foreground">
+        Failed to load product
+      </div>
     );
   }
 
@@ -231,29 +229,31 @@ function UpdateProduct() {
 
   return (
     <Modal>
-      <div className="p-6 max-w-3xl mx-auto flex flex-col gap-10">
+      <div className=" flex max-w-4xl flex-col gap-10 ">
         {/* HEADER */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border pb-6">
           <div>
-            <p className="text-xs text-gray-400 uppercase tracking-widest mb-0.5">
-              Editing
+            <p className="mb-1 text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+              Product management / Editing
             </p>
-            <h1 className="text-xl font-semibold text-gray-900">
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
               {product.name}
             </h1>
           </div>
+
           <div className="flex items-center gap-2">
             <span
-              className={`text-xs px-2 py-1 rounded-full font-medium ${
+              className={`rounded-md border px-3 py-1.5 text-xs font-medium ${
                 product.isActive
-                  ? 'bg-green-100 text-green-700'
-                  : 'bg-gray-100 text-gray-500'
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : 'border-border bg-accent text-muted-foreground'
               }`}
             >
               {product.isActive ? 'Active' : 'Inactive'}
             </span>
+
             {product.featured && (
-              <span className="text-xs px-2 py-1 rounded-full font-medium bg-yellow-100 text-yellow-700">
+              <span className="rounded-md border border-border bg-accent px-3 py-1.5 text-xs font-medium text-foreground">
                 Featured
               </span>
             )}
@@ -261,50 +261,54 @@ function UpdateProduct() {
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-10">
-          {/* ── SECTION: Cover Image ── */}
+          {/* COVER IMAGE */}
           <section>
             <SectionTitle>Cover Image</SectionTitle>
 
-            <div className="flex items-start gap-5">
-              {/* Current / preview */}
-              <div className="relative w-36 h-36 rounded-xl overflow-hidden border border-gray-200 shrink-0 bg-gray-50">
+            <div className="flex flex-col gap-5 sm:flex-row">
+              <div className="relative h-40 w-40 shrink-0 overflow-hidden rounded-xl border border-border bg-surface">
                 <img
                   src={coverPreview || product.imageCover}
                   alt="Cover"
-                  className="w-full h-full object-cover"
+                  className="h-full w-full object-cover"
                 />
+
                 {coverPreview && (
-                  <span className="absolute top-1 left-1 text-[10px] bg-green-600 text-white px-1.5 py-0.5 rounded">
+                  <span className="absolute left-2 top-2 rounded-md bg-primary px-2 py-1 text-[10px] font-semibold text-primary-foreground">
                     New
                   </span>
                 )}
               </div>
 
-              <div className="flex flex-col gap-2 justify-center pt-2">
-                <p className="text-sm text-gray-500">
+              <div className="flex flex-col justify-center gap-3">
+                <p className="max-w-sm text-sm leading-relaxed text-muted-foreground">
                   {coverPreview
-                    ? 'New cover selected — will be uploaded on save.'
-                    : 'Replace the current cover image.'}
+                    ? 'New cover selected — it will be uploaded when you save your changes.'
+                    : 'Choose a new cover image to replace the current product image.'}
                 </p>
-                <Button
-                  type="button"
-                  onClick={() => coverInputRef.current?.click()}
-                >
-                  {coverPreview ? 'Change again' : 'Choose new cover'}
-                </Button>
 
-                {coverPreview && (
+                <div className="flex flex-wrap gap-2">
                   <Button
-                    variant="textDanger"
                     type="button"
-                    onClick={() => {
-                      setCoverFile(null);
-                      setCoverPreview(null);
-                    }}
+                    onClick={() => coverInputRef.current?.click()}
                   >
-                    Discard new cover
+                    {coverPreview ? 'Change again' : 'Choose new cover'}
                   </Button>
-                )}
+
+                  {coverPreview && (
+                    <Button
+                      variant="secondary"
+                      type="button"
+                      onClick={() => {
+                        setCoverFile(null);
+                        setCoverPreview(null);
+                      }}
+                    >
+                      Discard
+                    </Button>
+                  )}
+                </div>
+
                 <input
                   ref={coverInputRef}
                   type="file"
@@ -316,11 +320,11 @@ function UpdateProduct() {
             </div>
           </section>
 
-          {/* ── SECTION: Basic Info ── */}
-          <section className="flex flex-col gap-4">
-            <SectionTitle>Basic Info</SectionTitle>
+          {/* BASIC INFO */}
+          <section className="flex flex-col gap-5">
+            <SectionTitle>Basic Information</SectionTitle>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
               <div className="sm:col-span-2">
                 <FieldRow label="Name">
                   <input
@@ -341,28 +345,28 @@ function UpdateProduct() {
                     name="description"
                     value={fields.description}
                     onChange={handleChange}
-                    rows={3}
-                    className={inputCls + ' resize-none'}
+                    rows={4}
+                    className={`${inputCls} resize-none`}
                     required
                     minLength={10}
                   />
                 </FieldRow>
-
-                <FieldRow label="Gender">
-                  <select
-                    name="gender"
-                    value={fields.gender}
-                    onChange={handleChange}
-                    className={inputCls}
-                    required
-                  >
-                    <option value="">Select gender</option>
-                    <option value="men">Men</option>
-                    <option value="women">Women</option>
-                    <option value="kids">Kids</option>
-                  </select>
-                </FieldRow>
               </div>
+
+              <FieldRow label="Gender">
+                <select
+                  name="gender"
+                  value={fields.gender}
+                  onChange={handleChange}
+                  className={inputCls}
+                  required
+                >
+                  <option value="">Select gender</option>
+                  <option value="men">Men</option>
+                  <option value="women">Women</option>
+                  <option value="kids">Kids</option>
+                </select>
+              </FieldRow>
 
               <FieldRow label="Price (EGP)">
                 <input
@@ -423,7 +427,7 @@ function UpdateProduct() {
                     setFields((p) => ({
                       ...p,
                       category: value,
-                      subcategory: '', // reset when category changes
+                      subcategory: '',
                     }));
                   }}
                   className={inputCls}
@@ -477,9 +481,10 @@ function UpdateProduct() {
             </div>
           </section>
 
-          {/* ── SECTION: Season ── */}
+          {/* SEASON */}
           <section>
             <SectionTitle>Season</SectionTitle>
+
             <div className="flex flex-wrap gap-2">
               {SEASONS.map((s) => (
                 <Button
@@ -487,7 +492,7 @@ function UpdateProduct() {
                   type="button"
                   variant="secondary"
                   active={fields.season.includes(s)}
-                  activeClassName="!bg-green-600 !border-green-600 !text-white hover:!bg-green-700"
+                  activeClassName="!bg-primary !border-primary !text-primary-foreground"
                   onClick={() => handleSeasonToggle(s)}
                   className="rounded-full"
                 >
@@ -497,15 +502,17 @@ function UpdateProduct() {
             </div>
           </section>
 
-          {/* ── SECTION: Flags ── */}
+          {/* FLAGS */}
           <section>
             <SectionTitle>Visibility & Flags</SectionTitle>
-            <div className="flex gap-6">
+
+            <div className="flex flex-wrap gap-8">
               <Toggle
                 label="Active"
                 checked={fields.isActive}
                 onChange={(v) => setFields((p) => ({ ...p, isActive: v }))}
               />
+
               <Toggle
                 label="Featured"
                 checked={fields.featured}
@@ -514,17 +521,17 @@ function UpdateProduct() {
             </div>
           </section>
 
-          {/* ── SAVE BUTTON ── */}
-          <div className="flex justify-end pt-2">
+          {/* SAVE */}
+          <div className="flex justify-end border-t border-border pt-6">
             <Button type="submit" loading={isUpdating}>
               {coverFile ? 'Save with new cover' : 'Save changes'}
             </Button>
           </div>
         </form>
 
-        {/* ── SECTION: Gallery Images ── */}
-        <section>
-          <div className="mb-3 flex items-center justify-between">
+        {/* GALLERY IMAGES */}
+        <section className="border-t border-border pt-8">
+          <div className="mb-5 flex items-center justify-between gap-3">
             <SectionTitle noMargin>Gallery Images</SectionTitle>
 
             <Modal.Open opens="add-image">
@@ -534,30 +541,38 @@ function UpdateProduct() {
               </Button>
             </Modal.Open>
           </div>
+
           <Modal.Window name="add-image">
             <AddImageForm productId={productId} />
           </Modal.Window>
+
           {images.length === 0 ? (
-            <p className="text-sm text-gray-400">No gallery images yet.</p>
+            <p className="rounded-xl border border-dashed border-border py-10 text-center text-sm text-muted-foreground">
+              No gallery images yet.
+            </p>
           ) : (
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               {images.map((img) => (
                 <div
                   key={img._id}
-                  className="relative group rounded-xl overflow-hidden border border-gray-200 aspect-square"
+                  className="group relative aspect-square overflow-hidden rounded-xl border border-border bg-surface"
                 >
                   <img
                     src={img.url}
-                    className="w-full h-full object-cover"
+                    className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                     alt=""
                   />
-                  <Modal.Open opens={`del-img-${img._id}`}>
-                    <div className="absolute top-1.5 right-1.5 opacity-0 group-hover:opacity-100">
-                      <IconButton variant="danger" size="sm">
-                        ✕
-                      </IconButton>
-                    </div>
-                  </Modal.Open>
+
+                  <div className="absolute inset-0 flex items-start justify-end bg-black/0 p-2 opacity-0 transition group-hover:bg-black/20 group-hover:opacity-100">
+                    <Modal.Open opens={`del-img-${img._id}`}>
+                      <div>
+                        <IconButton variant="danger" size="sm">
+                          ✕
+                        </IconButton>
+                      </div>
+                    </Modal.Open>
+                  </div>
+
                   <Modal.Window name={`del-img-${img._id}`}>
                     <ConfirmDelete
                       resourceName="image"
@@ -570,9 +585,9 @@ function UpdateProduct() {
           )}
         </section>
 
-        {/* ── SECTION: Variants ── */}
-        <section>
-          <div className="mb-3 flex items-center justify-between">
+        {/* VARIANTS */}
+        <section className="border-t border-border pt-8">
+          <div className="mb-5 flex items-center justify-between gap-3">
             <SectionTitle noMargin>Variants</SectionTitle>
 
             <Modal.Open opens="add-variant">
@@ -582,51 +597,69 @@ function UpdateProduct() {
               </Button>
             </Modal.Open>
           </div>
+
           <Modal.Window name="add-variant">
             <AddVariantForm productId={productId} />
           </Modal.Window>
+
           {variants.length === 0 ? (
-            <p className="text-sm text-gray-400">No variants yet.</p>
+            <p className="rounded-xl border border-dashed border-border py-10 text-center text-sm text-muted-foreground">
+              No variants yet.
+            </p>
           ) : (
-            <div className="border rounded-xl overflow-hidden">
+            <div className="overflow-x-auto rounded-xl border border-border">
               <table className="w-full text-sm">
-                <thead className="bg-gray-50 border-b">
-                  <tr>
-                    <th className="px-3 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                <thead className="bg-surface text-muted-foreground">
+                  <tr className="border-b border-border">
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">
                       Size
                     </th>
-                    <th className="px-3 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">
                       Color
                     </th>
-                    <th className="px-3 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">
                       Qty
                     </th>
-                    <th className="px-3 py-2.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider">
                       SKU
                     </th>
-                    <th className="px-3 py-2.5 text-right text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                    <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+
+                <tbody className="divide-y divide-border">
                   {variants.map((v) => (
-                    <tr key={v._id} className="hover:bg-gray-50 transition">
-                      <td className="px-3 py-2.5 font-medium">{v.size}</td>
-                      <td className="px-3 py-2.5">
+                    <tr
+                      key={v._id}
+                      className="transition-colors hover:bg-accent/50"
+                    >
+                      <td className="px-4 py-3 font-medium text-foreground">
+                        {v.size}
+                      </td>
+
+                      <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           <span
-                            className="w-4 h-4 rounded-full border border-gray-300 shrink-0"
+                            className="h-4 w-4 shrink-0 rounded-full border border-border"
                             style={{ backgroundColor: v.color?.hex }}
                           />
-                          <span>{v.color?.name}</span>
+                          <span className="text-foreground">
+                            {v.color?.name}
+                          </span>
                         </div>
                       </td>
-                      <td className="px-3 py-2.5">{v.quantity}</td>
-                      <td className="px-3 py-2.5 font-mono text-xs text-gray-500">
+
+                      <td className="px-4 py-3 text-foreground">
+                        {v.quantity}
+                      </td>
+
+                      <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
                         {v.sku || '—'}
                       </td>
-                      <td className="px-3 py-2.5">
+
+                      <td className="px-4 py-3">
                         <div className="flex justify-end gap-2">
                           <Modal.Open opens={`edit-${v._id}`}>
                             <Button variant="secondary" size="sm">
@@ -671,8 +704,8 @@ function UpdateProduct() {
 function SectionTitle({ children, noMargin }) {
   return (
     <h2
-      className={`text-xs font-semibold uppercase tracking-widest text-gray-400 ${
-        noMargin ? '' : 'mb-4'
+      className={`text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground ${
+        noMargin ? '' : 'mb-5'
       }`}
     >
       {children}
@@ -682,20 +715,21 @@ function SectionTitle({ children, noMargin }) {
 
 function Toggle({ label, checked, onChange }) {
   return (
-    <label className="flex items-center gap-2.5 cursor-pointer select-none">
+    <label className="flex cursor-pointer select-none items-center gap-3">
       <div
         onClick={() => onChange(!checked)}
-        className={`relative w-10 h-5 rounded-full transition-colors ${
-          checked ? 'bg-green-600' : 'bg-gray-300'
+        className={`relative h-5 w-10 rounded-full transition-colors ${
+          checked ? 'bg-primary' : 'bg-border'
         }`}
       >
         <span
-          className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${
+          className={`absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform ${
             checked ? 'translate-x-5' : 'translate-x-0'
           }`}
         />
       </div>
-      <span className="text-sm text-gray-700">{label}</span>
+
+      <span className="text-sm font-medium text-foreground">{label}</span>
     </label>
   );
 }

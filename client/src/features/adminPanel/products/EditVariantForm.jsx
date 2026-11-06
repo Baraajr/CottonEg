@@ -55,9 +55,12 @@ function EditVariantForm({ productId, variant, onCloseModal }) {
     });
   };
 
+  const inputClass =
+    'w-full rounded-none border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-foreground';
+
   const field = (label, input) => (
-    <div className="flex flex-col gap-1">
-      <label className="text-xs font-medium uppercase tracking-wide text-gray-600">
+    <div className="flex flex-col gap-1.5">
+      <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
         {label}
       </label>
       {input}
@@ -65,15 +68,20 @@ function EditVariantForm({ productId, variant, onCloseModal }) {
   );
 
   return (
-    <div className="flex w-80 flex-col gap-4 p-6">
-      <h2 className="text-lg font-semibold">Edit Variant</h2>
+    <div className="flex w-full min-w-70 flex-col gap-4 bg-background p-5 text-foreground sm:w-90">
+      <div className="border-b border-border pb-3">
+        <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+          Product inventory
+        </span>
+        <h2 className="mt-1 font-display text-2xl">Edit Variant</h2>
+      </div>
 
       {field(
         'Size',
         <select
           value={form.size}
           onChange={(e) => setForm((f) => ({ ...f, size: e.target.value }))}
-          className="rounded border border-gray-300 px-3 py-2 text-sm"
+          className={inputClass}
         >
           {SIZES.map((s) => (
             <option key={s} value={s}>
@@ -91,21 +99,25 @@ function EditVariantForm({ productId, variant, onCloseModal }) {
           onChange={(e) =>
             setForm((f) => ({ ...f, colorName: e.target.value }))
           }
-          className="rounded border border-gray-300 px-3 py-2 text-sm"
+          placeholder="Enter color name"
+          className={inputClass}
         />,
       )}
 
       {field(
         'Color hex',
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3 border border-border bg-surface px-3 py-2">
           <input
             type="color"
             value={form.colorHex}
             onChange={(e) =>
               setForm((f) => ({ ...f, colorHex: e.target.value }))
             }
+            className="h-8 w-10 cursor-pointer border-0 bg-transparent"
           />
-          <span className="font-mono text-sm">{form.colorHex}</span>
+          <span className="font-mono text-sm text-muted-foreground">
+            {form.colorHex.toUpperCase()}
+          </span>
         </div>,
       )}
 
@@ -116,7 +128,7 @@ function EditVariantForm({ productId, variant, onCloseModal }) {
           min={0}
           value={form.quantity}
           onChange={(e) => setForm((f) => ({ ...f, quantity: e.target.value }))}
-          className="rounded border border-gray-300 px-3 py-2 text-sm"
+          className={inputClass}
         />,
       )}
 
@@ -126,11 +138,12 @@ function EditVariantForm({ productId, variant, onCloseModal }) {
           type="text"
           value={form.sku}
           onChange={(e) => setForm((f) => ({ ...f, sku: e.target.value }))}
-          className="rounded border border-gray-300 px-3 py-2 text-sm"
+          placeholder="Enter SKU"
+          className={inputClass}
         />,
       )}
 
-      <div className="flex gap-2 pt-1">
+      <div className="flex gap-2 border-t border-border pt-4">
         <Button
           onClick={handleSubmit}
           loading={isPending}

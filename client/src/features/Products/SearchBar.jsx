@@ -34,23 +34,23 @@ function SearchBar({ onClose }) {
   return (
     <div
       ref={searchRef}
-      className="fixed top-20 inset-x-0 z-500 mx-auto w-full border-b border-gray-200 bg-white px-4 py-3 md:w-[50%]"
+      className="fixed inset-x-0 top-16 z-500 mx-auto w-full border-b border-border bg-background px-4 py-4 shadow-lg md:top-20 md:w-[50%]"
     >
-      <form onSubmit={handleSearch} className="flex items-center gap-2">
-        <IoIosSearch className="h-5 w-5 text-gray-500" />
+      <form onSubmit={handleSearch} className="flex items-center gap-3">
+        <IoIosSearch className="h-5 w-5 shrink-0 text-muted-foreground" />
 
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search products..."
-          className="w-full text-sm outline-none"
+          className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
           autoFocus
         />
 
         <button
           type="button"
           onClick={onClose}
-          className="text-sm text-gray-500 hover:text-black"
+          className="shrink-0 text-xs font-medium uppercase tracking-wider text-muted-foreground transition-colors hover:text-foreground"
         >
           Close
         </button>

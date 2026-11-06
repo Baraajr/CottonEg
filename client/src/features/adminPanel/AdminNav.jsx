@@ -11,24 +11,22 @@ const links = [
 
 function AdminNav({ onClickItem }) {
   const base =
-    'relative px-3 py-2 text-sm font-medium text-gray-600 transition-colors duration-200';
+    'relative rounded-lg px-4 py-3 text-sm font-medium transition-colors duration-200';
 
-  const active = 'text-black after:scale-x-100';
+  const active = 'bg-primary text-primary-foreground';
 
-  const underline =
-    'after:absolute after:left-0 after:bottom-0 after:h-[2px] after:w-full after:bg-black after:origin-left after:scale-x-0 after:transition-transform';
+  const inactive =
+    'text-muted-foreground hover:bg-accent hover:text-foreground';
 
   return (
-    <nav className="flex flex-col gap-6">
+    <nav className="flex flex-col gap-1.5 ">
       {links.map(({ to, label }) => (
         <NavLink
           onClick={onClickItem}
           key={to}
           to={to}
           className={({ isActive }) =>
-            `${base} ${underline} hover:text-black hover:after:scale-x-100 ${
-              isActive ? active : ''
-            }`
+            `${base} ${isActive ? active : inactive}`
           }
         >
           {label}

@@ -39,9 +39,16 @@ function UpdateUserForm({ user, onCloseModal }) {
   const onSubmit = (data) => {
     if (!isDirty) return;
 
-    const payload = { ...data };
+    // 1. Filter out empty, null, or undefined fields (like an empty phone string)
+    const cleanedData = Object.fromEntries(
+      Object.entries(data).filter(
+        // eslint-disable-next-line no-unused-vars
+        ([_, value]) => value !== '' && value !== null && value !== undefined,
+      ),
+    );
 
-    // Skip sending email if unchanged
+    const payload = { ...cleanedData };
+
     if (payload.email === user.email) delete payload.email;
 
     let body;
@@ -50,9 +57,7 @@ function UpdateUserForm({ user, onCloseModal }) {
       body = new FormData();
 
       Object.entries(payload).forEach(([key, value]) => {
-        if (value !== null && value !== undefined) {
-          body.append(key, value);
-        }
+        body.append(key, value);
       });
     } else {
       delete payload.profileImg;
@@ -87,23 +92,22 @@ function UpdateUserForm({ user, onCloseModal }) {
     register('profileImg');
 
   return (
-    <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+    <form className="flex flex-col gap-5" onSubmit={handleSubmit(onSubmit)}>
       <div>
-        <label className="mb-1 block text-sm font-medium">Name</label>
+        <label className="label">Name</label>
         <input
           {...register('name', {
             required: 'Name is required',
           })}
-          className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+          className="input"
         />
-        {errors.name && (
-          <p className="text-sm text-red-500">{errors.name.message}</p>
-        )}
+        {errors.name && <p className="error">{errors.name.message}</p>}
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium">Email</label>
+        <label className="label">Email</label>
         <input
+          type="email"
           {...register('email', {
             required: 'Email is required',
             pattern: {
@@ -111,39 +115,33 @@ function UpdateUserForm({ user, onCloseModal }) {
               message: 'Invalid email',
             },
           })}
-          className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+          className="input"
         />
-        {errors.email && (
-          <p className="text-sm text-red-500">{errors.email.message}</p>
-        )}
+        {errors.email && <p className="error">{errors.email.message}</p>}
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium">
-          Phone (optional)
-        </label>
+        <label className="label">Phone (optional)</label>
         <input
           {...register('phone')}
           placeholder="Enter phone number"
-          className="w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+          className="input"
         />
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium">
-          Profile Image (optional)
-        </label>
+        <label className="label">Profile Image (optional)</label>
 
         <div className="flex items-center gap-4">
           {previewImg && (
             <img
               src={previewImg}
               alt="Profile preview"
-              className="h-12 w-12 rounded-full object-cover"
+              className="h-14 w-14 rounded-full border border-border object-cover"
             />
           )}
 
-          <label className="cursor-pointer rounded-md bg-gray-200 px-3 py-2 text-sm hover:bg-gray-300">
+          <label className="cursor-pointer rounded-md border border-border bg-surface px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-surface-hover">
             Choose Image
             <input
               type="file"
@@ -159,7 +157,7 @@ function UpdateUserForm({ user, onCloseModal }) {
         </div>
       </div>
 
-      <div className="flex justify-end gap-2">
+      <div className="flex justify-end gap-3 border-t border-border pt-4">
         <Button
           variant="secondary"
           type="button"

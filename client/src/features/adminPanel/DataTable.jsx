@@ -1,11 +1,13 @@
 function DataTable({ head, children }) {
   return (
-    <table className="w-full text-sm">
-      <thead className="sticky top-0 z-10 bg-gray-50 text-gray-600">
-        <tr className="border-b">{head}</tr>
+    <table className="w-full text-sm text-foreground">
+      <thead className="sticky top-0 z-10 bg-surface text-muted-foreground">
+        <tr className="border-b border-border">{head}</tr>
       </thead>
-      <tbody>{children}</tbody>
+
+      <tbody className="divide-y divide-border">{children}</tbody>
     </table>
   );
 }
+
 export default DataTable;

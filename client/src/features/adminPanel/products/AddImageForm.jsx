@@ -38,31 +38,57 @@ function AddImageForm({ productId, onCloseModal }) {
   };
 
   return (
-    <div className="p-6 w-80">
-      <h2 className="text-lg font-semibold mb-4">Add Image</h2>
+    <div className="w-80 p-6">
+      <div className="mb-6">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+          Product gallery
+        </p>
+        <h2 className="mt-2 text-xl font-semibold text-foreground">
+          Add Image
+        </h2>
+      </div>
 
-      <label className="block w-full cursor-pointer border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
+      <label className="flex min-h-48 w-full cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-border bg-surface p-5 text-center transition-colors hover:border-primary">
         <input
           type="file"
           accept="image/*"
           className="hidden"
           onChange={handleFileChange}
         />
+
         {preview ? (
-          <img
-            src={preview}
-            alt="preview"
-            className="mx-auto h-32 w-32 object-cover rounded"
-          />
+          <>
+            <img
+              src={preview}
+              alt="preview"
+              className="h-40 w-full rounded-lg object-contain"
+            />
+            <span className="mt-3 text-xs text-muted-foreground">
+              Click to change image
+            </span>
+          </>
         ) : (
-          <span className="text-gray-400 text-sm">
-            Click to select an image
-          </span>
+          <>
+            <div className="mb-3 rounded-full bg-accent px-4 py-4 text-primary">
+              <span className="text-2xl">+</span>
+            </div>
+            <span className="text-sm font-medium text-foreground">
+              Click to select an image
+            </span>
+            <span className="mt-1 text-xs text-muted-foreground">
+              Choose an image from your device
+            </span>
+          </>
         )}
       </label>
 
-      <div className="mt-4 flex gap-2">
-        <Button onClick={handleSubmit} loading={isPending} disabled={!file}>
+      <div className="mt-6 flex gap-3">
+        <Button
+          onClick={handleSubmit}
+          loading={isPending}
+          disabled={!file}
+          className="flex-1"
+        >
           Upload
         </Button>
 

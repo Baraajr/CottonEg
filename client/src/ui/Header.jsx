@@ -2,19 +2,15 @@ import { useState, useRef, useEffect } from 'react';
 import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 
-// icons
 import { RiDashboardLine } from 'react-icons/ri';
 import { IoIosSearch } from 'react-icons/io';
 import { FaCartShopping, FaHeart } from 'react-icons/fa6';
 import { HiOutlineMenu, HiOutlineX } from 'react-icons/hi';
-import { FiShoppingCart } from 'react-icons/fi';
-import { FiUser } from 'react-icons/fi';
+import { FiShoppingCart, FiUser } from 'react-icons/fi';
 import { CiHeart } from 'react-icons/ci';
 
-// hooks
 import useUser from '../hooks/useUser';
 import useWishlist from '../features/wishlist/useWishlist';
-
 import { GENDERS } from '../constants/constants';
 import useNavByGender from '../hooks/useMenu';
 import useCart from '../features/cart/useCart';
@@ -25,19 +21,16 @@ import GenderMenu from './Gendermenu';
 
 const MOTION = {
   duration: 0.28,
-  ease: [0.4, 0, 0.2, 1], // smooth standard ease
+  ease: [0.4, 0, 0.2, 1],
 };
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeGender, setActiveGender] = useState(null);
-
   const [searchOpen, setSearchOpen] = useState(false);
 
   const navigate = useNavigate();
-
   const location = useLocation();
-
   const [scrolled, setScrolled] = useState(false);
 
   const isHome = location.pathname === '/';
@@ -48,8 +41,9 @@ export default function Header() {
 
   const transparent = isHome && !scrolled;
 
-  const textColor = transparent ? 'text-white' : 'text-black';
-  const iconColor = transparent ? 'text-white' : 'text-gray-700';
+  const textColor = transparent ? 'text-white' : 'text-foreground';
+  const iconColor = transparent ? 'text-white' : 'text-foreground';
+
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 40);
@@ -93,10 +87,8 @@ export default function Header() {
 
   return (
     <>
-      {/* SEARCH BAR */}
       {searchOpen && <SearchBar onClose={() => setSearchOpen(false)} />}
 
-      {/* MOBILE MENU */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
@@ -106,37 +98,40 @@ export default function Header() {
             exit={{ opacity: 0 }}
             transition={{ duration: MOTION.duration, ease: MOTION.ease }}
           >
-            {/* OVERLAY */}
             <motion.div
-              className="absolute inset-0 bg-black/40"
+              className="absolute inset-0 bg-foreground/50"
               onClick={() => setMobileMenuOpen(false)}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             />
 
-            {/* DRAWER */}
             <motion.div
               initial={{ x: '-100%' }}
               animate={{ x: 0 }}
               exit={{ x: '-100%' }}
               transition={{ duration: MOTION.duration, ease: MOTION.ease }}
-              className="relative h-screen w-[70%] bg-white shadow-xl z-10"
+              className="relative z-10 h-screen w-[78%] max-w-sm border-r border-border bg-background shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="h-20 border-b border-gray-200 flex items-center justify-between px-4">
-                <h1 className="text-2xl font-bold">CottonEg.</h1>
+              <div className="flex h-16 items-center justify-between border-b border-border px-5">
+                <h1
+                  onClick={() => navigate('/')}
+                  className="cursor-pointer font-display text-2xl text-foreground"
+                >
+                  CottonEg.
+                </h1>
 
                 <IconButton
                   size="sm"
                   onClick={() => setMobileMenuOpen(false)}
                   aria-label="Close menu"
                 >
-                  <HiOutlineX className="h-5 w-5" />
+                  <HiOutlineX className="h-5 w-5 text-foreground" />
                 </IconButton>
               </div>
 
-              <div className="h-[calc(100vh-80px)] overflow-y-auto p-4">
+              <div className="h-[calc(100vh-64px)] overflow-y-auto p-4">
                 <MobileMenu
                   menus={menus}
                   onClose={() => setMobileMenuOpen(false)}
@@ -146,29 +141,30 @@ export default function Header() {
           </motion.div>
         )}
       </AnimatePresence>
+
       <header
-        className={`fixed inset-x-0 top-0 z-50 h-20 transition-all duration-300 ${
+        className={`fixed inset-x-0 top-0 z-50 h-16 md:h-20 transition-all duration-300 ${
           transparent
-            ? 'bg-transparent border-transparent'
-            : 'bg-white border-b border-gray-200 shadow-sm'
+            ? 'border-transparent bg-transparent'
+            : 'border-transparent bg-background/95 shadow-sm backdrop-blur-md'
         }`}
       >
-        <div className="h-full px-4 md:px-6 flex items-center justify-between">
+        <div className="flex h-full items-center justify-between px-4 md:px-8">
           <h1
             onClick={() => navigate('/')}
-            className={`text-2xl md:text-3xl font-bold cursor-pointer transition-colors ${textColor}`}
+            className={`cursor-pointer font-display text-2xl md:text-[2rem] tracking-tight transition-colors ${textColor}`}
           >
             CottonEg.
           </h1>
 
-          <nav className="hidden md:flex flex-1 justify-center items-stretch gap-6 h-full">
+          <nav className="hidden h-full flex-1 items-stretch justify-center gap-8 md:flex">
             <div className="flex items-center">
               <NavLink
                 to="/"
-                className={`text-sm transition-colors ${
+                className={`relative text-[13px] font-medium tracking-wide transition-colors after:absolute after:-bottom-1 after:left-0 after:h-px after:w-0 after:bg-current after:transition-all hover:after:w-full ${
                   transparent
-                    ? 'text-white hover:text-gray-200'
-                    : 'text-black hover:text-gray-500'
+                    ? 'text-white/90 hover:text-white'
+                    : 'text-foreground hover:text-muted-foreground'
                 }`}
               >
                 Home
@@ -180,24 +176,24 @@ export default function Header() {
                 key={gender}
                 onMouseEnter={() => handleGenderEnter(gender)}
                 onMouseLeave={handleGenderLeave}
-                className="relative flex items-center h-full"
+                className="relative flex h-full items-center"
               >
                 <NavLink
                   to={`/products?gender=${gender}`}
-                  className={`text-sm transition-colors ${
+                  className={`relative text-[13px] font-medium capitalize tracking-wide transition-colors after:absolute after:-bottom-1 after:left-0 after:h-px after:w-0 after:bg-current after:transition-all hover:after:w-full ${
                     transparent
-                      ? 'text-white hover:text-gray-200'
-                      : 'text-black hover:text-gray-500'
+                      ? 'text-white/90 hover:text-white'
+                      : 'text-foreground hover:text-muted-foreground'
                   }`}
                 >
-                  {gender.charAt(0).toUpperCase() + gender.slice(1)}
+                  {gender}
                 </NavLink>
 
                 {activeGender === gender && (
                   <div
                     onMouseEnter={handleMenuEnter}
                     onMouseLeave={handleGenderLeave}
-                    className="absolute top-full left-0"
+                    className="absolute left-0 top-full"
                   >
                     <GenderMenu
                       gender={gender}
@@ -210,14 +206,14 @@ export default function Header() {
             ))}
           </nav>
 
-          <div className="flex items-center gap-2">
-            {/* Desktop */}
-            <div className="hidden md:flex items-center gap-2">
+          <div className="flex items-center gap-1">
+            {/* Desktop actions */}
+            <div className="hidden items-center gap-1 md:flex">
               <IconButton
                 onClick={() => setSearchOpen((s) => !s)}
                 tooltip="Search"
               >
-                <IoIosSearch className={`w-6 h-6 ${iconColor}`} />
+                <IoIosSearch className={`h-5 w-5 ${iconColor}`} />
               </IconButton>
 
               {user?.role === 'user' && (
@@ -228,9 +224,9 @@ export default function Header() {
                     tooltip="Wishlist"
                   >
                     {wishlistCount > 0 ? (
-                      <FaHeart className="w-6 h-6 text-red-500" />
+                      <FaHeart className={`h-[18px] w-[18px] ${iconColor}`} />
                     ) : (
-                      <CiHeart className={`w-6 h-6 ${iconColor}`} />
+                      <CiHeart className={`h-6 w-6 ${iconColor}`} />
                     )}
                   </IconButton>
 
@@ -240,9 +236,11 @@ export default function Header() {
                     tooltip="Cart"
                   >
                     {cartCount > 0 ? (
-                      <FaCartShopping className={`w-6 h-6 ${iconColor}`} />
+                      <FaCartShopping
+                        className={`h-[18px] w-[18px] ${iconColor}`}
+                      />
                     ) : (
-                      <FiShoppingCart className={`w-6 h-6 ${iconColor}`} />
+                      <FiShoppingCart className={`h-5 w-5 ${iconColor}`} />
                     )}
                   </IconButton>
                 </>
@@ -253,7 +251,7 @@ export default function Header() {
                   onClick={() => navigate('/admin')}
                   tooltip="Admin Panel"
                 >
-                  <RiDashboardLine className={`w-6 h-6 ${iconColor}`} />
+                  <RiDashboardLine className={`h-5 w-5 ${iconColor}`} />
                 </IconButton>
               )}
 
@@ -264,14 +262,14 @@ export default function Header() {
                 }}
                 tooltip={user ? 'Profile' : 'Login'}
               >
-                <FiUser className={`w-6 h-6 ${iconColor}`} />
+                <FiUser className={`h-5 w-5 ${iconColor}`} />
               </IconButton>
             </div>
 
-            {/* Mobile */}
-            <div className="flex md:hidden items-center gap-1">
+            {/* Mobile actions */}
+            <div className="flex items-center gap-1 md:hidden">
               <IconButton onClick={() => setSearchOpen((s) => !s)}>
-                <IoIosSearch className={`w-6 h-6 ${iconColor}`} />
+                <IoIosSearch className={`h-5 w-5 ${iconColor}`} />
               </IconButton>
 
               <IconButton
@@ -279,7 +277,7 @@ export default function Header() {
                 onClick={() => setMobileMenuOpen(true)}
                 aria-label="Open menu"
               >
-                <HiOutlineMenu className="h-7 w-7" />
+                <HiOutlineMenu className={`h-6 w-6 ${iconColor}`} />
               </IconButton>
             </div>
           </div>

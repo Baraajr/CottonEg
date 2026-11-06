@@ -1,15 +1,18 @@
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { FcGoogle } from 'react-icons/fc';
-import { FaRegEye } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom';
+import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa';
 import { toast } from 'react-hot-toast';
+
 import { signup } from '../../services/auth';
-import SpinnerMini from '../../ui/SpinnerMini';
 import Button from '../../ui/Button';
+import SpinnerMini from '../../ui/SpinnerMini';
 
 function SignupForm() {
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
@@ -17,17 +20,15 @@ function SignupForm() {
 
   const navigate = useNavigate();
 
-  const { mutate, isLoading } = useMutation({
-    mutationFn: ({ email, password, passwordConfirm, name }) =>
-      signup({ email, password, passwordConfirm, name }),
-    onSuccess: (res) => {
-      // toast.success(res.message);
-      toast.success('signed up');
+  const { mutate, isPending } = useMutation({
+    mutationFn: signup,
+    onSuccess: () => {
+      toast.success('Account created successfully');
 
-      localStorage.setItem('pendingVerificationEmail', email);
+      localStorage.setItem('pendingVerificationEmail', email.trim());
 
       navigate('/', {
-        state: { email },
+        state: { email: email.trim() },
       });
     },
     onError: (err) => {
@@ -37,121 +38,218 @@ function SignupForm() {
 
   function handleSubmit(e) {
     e.preventDefault();
-    if (!email || !password || !passwordConfirm || !name) return;
 
-    mutate(
-      { email, password, passwordConfirm, name },
-      {
-        onSettled: () => {
-          setPassword('');
-          setPasswordConfirm('');
-          setName('');
-        },
-      },
-    );
+    const trimmedName = name.trim();
+    const trimmedEmail = email.trim();
+
+    if (!trimmedName || !trimmedEmail || !password || !passwordConfirm) return;
+
+    if (password !== passwordConfirm) {
+      toast.error('Passwords do not match');
+      return;
+    }
+
+    mutate({
+      name: trimmedName,
+      email: trimmedEmail,
+      password,
+      passwordConfirm,
+    });
   }
 
   function handleGoogleAuth() {
-    navigate(`${import.meta.env.VITE_API_URL}/auth/google`);
+    window.location.href = `${import.meta.env.VITE_API_URL}/auth/google`;
   }
 
   return (
-    <div className="flex justify-center px-4 py-16">
-      <form onSubmit={handleSubmit} className="w-full max-w-md">
-        <h1 className="mb-3 text-center text-3xl font-light tracking-[0.3em]">
-          SIGN UP
-        </h1>
+    <div className="flex w-full justify-center px-4 py-8 sm:py-10">
+      <form onSubmit={handleSubmit} className="w-full max-w-md space-y-4">
+        {/* Heading */}
+        <div className="space-y-2">
+          <p className="section-label">Join CottonEg</p>
 
-        <p className="mb-8 text-center text-sm text-gray-600">
-          Create your account to continue
-        </p>
+          <h1 className="font-serif text-3xl font-medium text-foreground">
+            Create account.
+          </h1>
+
+          <p className="text-sm text-muted-foreground">
+            Create your account and discover your style.
+          </p>
+        </div>
 
         {/* Name */}
-        <div className="mb-4">
+        <div>
+          <label htmlFor="signup-name" className="label">
+            Full name
+          </label>
+
           <input
+            id="signup-name"
+            type="text"
+            name="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            type="text"
-            placeholder="Full Name"
+            placeholder="Your full name"
+            autoComplete="name"
             required
-            disabled={isLoading}
-            className="w-full border border-gray-300 px-4 py-3 text-sm outline-none focus:border-black"
+            disabled={isPending}
+            className="input"
           />
         </div>
 
         {/* Email */}
-        <div className="mb-4">
+        <div>
+          <label htmlFor="signup-email" className="label">
+            Email address
+          </label>
+
           <input
+            id="signup-email"
+            type="email"
+            name="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            type="email"
-            placeholder="E-mail"
+            placeholder="name@example.com"
+            autoComplete="email"
             required
-            disabled={isLoading}
-            className="w-full border border-gray-300 px-4 py-3 text-sm outline-none focus:border-black"
+            disabled={isPending}
+            className="input"
           />
         </div>
 
         {/* Password */}
-        <div className="relative mb-4">
-          <input
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            type={showPassword ? 'text' : 'password'}
-            placeholder="Password"
-            required
-            disabled={isLoading}
-            className="w-full border border-gray-300 px-4 py-3 pr-12 text-sm outline-none focus:border-black"
-          />
+        <div>
+          <label htmlFor="signup-password" className="label">
+            Password
+          </label>
 
-          <FaRegEye
-            onClick={() => setShowPassword((s) => !s)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500 hover:text-black"
-          />
+          <div className="relative">
+            <input
+              id="signup-password"
+              type={showPassword ? 'text' : 'password'}
+              name="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Create a password"
+              autoComplete="new-password"
+              required
+              disabled={isPending}
+              className="input pr-11"
+            />
+
+            <button
+              type="button"
+              onClick={() => setShowPassword((s) => !s)}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            >
+              {showPassword ? (
+                <FaRegEyeSlash size={15} />
+              ) : (
+                <FaRegEye size={15} />
+              )}
+            </button>
+          </div>
         </div>
 
-        {/* Confirm Password */}
-        <div className="mb-6">
-          <input
-            value={passwordConfirm}
-            onChange={(e) => setPasswordConfirm(e.target.value)}
-            type={showPassword ? 'text' : 'password'}
-            placeholder="Confirm Password"
-            required
-            disabled={isLoading}
-            className="w-full border border-gray-300 px-4 py-3 text-sm outline-none focus:border-black"
-          />
+        {/* Confirm password */}
+        <div>
+          <label htmlFor="signup-confirm-password" className="label">
+            Confirm password
+          </label>
+
+          <div className="relative">
+            <input
+              id="signup-confirm-password"
+              type={showConfirmPassword ? 'text' : 'password'}
+              name="passwordConfirm"
+              value={passwordConfirm}
+              onChange={(e) => setPasswordConfirm(e.target.value)}
+              placeholder="Confirm your password"
+              autoComplete="new-password"
+              required
+              disabled={isPending}
+              className="input pr-11"
+            />
+
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword((s) => !s)}
+              aria-label={
+                showConfirmPassword ? 'Hide password' : 'Show password'
+              }
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            >
+              {showConfirmPassword ? (
+                <FaRegEyeSlash size={15} />
+              ) : (
+                <FaRegEye size={15} />
+              )}
+            </button>
+          </div>
+
+          {passwordConfirm && password !== passwordConfirm && (
+            <p className="error">Passwords do not match.</p>
+          )}
         </div>
 
-        {/* Signup button (HOVER EFFECT ADDED) */}
-        {/* Sign Up */}
+        {/* Submit */}
         <Button
           type="submit"
           fullWidth
-          loading={isLoading}
-          className="py-3 tracking-[0.25em]"
+          disabled={
+            isPending ||
+            !name.trim() ||
+            !email.trim() ||
+            !password ||
+            !passwordConfirm ||
+            password !== passwordConfirm
+          }
+          className="py-3 text-xs tracking-[0.15em]"
         >
-          SIGN UP
+          {isPending ? (
+            <span className="flex items-center justify-center gap-2">
+              <SpinnerMini />
+              CREATING ACCOUNT...
+            </span>
+          ) : (
+            'CREATE ACCOUNT'
+          )}
         </Button>
+
+        {/* Divider */}
+        <div className="flex items-center gap-3">
+          <div className="h-px flex-1 bg-border" />
+
+          <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
+            Or continue with
+          </span>
+
+          <div className="h-px flex-1 bg-border" />
+        </div>
 
         {/* Google */}
         <Button
-          onClick={() => handleGoogleAuth()}
           type="button"
           variant="secondary"
           fullWidth
-          className="mt-4 justify-center py-3"
+          disabled={isPending}
+          onClick={handleGoogleAuth}
+          className="justify-center gap-2 py-3 text-xs"
         >
-          <FcGoogle className="h-5 w-5" />
+          <FcGoogle size={17} />
           Continue with Google
         </Button>
 
         {/* Login */}
-        <p className="mt-6 text-center text-sm text-gray-600">
-          Already have an account?
-          <a href="/login" className="text-black hover:underline">
+        <p className="pt-1 text-center text-sm text-muted-foreground">
+          Already have an account?{' '}
+          <Link
+            to="/login"
+            className="font-semibold text-foreground underline underline-offset-4 hover:text-muted-foreground"
+          >
             Sign in
-          </a>
+          </Link>
         </p>
       </form>
     </div>

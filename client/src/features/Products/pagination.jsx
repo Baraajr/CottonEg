@@ -25,33 +25,50 @@ function Pagination({ currentPage, numberOfPages, onPageChange }) {
   };
 
   return (
-    <div className="flex items-center gap-4 py-2 px-4 justify-center">
-      {/* Prev */}
+    <nav
+      aria-label="Pagination"
+      className="flex items-center justify-center gap-2 px-3 py-5 sm:gap-4 sm:px-4"
+    >
+      {/* Previous */}
       <button
         onClick={goPrev}
         disabled={currentPage === 1}
-        className="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+        aria-label="Previous page"
+        className="
+          flex h-9 w-9 shrink-0 items-center justify-center
+          border border-border text-foreground
+          transition-colors hover:bg-accent
+          disabled:cursor-not-allowed disabled:opacity-30
+        "
       >
         &lt;
       </button>
 
       {/* Pages */}
-      <div className="flex gap-2 items-center">
+      <div className="flex min-w-0 items-center gap-1 sm:gap-2">
         {getPages().map((page, idx) =>
           page === '...' ? (
-            <span key={idx} className="px-2 text-gray-500">
+            <span
+              key={`ellipsis-${idx}`}
+              className="px-1 text-xs text-muted-foreground sm:px-2"
+            >
               ...
             </span>
           ) : (
             <button
-              key={idx}
+              key={page}
               onClick={() => onPageChange(page)}
-              className={`h-10 w-10 flex items-center justify-center border-b-2 transition-all duration-200
+              aria-label={`Page ${page}`}
+              aria-current={currentPage === page ? 'page' : undefined}
+              className={`
+                flex h-9 w-9 shrink-0 items-center justify-center
+                border-b-2 text-sm transition-colors
                 ${
                   currentPage === page
-                    ? 'border-black text-black'
-                    : 'border-transparent text-gray-500 hover:text-black hover:border-gray-400'
-                }`}
+                    ? 'border-primary font-semibold text-foreground'
+                    : 'border-transparent text-muted-foreground hover:border-border hover:text-foreground'
+                }
+              `}
             >
               {page}
             </button>
@@ -63,11 +80,17 @@ function Pagination({ currentPage, numberOfPages, onPageChange }) {
       <button
         onClick={goNext}
         disabled={currentPage === numberOfPages}
-        className="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+        aria-label="Next page"
+        className="
+          flex h-9 w-9 shrink-0 items-center justify-center
+          border border-border text-foreground
+          transition-colors hover:bg-accent
+          disabled:cursor-not-allowed disabled:opacity-30
+        "
       >
         &gt;
       </button>
-    </div>
+    </nav>
   );
 }
 

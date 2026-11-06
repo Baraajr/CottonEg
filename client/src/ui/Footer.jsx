@@ -9,28 +9,64 @@ import {
 } from 'react-icons/fi';
 
 function Footer() {
+  const linkClass =
+    'text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground';
+
+  const headingClass = 'mb-5 font-display text-lg text-foreground';
+
+  const socialClass =
+    'flex h-10 w-10 items-center justify-center border border-border text-muted-foreground transition-all duration-200 hover:border-foreground hover:bg-foreground hover:text-background';
+
   return (
-    <footer className="bg-black text-gray-300">
-      <div className="mx-auto grid max-w-7xl gap-12 px-4 py-16 sm:px-6 md:grid-cols-2 lg:grid-cols-3 lg:px-8">
+    <footer className="border-t border-border bg-surface text-foreground">
+      <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-5 py-12 sm:grid-cols-2 sm:px-8 lg:grid-cols-4 lg:gap-12 lg:py-14">
+        {/* Brand */}
+        <div className="sm:col-span-2 lg:col-span-1">
+          <Link
+            to="/"
+            className="inline-block font-display text-3xl tracking-tight text-foreground"
+          >
+            CottonEg.
+          </Link>
+
+          <p className="mt-3 max-w-xs text-sm leading-6 text-muted-foreground">
+            Everyday essentials, thoughtfully selected.
+          </p>
+
+          <div className="mt-6 flex gap-2">
+            <a href="#" aria-label="Facebook" className={socialClass}>
+              <FiFacebook size={17} />
+            </a>
+
+            <a href="#" aria-label="Instagram" className={socialClass}>
+              <FiInstagram size={17} />
+            </a>
+
+            <a href="#" aria-label="Twitter" className={socialClass}>
+              <FiTwitter size={17} />
+            </a>
+          </div>
+        </div>
+
         {/* Find Us */}
         <div>
-          <h3 className="mb-5 text-lg font-semibold text-white">Find Us</h3>
+          <h3 className={headingClass}>Find Us</h3>
 
           <ul className="space-y-3">
             <li>
-              <Link to="pages/store" className="transition hover:text-white">
+              <Link to="pages/store" className={linkClass}>
                 Store Location
               </Link>
             </li>
 
             <li>
-              <a href="#" className="transition hover:text-white">
+              <a href="#" className={linkClass}>
                 Google Maps
               </a>
             </li>
 
             <li>
-              <Link to="pages/contact" className="transition hover:text-white">
+              <Link to="pages/contact" className={linkClass}>
                 Contact Us
               </Link>
             </li>
@@ -39,31 +75,29 @@ function Footer() {
 
         {/* Customer Care */}
         <div>
-          <h3 className="mb-5 text-lg font-semibold text-white">
-            Customer Care
-          </h3>
+          <h3 className={headingClass}>Customer Care</h3>
 
           <ul className="space-y-3">
             <li>
-              <Link to="pages/shipping" className="transition hover:text-white">
+              <Link to="pages/shipping" className={linkClass}>
                 Shipping
               </Link>
             </li>
 
             <li>
-              <Link to="pages/returns" className="transition hover:text-white">
+              <Link to="pages/returns" className={linkClass}>
                 Returns
               </Link>
             </li>
 
             <li>
-              <Link to="pages/privacy" className="transition hover:text-white">
+              <Link to="pages/privacy" className={linkClass}>
                 Privacy Policy
               </Link>
             </li>
 
             <li>
-              <Link to="pages/terms" className="transition hover:text-white">
+              <Link to="pages/terms" className={linkClass}>
                 Terms &amp; Conditions
               </Link>
             </li>
@@ -72,78 +106,44 @@ function Footer() {
 
         {/* Contact */}
         <div>
-          <h3 className="mb-5 text-lg font-semibold text-white">Contact</h3>
+          <h3 className={headingClass}>Get in Touch</h3>
 
           <ul className="space-y-4">
-            <li className="flex items-center gap-3">
-              <FiMail className="shrink-0" />
+            <li className="flex items-center gap-3 text-sm text-muted-foreground">
+              <FiMail className="shrink-0 text-foreground" />
               <span>support@cottoneg.com</span>
             </li>
 
-            <li className="flex items-center gap-3">
-              <FiPhone className="shrink-0" />
+            <li className="flex items-center gap-3 text-sm text-muted-foreground">
+              <FiPhone className="shrink-0 text-foreground" />
               <span>+20 100 000 0000</span>
             </li>
 
-            <li className="flex items-start gap-3">
-              <FiMapPin className="mt-1 shrink-0" />
+            <li className="flex items-center gap-3 text-sm text-muted-foreground">
+              <FiMapPin className="shrink-0 text-foreground" />
               <span>Egypt</span>
             </li>
           </ul>
         </div>
       </div>
 
-      <div className="border-t border-white/10">
-        <div className="mx-auto flex max-w-7xl flex-col items-center gap-6 px-4 py-6 sm:px-6 lg:flex-row lg:justify-between lg:px-8">
-          {/* Social */}
-          <div className="flex gap-4">
-            <a
-              href="#"
-              className="rounded-full border border-gray-700 p-3 transition hover:border-white hover:bg-white hover:text-black"
-            >
-              <FiFacebook size={18} />
-            </a>
-
-            <a
-              href="#"
-              className="rounded-full border border-gray-700 p-3 transition hover:border-white hover:bg-white hover:text-black"
-            >
-              <FiInstagram size={18} />
-            </a>
-
-            <a
-              href="#"
-              className="rounded-full border border-gray-700 p-3 transition hover:border-white hover:bg-white hover:text-black"
-            >
-              <FiTwitter size={18} />
-            </a>
-          </div>
-
-          {/* Copyright */}
-          <p className="text-center text-sm text-gray-500">
+      {/* Bottom bar */}
+      <div className="border-t border-border">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-5 py-5 sm:px-8 lg:flex-row">
+          <p className="text-center text-xs text-muted-foreground">
             © {new Date().getFullYear()} CottonEg. All rights reserved.
           </p>
 
-          {/* Bottom Links */}
-          <div className="flex gap-6 text-sm">
-            <Link
-              to="pages/terms"
-              className="text-gray-500 transition hover:text-white"
-            >
+          <div className="flex flex-wrap justify-center gap-5 text-xs">
+            <Link to="pages/terms" className={linkClass}>
               Terms
             </Link>
 
-            <Link
-              to="pages/privacy"
-              className="text-gray-500 transition hover:text-white"
-            >
+            <Link to="pages/privacy" className={linkClass}>
               Privacy
             </Link>
 
-            <Link
-              to="pages/cookies"
-              className="text-gray-500 transition hover:text-white"
-            >
+            <Link to="pages/cookies" className={linkClass}>
               Cookies
             </Link>
           </div>

@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { toast } from 'react-hot-toast';
+import { FiTag, FiPlus, FiLayers } from 'react-icons/fi';
 
 import useCategories from '../../../hooks/useCategories';
 import Modal from '../../../ui/Modal';
@@ -12,13 +13,6 @@ import AdminPageLayout from '../AdminPageLayout';
 import DataTable from '../DataTable';
 import ConfirmDelete from '../../../ui/ConfirmDelete';
 import Spinner from '../../../ui/Spinner';
-import SpinnerMini from '../../../ui/SpinnerMini';
-
-const GENDER_STYLES = {
-  men: 'bg-blue-100 text-blue-800',
-  women: 'bg-pink-100 text-pink-800',
-  kids: 'bg-green-100 text-green-800',
-};
 
 function CategoriesTable() {
   const { categories = [], isPending } = useCategories();
@@ -52,82 +46,117 @@ function CategoriesTable() {
         title="Categories"
         headerActions={
           <Modal.Open opens="add-category">
-            <Button variant="primary">Add Category</Button>
+            <Button>
+              <span className="flex items-center gap-2">
+                <FiPlus size={16} />
+                Add Category
+              </span>
+            </Button>
           </Modal.Open>
         }
       >
-        <DataTable
-          head={
-            <>
-              <th className="px-4 py-3 text-left">Name</th>
-              <th className="px-4 py-3 text-left">Genders</th>
-              <th className="px-4 py-3 text-right">Actions</th>
-            </>
-          }
-        >
-          {categories.length === 0 && (
-            <tr>
-              <td colSpan={3} className="py-8 text-center text-gray-500">
-                No categories found
-              </td>
-            </tr>
-          )}
-
-          {categories.map((category) => (
-            <tr
-              key={category._id}
-              className="border-b hover:bg-gray-50 transition"
+        <div className="space-y-5">
+          <div className="overflow-hidden rounded-xl border border-border bg-surface">
+            <DataTable
+              head={
+                <>
+                  <th className="px-6 py-4 text-left font-medium">Category</th>
+                  <th className="px-6 py-4 text-left font-medium">
+                    Available for
+                  </th>
+                  <th className="px-6 py-4 text-right font-medium">Actions</th>
+                </>
+              }
             >
-              <td className="px-4 py-3 font-medium">{category.name}</td>
-
-              <td className="px-4 py-3">
-                <div className="flex gap-1 flex-wrap">
-                  {category.genders?.map((gender) => (
-                    <span
-                      key={gender}
-                      className={`px-2 py-0.5 rounded-full text-xs font-medium capitalize ${GENDER_STYLES[gender]}`}
-                    >
-                      {gender}
-                    </span>
-                  ))}
-                </div>
-              </td>
-
-              <td className="px-4 py-3">
-                <div className="flex justify-end gap-3">
-                  <Modal.Open opens={`update-category-${category._id}`}>
-                    <Button variant="secondary" size="sm">
-                      Edit
-                    </Button>
-                  </Modal.Open>
-
-                  <Modal.Window name={`update-category-${category._id}`}>
-                    <UpdateCategoryForm category={category} />
-                  </Modal.Window>
-
-                  <Modal.Open opens={`delete-category-${category._id}`}>
-                    <Button
-                      size="sm"
-                      variant="dangerOutline"
-                      loading={deletingId === category._id}
-                    >
-                      Delete
-                    </Button>
-                  </Modal.Open>
-
-                  <Modal.Window name={`delete-category-${category._id}`}>
-                    <ConfirmDelete
-                      resourceName="category"
-                      disabled={deletingId === category._id}
-                      onCloseModal={() => {}}
-                      onConfirm={() => handleDelete(category._id)}
+              {categories.length === 0 && (
+                <tr>
+                  <td colSpan={3} className="px-6 py-16 text-center">
+                    <FiTag
+                      size={28}
+                      className="mx-auto mb-3 text-muted-foreground"
                     />
-                  </Modal.Window>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </DataTable>
+                    <p className="font-serif text-lg text-foreground">
+                      No categories yet
+                    </p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Create your first category to organize your products.
+                    </p>
+                  </td>
+                </tr>
+              )}
+
+              {categories.map((category) => (
+                <tr
+                  key={category._id}
+                  className="border-b border-border last:border-0 transition-colors hover:bg-background"
+                >
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background">
+                        <FiTag size={16} className="text-muted-foreground" />
+                      </div>
+                      <span className="text-sm font-medium text-foreground">
+                        {category.name}
+                      </span>
+                    </div>
+                  </td>
+
+                  <td className="px-6 py-4">
+                    <div className="flex flex-wrap gap-2">
+                      {category.genders?.length ? (
+                        category.genders.map((gender) => (
+                          <span
+                            key={gender}
+                            className="rounded-full border border-border bg-background px-3 py-1 text-xs font-medium capitalize text-muted-foreground"
+                          >
+                            {gender}
+                          </span>
+                        ))
+                      ) : (
+                        <span className="text-xs text-muted-foreground">
+                          Not specified
+                        </span>
+                      )}
+                    </div>
+                  </td>
+
+                  <td className="px-6 py-4">
+                    <div className="flex justify-end gap-2">
+                      <Modal.Open opens={`update-category-${category._id}`}>
+                        <Button variant="secondary" size="sm">
+                          Edit
+                        </Button>
+                      </Modal.Open>
+
+                      <Modal.Window name={`update-category-${category._id}`}>
+                        <UpdateCategoryForm category={category} />
+                      </Modal.Window>
+
+                      <Modal.Open opens={`delete-category-${category._id}`}>
+                        <Button
+                          size="sm"
+                          variant="dangerOutline"
+                          loading={deletingId === category._id}
+                        >
+                          Delete
+                        </Button>
+                      </Modal.Open>
+
+                      <Modal.Window name={`delete-category-${category._id}`}>
+                        <ConfirmDelete
+                          resourceName="category"
+                          disabled={deletingId === category._id}
+                          onCloseModal={() => {}}
+                          onConfirm={() => handleDelete(category._id)}
+                        />
+                      </Modal.Window>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </DataTable>
+          </div>
+        </div>
       </AdminPageLayout>
 
       <Modal.Window name="add-category">

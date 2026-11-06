@@ -60,6 +60,18 @@ function Filter({ filters, onFilterChange, onClose }) {
     onFilterChange(reset);
   };
 
+  const optionClass = (selected) =>
+    `group flex cursor-pointer items-center justify-between border px-3.5 py-2.5 text-sm transition-colors duration-200 ${
+      selected
+        ? 'border-foreground bg-foreground text-background'
+        : 'border-border bg-background text-foreground hover:border-foreground/50 hover:bg-surface'
+    }`;
+
+  const radioIndicatorClass = (selected) =>
+    `flex h-4 w-4 items-center justify-center rounded-full border transition-colors ${
+      selected ? 'border-background' : 'border-muted-foreground/40'
+    }`;
+
   const sections = [
     {
       title: 'Collections',
@@ -70,23 +82,13 @@ function Filter({ filters, onFilterChange, onClose }) {
           {subcategories.map((sub) => (
             <label
               key={sub._id}
-              className={`group flex cursor-pointer items-center justify-between rounded-lg border px-4 py-3 transition-all duration-200 ${
-                subcategory === sub._id
-                  ? 'border-black bg-black text-white shadow-sm'
-                  : 'border-gray-200 bg-white text-gray-700 hover:border-gray-400 hover:bg-gray-50'
-              }`}
+              className={optionClass(subcategory === sub._id)}
             >
-              <span className="text-sm font-medium">{sub.name}</span>
+              <span className="font-medium">{sub.name}</span>
 
-              <span
-                className={`flex h-4 w-4 items-center justify-center rounded-full border transition ${
-                  subcategory === sub._id
-                    ? 'border-white'
-                    : 'border-gray-300 group-hover:border-gray-500'
-                }`}
-              >
+              <span className={radioIndicatorClass(subcategory === sub._id)}>
                 {subcategory === sub._id && (
-                  <span className="h-2 w-2 rounded-full bg-white" />
+                  <span className="h-2 w-2 rounded-full bg-background" />
                 )}
               </span>
 
@@ -115,12 +117,12 @@ function Filter({ filters, onFilterChange, onClose }) {
         <div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-wide text-gray-400">
+              <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                 Minimum
               </label>
 
-              <div className="flex items-center rounded-lg border border-gray-200 bg-gray-50 px-3 transition focus-within:border-black focus-within:bg-white">
-                <span className="text-xs text-gray-400">EGP</span>
+              <div className="flex items-center border border-border bg-surface px-2.5 transition-colors focus-within:border-foreground focus-within:bg-background">
+                <span className="text-[10px] text-muted-foreground">EGP</span>
 
                 <input
                   type="number"
@@ -135,18 +137,18 @@ function Filter({ filters, onFilterChange, onClose }) {
                       priceRange: [Math.min(num, maxPrice), maxPrice],
                     });
                   }}
-                  className="w-full bg-transparent px-2 py-2.5 text-sm outline-none"
+                  className="w-full min-w-0 bg-transparent px-2 py-2.5 text-sm text-foreground outline-none"
                 />
               </div>
             </div>
 
             <div>
-              <label className="mb-1.5 block text-[11px] font-medium uppercase tracking-wide text-gray-400">
+              <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                 Maximum
               </label>
 
-              <div className="flex items-center rounded-lg border border-gray-200 bg-gray-50 px-3 transition focus-within:border-black focus-within:bg-white">
-                <span className="text-xs text-gray-400">EGP</span>
+              <div className="flex items-center border border-border bg-surface px-2.5 transition-colors focus-within:border-foreground focus-within:bg-background">
+                <span className="text-[10px] text-muted-foreground">EGP</span>
 
                 <input
                   type="number"
@@ -161,13 +163,13 @@ function Filter({ filters, onFilterChange, onClose }) {
                       priceRange: [minPrice, Math.max(num, minPrice)],
                     });
                   }}
-                  className="w-full bg-transparent px-2 py-2.5 text-sm outline-none"
+                  className="w-full min-w-0 bg-transparent px-2 py-2.5 text-sm text-foreground outline-none"
                 />
               </div>
             </div>
           </div>
 
-          <p className="mt-3 text-xs text-gray-400">
+          <p className="mt-2.5 text-xs text-muted-foreground">
             Set your preferred price range.
           </p>
         </div>
@@ -186,23 +188,13 @@ function Filter({ filters, onFilterChange, onClose }) {
           ].map((opt) => (
             <label
               key={opt.value}
-              className={`group flex cursor-pointer items-center justify-between rounded-lg border px-4 py-3 transition-all duration-200 ${
-                featured === opt.value
-                  ? 'border-black bg-black text-white shadow-sm'
-                  : 'border-gray-200 bg-white text-gray-700 hover:border-gray-400 hover:bg-gray-50'
-              }`}
+              className={optionClass(featured === opt.value)}
             >
-              <span className="text-sm font-medium">{opt.label}</span>
+              <span className="font-medium">{opt.label}</span>
 
-              <span
-                className={`flex h-4 w-4 items-center justify-center rounded-full border ${
-                  featured === opt.value
-                    ? 'border-white'
-                    : 'border-gray-300 group-hover:border-gray-500'
-                }`}
-              >
+              <span className={radioIndicatorClass(featured === opt.value)}>
                 {featured === opt.value && (
-                  <span className="h-2 w-2 rounded-full bg-white" />
+                  <span className="h-2 w-2 rounded-full bg-background" />
                 )}
               </span>
 
@@ -230,25 +222,12 @@ function Filter({ filters, onFilterChange, onClose }) {
             { label: 'In Stock', value: '>inStock' },
             { label: 'Out of Stock', value: 'outOfStock' },
           ].map((opt) => (
-            <label
-              key={opt.value}
-              className={`group flex cursor-pointer items-center justify-between rounded-lg border px-4 py-3 transition-all duration-200 ${
-                stock === opt.value
-                  ? 'border-black bg-black text-white shadow-sm'
-                  : 'border-gray-200 bg-white text-gray-700 hover:border-gray-400 hover:bg-gray-50'
-              }`}
-            >
-              <span className="text-sm font-medium">{opt.label}</span>
+            <label key={opt.value} className={optionClass(stock === opt.value)}>
+              <span className="font-medium">{opt.label}</span>
 
-              <span
-                className={`flex h-4 w-4 items-center justify-center rounded-full border ${
-                  stock === opt.value
-                    ? 'border-white'
-                    : 'border-gray-300 group-hover:border-gray-500'
-                }`}
-              >
+              <span className={radioIndicatorClass(stock === opt.value)}>
                 {stock === opt.value && (
-                  <span className="h-2 w-2 rounded-full bg-white" />
+                  <span className="h-2 w-2 rounded-full bg-background" />
                 )}
               </span>
 
@@ -284,10 +263,10 @@ function Filter({ filters, onFilterChange, onClose }) {
           ].map((opt) => (
             <label
               key={opt.value}
-              className={`flex h-10 cursor-pointer items-center justify-center rounded-lg border text-xs font-medium transition-all duration-200 ${
+              className={`flex h-9 cursor-pointer items-center justify-center border text-xs font-medium transition-colors ${
                 size === opt.value
-                  ? 'border-black bg-black text-white shadow-sm'
-                  : 'border-gray-200 bg-white text-gray-600 hover:border-gray-400 hover:text-black'
+                  ? 'border-foreground bg-foreground text-background'
+                  : 'border-border bg-background text-muted-foreground hover:border-foreground hover:text-foreground'
               }`}
             >
               {opt.label}
@@ -310,9 +289,9 @@ function Filter({ filters, onFilterChange, onClose }) {
       open: showColor,
       setOpen: setShowColor,
       content: (
-        <div className="mt-2 grid grid-cols-5 gap-3">
+        <div className="mt-1 grid grid-cols-5 gap-y-3">
           {[
-            { label: 'All', value: '', className: 'bg-white' },
+            { label: 'All', value: '', className: 'bg-background' },
             { label: 'Black', value: 'black', className: 'bg-black' },
             { label: 'White', value: 'white', className: 'bg-white' },
             { label: 'Gray', value: 'gray', className: 'bg-gray-400' },
@@ -329,20 +308,20 @@ function Filter({ filters, onFilterChange, onClose }) {
               className="group flex cursor-pointer flex-col items-center gap-1.5"
             >
               <span
-                className={`flex h-9 w-9 items-center justify-center rounded-full border transition-all duration-200 ${
+                className={`flex h-9 w-9 items-center justify-center rounded-full border transition-all ${
                   color === opt.value
-                    ? 'border-black ring-2 ring-black ring-offset-2'
-                    : 'border-gray-200 group-hover:ring-2 group-hover:ring-gray-200 group-hover:ring-offset-1'
+                    ? 'border-foreground ring-2 ring-foreground ring-offset-2 ring-offset-background'
+                    : 'border-border group-hover:ring-2 group-hover:ring-border group-hover:ring-offset-1'
                 }`}
               >
                 {opt.value === '' ? (
-                  <span className="relative h-full w-full overflow-hidden rounded-full bg-white">
-                    <span className="absolute left-1/2 top-0 h-full w-px rotate-45 bg-gray-300" />
+                  <span className="relative h-full w-full overflow-hidden rounded-full bg-background">
+                    <span className="absolute left-1/2 top-0 h-full w-px rotate-45 bg-border" />
                   </span>
                 ) : (
                   <span
                     className={`h-7 w-7 rounded-full ${opt.className} ${
-                      opt.value === 'white' ? 'border border-gray-200' : ''
+                      opt.value === 'white' ? 'border border-border' : ''
                     }`}
                   />
                 )}
@@ -351,8 +330,8 @@ function Filter({ filters, onFilterChange, onClose }) {
               <span
                 className={`text-[10px] ${
                   color === opt.value
-                    ? 'font-semibold text-black'
-                    : 'text-gray-400'
+                    ? 'font-semibold text-foreground'
+                    : 'text-muted-foreground'
                 }`}
               >
                 {opt.label}
@@ -374,20 +353,19 @@ function Filter({ filters, onFilterChange, onClose }) {
   ];
 
   return (
-    <div className="flex h-dvh w-full flex-col bg-white">
+    <div className="flex h-dvh w-full flex-col bg-background text-foreground">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-gray-100 px-6 py-5 sm:px-8">
+      <div className="flex items-center justify-between border-b border-border px-5 py-4 sm:px-6">
         <div>
-          <h2 className="text-lg font-semibold tracking-tight text-gray-900">
-            Filters
-          </h2>
-
-          <p className="mt-0.5 text-xs text-gray-400">Refine your selection</p>
+          <h2 className="font-display text-2xl text-foreground">Filters</h2>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            Refine your selection
+          </p>
         </div>
 
         <button
           onClick={onClose}
-          className="flex h-9 w-9 items-center justify-center rounded-full text-gray-400 transition hover:bg-gray-100 hover:text-black"
+          className="flex h-9 w-9 items-center justify-center text-muted-foreground transition-colors hover:bg-surface hover:text-foreground"
           aria-label="Close filters"
         >
           <span className="text-2xl font-light leading-none">×</span>
@@ -395,11 +373,11 @@ function Filter({ filters, onFilterChange, onClose }) {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto px-6 py-2 sm:px-8">
+      <div className="flex-1 overflow-y-auto px-5 sm:px-6">
         {sections.map((section, index) => (
           <div
             key={section.title}
-            className={`border-b border-gray-100 py-5 ${
+            className={`border-b border-border py-4 ${
               index === sections.length - 1 ? 'border-b-0' : ''
             }`}
           >
@@ -408,17 +386,17 @@ function Filter({ filters, onFilterChange, onClose }) {
               onClick={() => section.setOpen((value) => !value)}
               className="flex w-full items-center justify-between"
             >
-              <span className="text-xs font-semibold uppercase tracking-[0.15em] text-gray-700">
+              <span className="text-xs font-semibold uppercase tracking-[0.14em] text-foreground">
                 {section.title}
               </span>
 
               <span
-                className={`flex h-6 w-6 items-center justify-center rounded-full transition ${
-                  section.open ? 'bg-gray-100' : ''
+                className={`flex h-6 w-6 items-center justify-center transition-colors ${
+                  section.open ? 'bg-surface' : ''
                 }`}
               >
                 <span
-                  className={`h-2 w-2 rotate-45 border-r border-b border-gray-500 transition-transform duration-300 ${
+                  className={`h-2 w-2 rotate-45 border-b border-r border-muted-foreground transition-transform duration-300 ${
                     section.open ? 'rotate-225' : ''
                   }`}
                 />
@@ -428,7 +406,7 @@ function Filter({ filters, onFilterChange, onClose }) {
             <div
               className={`overflow-hidden transition-all duration-300 ease-in-out ${
                 section.open
-                  ? 'mt-4 max-h-125 opacity-100'
+                  ? 'mt-3 max-h-125 opacity-100'
                   : 'max-h-0 opacity-0'
               }`}
             >
@@ -439,7 +417,7 @@ function Filter({ filters, onFilterChange, onClose }) {
       </div>
 
       {/* Footer */}
-      <div className="border-t border-gray-100 bg-white px-6 py-5 shadow-[0_-8px_20px_rgba(0,0,0,0.04)] sm:px-8">
+      <div className="border-t border-border bg-background px-5 py-4 sm:px-6">
         <div className="flex gap-3">
           <Button onClick={resetFilters} variant="secondary" fullWidth>
             Reset

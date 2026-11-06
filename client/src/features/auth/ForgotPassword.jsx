@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
+
 import { forgotPassword } from '../../services/auth';
-import SpinnerMini from '../../ui/SpinnerMini';
 import Button from '../../ui/Button';
 
 function ForgotPassword() {
@@ -13,7 +13,7 @@ function ForgotPassword() {
   const initialEmail = location.state?.email || '';
   const [email, setEmail] = useState(initialEmail);
 
-  const { mutate, isLoading } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: forgotPassword,
 
     onSuccess: () => {
@@ -31,43 +31,59 @@ function ForgotPassword() {
 
   function handleSubmit(e) {
     e.preventDefault();
-    if (!email || isLoading) return;
+
+    if (!email || isPending) return;
 
     mutate(email);
   }
 
   return (
-    <div className="flex justify-center px-4 py-16">
-      <form onSubmit={handleSubmit} className="w-full max-w-md">
-        <h1 className="mb-3 text-center text-3xl font-light tracking-[0.3em]">
-          RESET PASSWORD
-        </h1>
+    <section className="flex min-h-[65vh] items-center justify-center bg-background px-4 py-10 text-foreground">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-md border border-border bg-surface px-5 py-8 sm:px-8"
+      >
+        <div className="text-center">
+          <span className="section-label">Account recovery</span>
 
-        <p className="mb-8 text-center text-sm text-gray-600">
-          Enter your email to receive a reset code
-        </p>
+          <h1 className="mt-2 font-display text-3xl sm:text-4xl">
+            Reset Password
+          </h1>
 
-        <input
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          type="email"
-          placeholder="E-mail"
-          required
-          disabled={isLoading}
-          className="mb-6 w-full border border-gray-300 px-4 py-3 text-sm outline-none focus:border-black"
-        />
+          <p className="mt-3 text-sm text-muted-foreground">
+            Enter your email to receive a password reset code.
+          </p>
+        </div>
 
-        <Button
-          type="submit"
-          loading={isLoading}
-          disabled={!email}
-          fullWidth
-          className="py-3 tracking-[0.25em]"
-        >
-          SEND CODE
-        </Button>
+        <div className="mt-8">
+          <label className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+            Email address
+          </label>
+
+          <input
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            type="email"
+            placeholder="Enter your email"
+            required
+            disabled={isPending}
+            className="w-full border border-border bg-background px-4 py-3 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-foreground disabled:opacity-50"
+          />
+        </div>
+
+        <div className="mt-6">
+          <Button
+            type="submit"
+            loading={isPending}
+            disabled={!email || isPending}
+            fullWidth
+            className="tracking-[0.15em]"
+          >
+            SEND CODE
+          </Button>
+        </div>
       </form>
-    </div>
+    </section>
   );
 }
 

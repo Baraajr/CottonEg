@@ -1,8 +1,8 @@
 import { useForm } from 'react-hook-form';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'react-hot-toast';
+
 import { addAddress as addAddressApi } from '../../services/address';
-import SpinnerMini from '../../ui/SpinnerMini';
 import Button from '../../ui/Button';
 
 function AddAddressForm({ onCloseModal }) {
@@ -16,11 +16,13 @@ function AddAddressForm({ onCloseModal }) {
 
   const { mutate, isPending } = useMutation({
     mutationFn: addAddressApi,
+
     onSuccess: () => {
       toast.success('Address added successfully');
       onCloseModal?.();
       queryClient.invalidateQueries({ queryKey: ['addresses'] });
     },
+
     onError: (err) => {
       toast.error(err.message || 'Failed to add address');
     },
@@ -31,24 +33,23 @@ function AddAddressForm({ onCloseModal }) {
   }
 
   const inputClass =
-    'w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-sm ' +
-    'text-gray-900 placeholder-gray-400 ' +
-    'focus:outline-none focus:border-gray-400 focus:ring-2 focus:ring-black/10 transition';
+    'w-full border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-foreground disabled:opacity-50';
 
-  const labelClass = 'text-sm font-medium text-gray-700';
+  const labelClass =
+    'mb-1.5 block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground';
 
-  const errorClass = 'text-xs text-red-500 mt-1';
+  const errorClass = 'mt-1 text-xs text-foreground';
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5">
-      {/* Top grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div>
           <label className={labelClass}>Alias</label>
           <input
             {...register('alias', { required: 'Alias is required' })}
             className={inputClass}
             placeholder="Home / Office"
+            disabled={isPending}
           />
           {errors.alias && <p className={errorClass}>{errors.alias.message}</p>}
         </div>
@@ -59,42 +60,46 @@ function AddAddressForm({ onCloseModal }) {
             {...register('phone', { required: 'Phone is required' })}
             className={inputClass}
             placeholder="+20..."
+            disabled={isPending}
           />
           {errors.phone && <p className={errorClass}>{errors.phone.message}</p>}
         </div>
       </div>
 
-      {/* Details */}
       <div>
-        <label className={labelClass}>Details</label>
+        <label className={labelClass}>Address details</label>
         <input
           {...register('details', { required: 'Details is required' })}
           className={inputClass}
           placeholder="Street, building, floor..."
+          disabled={isPending}
         />
         {errors.details && (
           <p className={errorClass}>{errors.details.message}</p>
         )}
       </div>
 
-      {/* Bottom grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <div>
           <label className={labelClass}>City</label>
           <input
             {...register('city', { required: 'City is required' })}
             className={inputClass}
+            placeholder="City"
+            disabled={isPending}
           />
           {errors.city && <p className={errorClass}>{errors.city.message}</p>}
         </div>
 
         <div>
-          <label className={labelClass}>Postal Code</label>
+          <label className={labelClass}>Postal code</label>
           <input
             {...register('postalCode', {
               required: 'Postal code is required',
             })}
             className={inputClass}
+            placeholder="Postal code"
+            disabled={isPending}
           />
           {errors.postalCode && (
             <p className={errorClass}>{errors.postalCode.message}</p>
@@ -102,9 +107,13 @@ function AddAddressForm({ onCloseModal }) {
         </div>
       </div>
 
-      {/* Actions */}
-      <div className="flex justify-end gap-3 pt-2">
-        <Button variant="secondary" onClick={onCloseModal} disabled={isPending}>
+      <div className="flex justify-end gap-2 border-t border-border pt-4">
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={onCloseModal}
+          disabled={isPending}
+        >
           Cancel
         </Button>
 

@@ -1,6 +1,11 @@
 import { NavLink } from 'react-router-dom';
-import { FiUser, FiMapPin, FiLock, FiShoppingBag } from 'react-icons/fi';
-import { CiLogout } from 'react-icons/ci';
+import {
+  FiUser,
+  FiMapPin,
+  FiLock,
+  FiShoppingBag,
+  FiLogOut,
+} from 'react-icons/fi';
 
 import useLogout from '../../hooks/useLogout';
 import Button from '../../ui/Button';
@@ -16,60 +21,59 @@ function AccountNav() {
   const { mutate: logout } = useLogout();
 
   const baseItem =
-    'relative flex shrink-0 md:w-full items-center justify-center md:justify-start gap-2 rounded-xl px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors duration-200';
+    'relative flex shrink-0 items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors duration-200 md:w-full';
 
   return (
-    <nav className="w-full rounded-2xl border border-gray-200 bg-white p-2 shadow-sm">
-      {/* Desktop title */}
-      <div className="hidden px-3 py-2 text-xs font-semibold uppercase text-gray-400 md:block">
-        Account
+    <nav className="w-full rounded-xl border border-border bg-surface p-3 shadow-soft">
+      {/* Navigation heading */}
+      <div className="hidden px-3 pb-4 pt-2 md:block">
+        <span className="section-label">Account settings</span>
+        <h3 className="mt-1 font-serif text-xl text-foreground">My Account</h3>
       </div>
 
-      {/* Navigation */}
-      <div className="flex gap-1 overflow-x-auto pb-1 md:flex-col lg:gap-2 md:overflow-visible md:pb-0">
-        {navItems.map(({ to, label, icon }) => {
-          const Icon = icon;
-          return (
-            <NavLink
-              key={to}
-              to={to}
-              className={({ isActive }) =>
-                `${baseItem} ${
-                  isActive
-                    ? 'bg-gray-100 text-gray-900'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                }`
-              }
-            >
-              {({ isActive }) => (
-                <>
-                  {/* Active indicator */}
-                  <span
-                    className={`absolute transition-colors duration-200
-                    left-2 right-2 bottom-0 h-1 rounded-t-full
-                    md:left-0 md:right-auto md:top-2 md:bottom-2 md:h-auto md:w-1 md:rounded-r-full md:rounded-t-none
-                    ${isActive ? 'bg-black' : 'bg-transparent'}
-                  `}
-                  />
+      {/* Navigation links */}
+      <div className="scrollbar-hide flex gap-1 overflow-x-auto pb-1 md:flex-col md:overflow-visible md:pb-0">
+        {navItems.map(({ to, label, icon: Icon }) => (
+          <NavLink
+            key={to}
+            to={to}
+            className={({ isActive }) =>
+              `${baseItem} ${
+                isActive
+                  ? 'bg-surface-hover text-foreground'
+                  : 'text-muted-foreground hover:bg-surface-hover hover:text-foreground'
+              }`
+            }
+          >
+            {({ isActive }) => (
+              <>
+                <span
+                  className={`absolute bottom-1 left-3 right-3 h-0.5 rounded-full transition-colors md:bottom-2 md:left-0 md:right-auto md:top-2 md:h-auto md:w-0.5 ${
+                    isActive ? 'bg-primary' : 'bg-transparent'
+                  }`}
+                />
 
-                  <Icon
-                    size={18}
-                    className={`${isActive ? 'text-black' : 'text-gray-500'} hidden lg:block `}
-                  />
+                <Icon
+                  size={18}
+                  className={`shrink-0 ${
+                    isActive ? 'text-primary' : 'text-muted-foreground'
+                  }`}
+                />
 
-                  <span>{label}</span>
-                </>
-              )}
-            </NavLink>
-          );
-        })}
+                <span>{label}</span>
+              </>
+            )}
+          </NavLink>
+        ))}
       </div>
 
       {/* Logout */}
-      <div className="mt-3 border-t border-gray-100 pt-3">
+      <div className="mt-3 border-t border-border pt-3">
         <Button variant="menuDanger" fullWidth onClick={() => logout()}>
-          <CiLogout size={18} />
-          Logout
+          <span className="flex items-center justify-center gap-2 md:justify-start">
+            <FiLogOut size={17} />
+            Logout
+          </span>
         </Button>
       </div>
     </nav>

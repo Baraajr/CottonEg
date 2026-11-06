@@ -6,6 +6,7 @@ import Button from '../../../ui/Button';
 
 function AddVariantForm({ productId, onCloseModal }) {
   const queryClient = useQueryClient();
+
   const [form, setForm] = useState({
     size: 'M',
     colorName: '',
@@ -42,9 +43,12 @@ function AddVariantForm({ productId, onCloseModal }) {
     });
   };
 
+  const inputClass =
+    'w-full rounded-none border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground focus:border-foreground';
+
   const field = (label, input) => (
-    <div className="flex flex-col gap-1">
-      <label className="text-xs font-medium text-gray-600 uppercase tracking-wide">
+    <div className="flex flex-col gap-1.5">
+      <label className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
         {label}
       </label>
       {input}
@@ -52,18 +56,25 @@ function AddVariantForm({ productId, onCloseModal }) {
   );
 
   return (
-    <div className="p-6 w-80 flex flex-col gap-4">
-      <h2 className="text-lg font-semibold">Add Variant</h2>
+    <div className="flex w-full min-w-70 flex-col gap-4 bg-background p-5 text-foreground sm:w-90">
+      <div className="border-b border-border pb-3">
+        <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+          Product inventory
+        </span>
+        <h2 className="mt-1 font-display text-2xl">Add Variant</h2>
+      </div>
 
       {field(
         'Size',
         <select
           value={form.size}
           onChange={(e) => setForm((f) => ({ ...f, size: e.target.value }))}
-          className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className={inputClass}
         >
           {SIZES.map((s) => (
-            <option key={s}>{s}</option>
+            <option key={s} value={s}>
+              {s}
+            </option>
           ))}
         </select>,
       )}
@@ -77,23 +88,23 @@ function AddVariantForm({ productId, onCloseModal }) {
             setForm((f) => ({ ...f, colorName: e.target.value }))
           }
           placeholder="e.g. Midnight Blue"
-          className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className={inputClass}
         />,
       )}
 
       {field(
         'Color hex',
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3 border border-border bg-surface px-3 py-2">
           <input
             type="color"
             value={form.colorHex}
             onChange={(e) =>
               setForm((f) => ({ ...f, colorHex: e.target.value }))
             }
-            className="w-10 h-10 rounded cursor-pointer border border-gray-300"
+            className="h-8 w-10 cursor-pointer border-0 bg-transparent"
           />
-          <span className="text-sm text-gray-500 font-mono">
-            {form.colorHex}
+          <span className="font-mono text-sm text-muted-foreground">
+            {form.colorHex.toUpperCase()}
           </span>
         </div>,
       )}
@@ -105,7 +116,7 @@ function AddVariantForm({ productId, onCloseModal }) {
           min={0}
           value={form.quantity}
           onChange={(e) => setForm((f) => ({ ...f, quantity: e.target.value }))}
-          className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+          className={inputClass}
         />,
       )}
 
@@ -115,11 +126,12 @@ function AddVariantForm({ productId, onCloseModal }) {
           type="text"
           value={form.sku}
           onChange={(e) => setForm((f) => ({ ...f, sku: e.target.value }))}
-          className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+          placeholder="Enter SKU"
+          className={inputClass}
         />,
       )}
 
-      <div className="flex gap-2 pt-1">
+      <div className="flex gap-2 border-t border-border pt-4">
         <Button
           onClick={handleSubmit}
           loading={isPending}

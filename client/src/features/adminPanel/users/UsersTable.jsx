@@ -40,103 +40,105 @@ function UsersTable() {
 
   return (
     <AdminPageLayout title="Users">
-      {/* Loading */}
       {isPending && <Spinner />}
 
-      {/* Table */}
       {!isPending && (
-        <DataTable
-          head={
-            <>
-              <th className="px-4 py-3 text-left">Photo</th>
-              <th className="px-4 py-3 text-left">Name</th>
-              <th className="px-4 py-3 text-center">Email</th>
-              <th className="px-4 py-3 text-center">Role</th>
-              <th className="px-4 py-3 text-center">Status</th>
-              <th className="px-4 py-3 text-right">Actions</th>
-            </>
-          }
-        >
-          {/* Empty */}
-          {users.length === 0 && (
-            <tr>
-              <td colSpan={6} className="py-8 text-center text-gray-500">
-                No users found
-              </td>
-            </tr>
-          )}
-
-          {/* Rows */}
-          {users.map((user) => (
-            <tr key={user._id} className="border-b hover:bg-gray-50">
-              {/* Photo */}
-              <td className="px-4 py-3">
-                <img
-                  src={user.profileImg || '/default-avatar.png'}
-                  alt={user.name}
-                  className="h-12 w-12 rounded-full border object-cover"
-                />
-              </td>
-
-              {/* Name */}
-              <td className="px-4 py-3 font-medium">{user.name}</td>
-
-              {/* Email */}
-              <td className="px-4 py-3 text-center">{user.email}</td>
-
-              {/* Role */}
-              <td className="px-4 py-3 text-center">
-                <span
-                  className={`rounded-full px-2 py-1 text-xs font-medium ${
-                    user.role === 'admin'
-                      ? 'bg-black text-white'
-                      : 'bg-gray-100 text-gray-700'
-                  }`}
+        <div className="overflow-hidden rounded-xl border border-border bg-surface">
+          <DataTable
+            head={
+              <>
+                <th className="px-5 py-4 text-left">Photo</th>
+                <th className="px-5 py-4 text-left">Name</th>
+                <th className="px-5 py-4 text-left">Email</th>
+                <th className="px-5 py-4 text-center">Role</th>
+                <th className="px-5 py-4 text-center">Status</th>
+                <th className="px-5 py-4 text-right">Actions</th>
+              </>
+            }
+          >
+            {users.length === 0 && (
+              <tr>
+                <td
+                  colSpan={6}
+                  className="py-12 text-center text-sm text-muted-foreground"
                 >
-                  {user.role}
-                </span>
-              </td>
+                  No users found
+                </td>
+              </tr>
+            )}
 
-              {/* Status */}
-              <td className="px-4 py-3 text-center">
-                <span
-                  className={`rounded-full px-2 py-1 text-xs font-medium ${
-                    user.active
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-gray-200 text-gray-700'
-                  }`}
-                >
-                  {user.active ? 'Active' : 'Deactivated'}
-                </span>
-              </td>
+            {users.map((user) => (
+              <tr
+                key={user._id}
+                className="transition-colors hover:bg-accent/40"
+              >
+                <td className="px-5 py-4">
+                  <img
+                    src={user.profileImg || '/default-avatar.png'}
+                    alt={user.name}
+                    className="h-11 w-11 rounded-full border border-border object-cover"
+                  />
+                </td>
 
-              {/* Actions */}
-              <td className="px-4 py-3">
-                <div className="flex justify-end gap-2">
-                  {!user.active && (
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => toggleActive(user._id)}
-                    >
-                      Activate
-                    </Button>
-                  )}
+                <td className="px-5 py-4 font-medium text-foreground">
+                  {user.name}
+                </td>
 
-                  {user.role !== 'admin' && (
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => promoteToAdmin(user._id)}
-                    >
-                      Make Admin
-                    </Button>
-                  )}
-                </div>
-              </td>
-            </tr>
-          ))}
-        </DataTable>
+                <td className="px-5 py-4 text-sm text-muted-foreground">
+                  {user.email}
+                </td>
+
+                <td className="px-5 py-4 text-center">
+                  <span
+                    className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-medium capitalize ${
+                      user.role === 'admin'
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-border bg-surface text-muted-foreground'
+                    }`}
+                  >
+                    {user.role}
+                  </span>
+                </td>
+
+                <td className="px-5 py-4 text-center">
+                  <span
+                    className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-medium ${
+                      user.active
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-border bg-accent text-muted-foreground'
+                    }`}
+                  >
+                    {user.active ? 'Active' : 'Deactivated'}
+                  </span>
+                </td>
+
+                <td className="px-5 py-4">
+                  <div className="flex justify-end gap-2">
+                    {!user.active && (
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => toggleActive(user._id)}
+                      >
+                        Activate
+                      </Button>
+                    )}
+
+                    {user.role !== 'admin' && (
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => promoteToAdmin(user._id)}
+                      >
+                        Make Admin
+                      </Button>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </DataTable>
+        </div>
       )}
     </AdminPageLayout>
   );

@@ -1,78 +1,85 @@
 import { Link } from 'react-router-dom';
+import { HiArrowUpRight } from 'react-icons/hi2';
+
 import heroImage from '../../assets/images/1.png';
-import heroImage2 from '../../assets/images/2.png'; // for mobile
+import heroImage2 from '../../assets/images/2.png';
 
 const slide = {
-  subtitle: 'NEW COLLECTION',
-  title: 'Timeless Essentials',
-  description: 'Premium cotton pieces made for everyday living.',
+  subtitle: 'THE NEW SEASON · 2026',
+  title: 'Timeless\nEssentials.',
+  description:
+    'Premium cotton pieces, thoughtfully designed for everyday living.',
   image: heroImage,
   mobileImage: heroImage2,
   actions: [
-    {
-      text: 'Shop Men',
-      link: '/products?gender=men',
-    },
-    {
-      text: 'Shop Women',
-      link: '/products?gender=women',
-    },
+    { text: 'Shop Men', link: '/products?gender=men' },
+    { text: 'Shop Women', link: '/products?gender=women' },
   ],
 };
 
 function Hero() {
   return (
-    <section className="relative md:h-dvh h-[calc(100dvh-4rem)] overflow-hidden">
-      {/* Desktop Image */}
+    <section className="relative h-[calc(100dvh-4rem)] min-h-[560px] overflow-hidden bg-black md:h-dvh">
+      {/* Desktop image */}
       <img
         src={slide.image}
-        alt={slide.title}
+        alt={slide.title.replace('\n', ' ')}
         className="absolute inset-0 hidden h-full w-full object-cover object-center md:block"
       />
 
-      {/* Mobile Image */}
+      {/* Mobile image */}
       <img
         src={slide.mobileImage}
-        alt={slide.title}
+        alt={slide.title.replace('\n', ' ')}
         className="absolute inset-0 h-full w-full object-cover object-center md:hidden"
       />
 
-      {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-linear-to-r from-black/55 via-black/20 to-transparent md:bg-linear-to-r md:from-black/55 md:via-black/20" />
+      {/* Overlays */}
+      <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-black/5" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/15" />
 
-      {/* Content */}
-      <div className="relative z-10 flex h-full items-end">
-        <div className="mx-auto w-full max-w-7xl px-5 pb-12 sm:px-6 sm:pb-20 lg:px-12 lg:pb-24">
-          <div className="max-w-lg text-white">
-            <p className="mb-3 text-[11px] font-medium tracking-[0.35em] sm:mb-4">
+      {/* Main content */}
+      <div className="relative z-10 mx-auto flex h-full w-full max-w-400 items-end px-5 pb-14 sm:px-10 sm:pb-20 lg:px-16 lg:pb-24">
+        <div className="max-w-3xl text-white">
+          <div className="mb-5 flex items-center gap-3 sm:mb-7">
+            <span className="h-px w-8 bg-white" />
+            <p className="text-[10px] font-semibold uppercase tracking-[0.3em] text-white/80 sm:text-xs">
               {slide.subtitle}
             </p>
+          </div>
 
-            <h1 className="mb-4 text-4xl font-medium leading-[0.95] tracking-tight sm:mb-5 sm:text-6xl md:text-7xl lg:text-8xl">
-              {slide.title}
-            </h1>
+          <h1 className="whitespace-pre-line font-display text-[clamp(3.8rem,9vw,8.5rem)] font-medium leading-[0.86] tracking-[-0.055em]">
+            {slide.title}
+          </h1>
 
-            <p className="mb-6 max-w-md text-sm leading-6 text-white/85 sm:mb-8 sm:text-base">
-              {slide.description}
-            </p>
+          <p className="mt-6 max-w-sm text-sm leading-6 text-white/75 sm:mt-7 sm:text-base sm:leading-7">
+            {slide.description}
+          </p>
 
-            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-              {slide.actions.map((action, index) => (
-                <Link
-                  key={action.text}
-                  to={action.link}
-                  className={`flex h-12 w-full sm:w-auto sm:min-w-36 items-center justify-center px-7 text-xs font-medium uppercase tracking-wide transition ${
-                    index === 0
-                      ? 'bg-white text-black hover:bg-gray-100'
-                      : 'border border-white/80 bg-black/10 text-white backdrop-blur-sm hover:bg-white hover:text-black'
-                  }`}
-                >
-                  {action.text}
-                </Link>
-              ))}
-            </div>
+          <div className="mt-7 flex flex-col gap-3 sm:mt-9 sm:flex-row sm:gap-3">
+            {slide.actions.map((action, index) => (
+              <Link
+                key={action.text}
+                to={action.link}
+                className={`group flex h-12 items-center justify-center gap-5 px-7 text-[10px] font-semibold uppercase tracking-[0.16em] transition-all duration-300 ${
+                  index === 0
+                    ? 'bg-white text-black hover:bg-neutral-200'
+                    : 'border border-white/70 bg-black/10 text-white hover:bg-white hover:text-black'
+                }`}
+              >
+                {action.text}
+                <HiArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </Link>
+            ))}
           </div>
         </div>
+      </div>
+
+      {/* Bottom detail */}
+      <div className="absolute bottom-7 right-8 z-10 hidden items-center gap-3 text-[9px] font-medium uppercase tracking-[0.22em] text-white/70 md:flex lg:right-16">
+        <span>Designed for everyday</span>
+        <span className="h-px w-9 bg-white/60" />
+        <span>01 / 01</span>
       </div>
     </section>
   );

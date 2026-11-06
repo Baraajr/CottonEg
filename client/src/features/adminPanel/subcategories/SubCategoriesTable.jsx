@@ -1,12 +1,15 @@
-import { Fragment, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState } from 'react';
 import { toast } from 'react-hot-toast';
-
-import Modal from '../../../ui/Modal';
-import Button from '../../../ui/Button';
+import { FiLayers, FiPlus } from 'react-icons/fi';
 
 import useSubCategories from '../../../hooks/useSubCategories';
 import useCategories from '../../../hooks/useCategories';
+
+import Modal from '../../../ui/Modal';
+import Button from '../../../ui/Button';
+import ConfirmDelete from '../../../ui/ConfirmDelete';
+import Spinner from '../../../ui/Spinner';
 
 import { deleteSubCategory } from '../../../services/subCategories';
 import AddSubCategoryForm from './AddSubCategoryForm';
@@ -14,14 +17,6 @@ import UpdateSubCategoryForm from './UpdateSubCategoryForm';
 
 import AdminPageLayout from '../AdminPageLayout';
 import DataTable from '../DataTable';
-import ConfirmDelete from '../../../ui/ConfirmDelete';
-import Spinner from '../../../ui/Spinner';
-
-const GENDER_STYLES = {
-  men: 'bg-blue-100 text-blue-800',
-  women: 'bg-pink-100 text-pink-800',
-  kids: 'bg-green-100 text-green-800',
-};
 
 function SubCategoriesTable() {
   const { categories = [] } = useCategories();
@@ -30,23 +25,25 @@ function SubCategoriesTable() {
   const queryClient = useQueryClient();
   const [deletingId, setDeletingId] = useState(null);
 
-  const { mutate: remove } = useMutation({
+  const { mutate: removeSubCategory } = useMutation({
     mutationFn: deleteSubCategory,
     onSuccess: () => {
-      toast.success('Deleted');
+      toast.success('Subcategory deleted successfully');
       queryClient.invalidateQueries({ queryKey: ['subcategories'] });
       setDeletingId(null);
     },
     onError: (err) => {
-      toast.error(err?.message || 'Failed');
+      toast.error(err?.message || 'Failed to delete subcategory');
       setDeletingId(null);
     },
   });
 
   function handleDelete(id) {
     setDeletingId(id);
-    remove(id);
+    removeSubCategory(id);
   }
+
+  if (isPending) return <Spinner />;
 
   return (
     <Modal>
@@ -54,157 +51,140 @@ function SubCategoriesTable() {
         title="Subcategories"
         headerActions={
           <Modal.Open opens="add-subcategory">
-            <Button variant="primary">Add Category</Button>
+            <Button>
+              <span className="flex items-center gap-2">
+                <FiPlus size={16} />
+                Add Subcategory
+              </span>
+            </Button>
           </Modal.Open>
         }
       >
-        <Modal.Window name="add-subcategory">
-          <AddSubCategoryForm categories={categories} />
-        </Modal.Window>
+        <div className="space-y-5">
+          <div className="overflow-hidden rounded-xl border border-border bg-surface">
+            <DataTable
+              head={
+                <>
+                  <th className="px-6 py-4 text-left font-medium">
+                    Subcategory
+                  </th>
+                  <th className="px-6 py-4 text-left font-medium">Category</th>
+                  <th className="px-6 py-4 text-left font-medium">
+                    Available for
+                  </th>
+                  <th className="px-6 py-4 text-right font-medium">Actions</th>
+                </>
+              }
+            >
+              {subcategories.length === 0 && (
+                <tr>
+                  <td colSpan={4} className="px-6 py-16 text-center">
+                    <FiLayers
+                      size={28}
+                      className="mx-auto mb-3 text-muted-foreground"
+                    />
+                    <p className="font-serif text-lg text-foreground">
+                      No subcategories yet
+                    </p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Create your first subcategory to organize your products.
+                    </p>
+                  </td>
+                </tr>
+              )}
 
-        {isPending && <Spinner />}
+              {subcategories.map((subcategory) => (
+                <tr
+                  key={subcategory._id}
+                  className="border-b border-border last:border-0 transition-colors hover:bg-background"
+                >
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background">
+                        <FiLayers size={16} className="text-muted-foreground" />
+                      </div>
+                      <span className="text-sm font-medium text-foreground">
+                        {subcategory.name}
+                      </span>
+                    </div>
+                  </td>
 
-        {!isPending && (
-          <>
-            {/* ================= DESKTOP TABLE ================= */}
-            <div className="hidden md:block">
-              <DataTable
-                head={
-                  <>
-                    <th className="px-4 py-3 text-left">Name</th>
-                    <th className="px-4 py-3 text-left">Category</th>
-                    <th className="px-4 py-3 text-left">Genders</th>
-                    <th className="px-4 py-3 text-right">Actions</th>
-                  </>
-                }
-              >
-                {subcategories.length === 0 && (
-                  <tr>
-                    <td colSpan={4} className="py-8 text-center text-gray-500">
-                      No subcategories found
-                    </td>
-                  </tr>
-                )}
+                  <td className="px-6 py-4 text-sm text-muted-foreground">
+                    {subcategory.category?.name ?? '—'}
+                  </td>
 
-                {subcategories.map((sc) => (
-                  <tr key={sc._id} className="border-b hover:bg-gray-50">
-                    <td className="px-4 py-3 font-medium">{sc.name}</td>
-
-                    <td className="px-4 py-3 text-sm text-gray-600">
-                      {sc.category?.name ?? '—'}
-                    </td>
-
-                    <td className="px-4 py-3">
-                      <div className="flex gap-1 flex-wrap">
-                        {sc.genders?.map((gender) => (
+                  <td className="px-6 py-4">
+                    <div className="flex flex-wrap gap-2">
+                      {subcategory.genders?.length ? (
+                        subcategory.genders.map((gender) => (
                           <span
                             key={gender}
-                            className={`px-2 py-0.5 rounded-full text-xs font-medium capitalize ${GENDER_STYLES[gender]}`}
+                            className="rounded-full border border-border bg-background px-3 py-1 text-xs font-medium capitalize text-muted-foreground"
                           >
                             {gender}
                           </span>
-                        ))}
-                      </div>
-                    </td>
-
-                    <td className="px-4 py-3">
-                      <div className="flex justify-end gap-3">
-                        <Modal.Open opens={`edit-${sc._id}`}>
-                          <Button variant="secondary" size="sm">
-                            Edit
-                          </Button>
-                        </Modal.Open>
-
-                        <Modal.Open opens={`delete-${sc._id}`}>
-                          <Button
-                            variant="dangerOutline"
-                            size="sm"
-                            loading={deletingId === sc._id}
-                          >
-                            Delete
-                          </Button>
-                        </Modal.Open>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </DataTable>
-            </div>
-
-            {/* ================= MOBILE ULTRA COMPACT ================= */}
-            <div className="md:hidden space-y-2">
-              {subcategories.length === 0 && (
-                <div className="text-center text-gray-500 py-6">
-                  No subcategories found
-                </div>
-              )}
-
-              {subcategories.map((sc) => (
-                <div
-                  key={sc._id}
-                  className="bg-white border rounded-md p-3 flex items-center justify-between"
-                >
-                  {/* LEFT */}
-                  <div className="min-w-0">
-                    <p className="font-medium text-sm truncate">{sc.name}</p>
-
-                    <p className="text-xs text-gray-500 truncate">
-                      {sc.category?.name ?? '—'}
-                    </p>
-
-                    <div className="flex gap-1 flex-wrap mt-1">
-                      {sc.genders?.map((gender) => (
-                        <span
-                          key={gender}
-                          className={`px-2 py-0.5 rounded-full text-[10px] capitalize ${GENDER_STYLES[gender]}`}
-                        >
-                          {gender}
+                        ))
+                      ) : (
+                        <span className="text-xs text-muted-foreground">
+                          Not specified
                         </span>
-                      ))}
+                      )}
                     </div>
-                  </div>
+                  </td>
 
-                  {/* ACTIONS */}
-                  <div className="flex items-center gap-2">
-                    <Modal.Open opens={`edit-${sc._id}`}>
-                      <Button variant="secondary" size="sm">
-                        Edit
-                      </Button>
-                    </Modal.Open>
+                  <td className="px-6 py-4">
+                    <div className="flex justify-end gap-2">
+                      <Modal.Open
+                        opens={`update-subcategory-${subcategory._id}`}
+                      >
+                        <Button variant="secondary" size="sm">
+                          Edit
+                        </Button>
+                      </Modal.Open>
 
-                    <Modal.Open opens={`delete-${sc._id}`}>
-                      <Button variant="dangerOutline" size="sm">
-                        Delete
-                      </Button>
-                    </Modal.Open>
-                  </div>
-                </div>
+                      <Modal.Window
+                        name={`update-subcategory-${subcategory._id}`}
+                      >
+                        <UpdateSubCategoryForm
+                          subcategory={subcategory}
+                          categories={categories}
+                        />
+                      </Modal.Window>
+
+                      <Modal.Open
+                        opens={`delete-subcategory-${subcategory._id}`}
+                      >
+                        <Button
+                          size="sm"
+                          variant="dangerOutline"
+                          loading={deletingId === subcategory._id}
+                        >
+                          Delete
+                        </Button>
+                      </Modal.Open>
+
+                      <Modal.Window
+                        name={`delete-subcategory-${subcategory._id}`}
+                      >
+                        <ConfirmDelete
+                          resourceName="subcategory"
+                          disabled={deletingId === subcategory._id}
+                          onCloseModal={() => {}}
+                          onConfirm={() => handleDelete(subcategory._id)}
+                        />
+                      </Modal.Window>
+                    </div>
+                  </td>
+                </tr>
               ))}
-            </div>
-
-            {/* ================= SHARED MODAL WINDOWS (rendered once per row) ================= */}
-            {subcategories.map((sc) => (
-              <Fragment key={sc._id}>
-                <Modal.Window name={`edit-${sc._id}`}>
-                  <UpdateSubCategoryForm
-                    subcategory={sc}
-                    categories={categories}
-                  />
-                </Modal.Window>
-
-                <Modal.Window name={`delete-${sc._id}`}>
-                  <ConfirmDelete
-                    resourceName="subcategory"
-                    disabled={deletingId === sc._id}
-                    onCloseModal={() => {}}
-                    onConfirm={() => handleDelete(sc._id)}
-                  />
-                </Modal.Window>
-              </Fragment>
-            ))}
-          </>
-        )}
+            </DataTable>
+          </div>
+        </div>
       </AdminPageLayout>
+
+      <Modal.Window name="add-subcategory">
+        <AddSubCategoryForm categories={categories} />
+      </Modal.Window>
     </Modal>
   );
 }

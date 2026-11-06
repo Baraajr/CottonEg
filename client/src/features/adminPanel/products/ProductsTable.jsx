@@ -2,29 +2,31 @@ import { useNavigate } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { toast } from 'react-hot-toast';
+import { HiXMark } from 'react-icons/hi2';
+import { IoIosSearch } from 'react-icons/io';
 
 import Modal from '../../../ui/Modal';
 import Button from '../../../ui/Button';
+import Spinner from '../../../ui/Spinner';
+import ConfirmDelete from '../../../ui/ConfirmDelete';
 
 import AddProductForm from './AddProductForm';
-
-import { deleteProduct, getFilteredProducts } from '../../../services/products';
 import AdminPageLayout from '../AdminPageLayout';
 import DataTable from '../DataTable';
-import ConfirmDelete from '../../../ui/ConfirmDelete';
+
+import { deleteProduct, getFilteredProducts } from '../../../services/products';
 import useCategories from '../../../hooks/useCategories';
-import { HiXMark } from 'react-icons/hi2';
-import Spinner from '../../../ui/Spinner';
-import { IoIosSearch } from 'react-icons/io';
+import useSubCategories from '../../../hooks/useSubCategories';
 import useDebounce from '../../../hooks/useDebounce';
+
 import Pagination from '../../Products/pagination';
 import { GENDERS } from '../../../constants/constants';
-import useSubCategories from '../../../hooks/useSubCategories';
 
 function ProductsTable() {
   const [showFilters, setShowFilters] = useState(false);
   const [featured, setFeatured] = useState('all');
   const [stock, setStock] = useState('all');
+
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -101,6 +103,12 @@ function ProductsTable() {
   const numberOfPages = data?.paginationResult?.numberOfPages || 1;
   const isEmpty = !isLoading && products.length === 0;
 
+  const selectClass =
+    'w-full rounded-lg border border-border bg-background px-3 py-2.5 text-sm text-foreground outline-none transition focus:border-primary focus:ring-1 focus:ring-primary';
+
+  const labelClass =
+    'mb-2 block text-xs font-semibold uppercase tracking-wider text-muted-foreground';
+
   return (
     <Modal>
       <AdminPageLayout
@@ -117,35 +125,47 @@ function ProductsTable() {
           </>
         }
         tableActions={
-          <div className="w-full space-y-3">
+          <div className="space-y-4">
             {/* Search */}
-            <div className="w-full border-b border-gray-200 bg-white py-2">
-              <div className="flex items-center gap-2">
-                <IoIosSearch className="h-5 w-5 shrink-0 text-gray-500" />
+            <div className="flex items-center gap-3 rounded-xl border border-border bg-surface px-4 py-3 transition focus-within:border-primary">
+              <IoIosSearch className="h-5 w-5 shrink-0 text-muted-foreground" />
 
-                <input
-                  value={search}
-                  onChange={(e) => {
-                    setSearch(e.target.value);
+              <input
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setPage(1);
+                }}
+                placeholder="Search products by name..."
+                className="w-full bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
+              />
+
+              {search && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearch('');
                     setPage(1);
                   }}
-                  placeholder="Search products..."
-                  className="w-full text-sm outline-none"
-                />
-              </div>
+                  className="text-muted-foreground transition hover:text-foreground"
+                  aria-label="Clear search"
+                >
+                  <HiXMark className="h-5 w-5" />
+                </button>
+              )}
             </div>
 
-            {/* Sort + Filters */}
-            <div className="flex w-full gap-2">
+            {/* Sort and filters */}
+            <div className="flex gap-3">
               <select
                 value={sort}
                 onChange={(e) => {
                   setSort(e.target.value);
                   setPage(1);
                 }}
-                className="min-w-0 flex-1 cursor-pointer rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+                className={`${selectClass} min-w-0 flex-1`}
               >
-                <option value="">Newest</option>
+                <option value="createdAt-desc">Newest</option>
                 <option value="createdAt-asc">Oldest</option>
                 <option value="name-asc">Name (A–Z)</option>
                 <option value="name-desc">Name (Z–A)</option>
@@ -171,37 +191,46 @@ function ProductsTable() {
         {/* Filter overlay */}
         {showFilters && (
           <div
-            className="fixed inset-0 z-40 bg-black/40"
+            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-[2px]"
             onClick={() => setShowFilters(false)}
           />
         )}
 
         {/* Filter drawer */}
         {showFilters && (
-          <div className="fixed right-0 top-0 z-50 h-screen w-full max-w-sm bg-white shadow-xl">
-            <div className="flex items-center justify-between border-b p-4">
-              <h2 className="text-lg font-semibold">Filters</h2>
+          <aside className="fixed right-0 top-0 z-50 flex h-dvh w-full max-w-sm flex-col border-l border-border bg-background shadow-2xl">
+            <div className="flex items-center justify-between border-b border-border px-6 py-5">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                  Catalog
+                </p>
+                <h2 className="mt-1 text-xl font-semibold text-foreground">
+                  Filters
+                </h2>
+              </div>
 
-              <button onClick={() => setShowFilters(false)}>
-                <HiXMark className="h-6 w-6" />
+              <button
+                type="button"
+                onClick={() => setShowFilters(false)}
+                className="rounded-full p-2 text-muted-foreground transition hover:bg-accent hover:text-foreground"
+                aria-label="Close filters"
+              >
+                <HiXMark className="h-5 w-5" />
               </button>
             </div>
 
-            <div className="space-y-5 overflow-y-auto p-4">
-              {/* Gender */}
+            <div className="flex-1 space-y-6 overflow-y-auto p-6">
               <div>
-                <label className="mb-2 block text-sm font-medium">Gender</label>
-
+                <label className={labelClass}>Gender</label>
                 <select
                   value={gender}
                   onChange={(e) => {
                     setGender(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full rounded border p-2"
+                  className={selectClass}
                 >
-                  <option value="all">All</option>
-
+                  <option value="all">All genders</option>
                   {GENDERS.map((gender) => (
                     <option key={gender} value={gender}>
                       {gender}
@@ -210,22 +239,17 @@ function ProductsTable() {
                 </select>
               </div>
 
-              {/* Category */}
               <div>
-                <label className="mb-2 block text-sm font-medium">
-                  Category
-                </label>
-
+                <label className={labelClass}>Category</label>
                 <select
                   value={category}
                   onChange={(e) => {
                     setCategory(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full rounded border p-2"
+                  className={selectClass}
                 >
-                  <option value="all">All</option>
-
+                  <option value="all">All categories</option>
                   {categories.map((cat) => (
                     <option key={cat._id} value={cat._id}>
                       {cat.name}
@@ -234,22 +258,17 @@ function ProductsTable() {
                 </select>
               </div>
 
-              {/* Subcategory */}
               <div>
-                <label className="mb-2 block text-sm font-medium">
-                  Subcategory
-                </label>
-
+                <label className={labelClass}>Subcategory</label>
                 <select
                   value={subcategory}
                   onChange={(e) => {
                     setSubcategory(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full rounded border p-2"
+                  className={selectClass}
                 >
-                  <option value="all">All</option>
-
+                  <option value="all">All subcategories</option>
                   {subcategories.map((sub) => (
                     <option key={sub._id} value={sub._id}>
                       {sub.name}
@@ -258,44 +277,40 @@ function ProductsTable() {
                 </select>
               </div>
 
-              {/* Featured */}
               <div>
-                <label className="mb-2 block text-sm font-medium">
-                  Featured
-                </label>
-
+                <label className={labelClass}>Featured</label>
                 <select
                   value={featured}
                   onChange={(e) => {
                     setFeatured(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full rounded border p-2"
+                  className={selectClass}
                 >
-                  <option value="all">All</option>
+                  <option value="all">All products</option>
                   <option value="true">Featured</option>
-                  <option value="false">Not Featured</option>
+                  <option value="false">Not featured</option>
                 </select>
               </div>
 
-              {/* Stock */}
               <div>
-                <label className="mb-2 block text-sm font-medium">Stock</label>
-
+                <label className={labelClass}>Stock availability</label>
                 <select
                   value={stock}
                   onChange={(e) => {
                     setStock(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full rounded border p-2"
+                  className={selectClass}
                 >
-                  <option value="all">All</option>
-                  <option value=">inStock">In Stock</option>
-                  <option value="outOfStock">Out of Stock</option>
+                  <option value="all">All stock levels</option>
+                  <option value=">inStock">In stock</option>
+                  <option value="outOfStock">Out of stock</option>
                 </select>
               </div>
+            </div>
 
+            <div className="border-t border-border p-6">
               <Button
                 variant="primary"
                 className="w-full"
@@ -304,93 +319,99 @@ function ProductsTable() {
                 Apply Filters
               </Button>
             </div>
-          </div>
+          </aside>
         )}
 
-        {isLoading && <Spinner />}
-
-        {!isLoading && (
+        {/* Products */}
+        {isLoading ? (
+          <div className="flex min-h-64 items-center justify-center">
+            <Spinner />
+          </div>
+        ) : (
           <>
-            {/* ================= MOBILE ================= */}
-            <div className="space-y-3 lg:hidden">
+            {/* Mobile cards */}
+            <div className="space-y-4 lg:hidden">
               {isEmpty ? (
-                <div className="py-10 text-center text-gray-500">
-                  No products found
+                <div className="rounded-xl border border-dashed border-border py-16 text-center">
+                  <p className="font-medium text-foreground">
+                    No products found
+                  </p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Try adjusting your search or filters.
+                  </p>
                 </div>
               ) : (
                 products.map((product) => (
-                  <div
+                  <article
                     key={product._id}
-                    className="rounded-lg border border-gray-200 bg-white p-3 shadow-sm"
+                    className="overflow-hidden rounded-xl border border-border bg-surface"
                   >
-                    <div className="flex gap-3">
-                      {/* Image */}
+                    <div className="flex gap-4 p-4">
                       <img
                         src={product.imageCover}
                         alt={product.name}
-                        className="h-20 w-20 shrink-0 rounded-md border object-cover"
+                        className="h-24 w-24 shrink-0 rounded-lg border border-border object-cover"
                       />
 
-                      {/* Main information */}
                       <div className="min-w-0 flex-1">
-                        <h3 className="truncate font-semibold text-gray-900">
+                        <h3 className="line-clamp-2 font-semibold text-foreground">
                           {product.name}
                         </h3>
 
-                        <p className="mt-1 text-xs text-gray-500">
+                        <p className="mt-1 text-xs text-muted-foreground">
                           {product.category?.name}
                           {product.subcategory?.name &&
-                            ` • ${product.subcategory.name}`}
+                            ` / ${product.subcategory.name}`}
                         </p>
 
-                        <p className="mt-1 text-xs capitalize text-gray-500">
+                        <p className="mt-1 text-xs capitalize text-muted-foreground">
                           {product.gender}
                         </p>
 
-                        <div className="mt-2 flex items-center gap-3">
-                          <span className="font-semibold">{product.price}</span>
+                        <p className="mt-3 font-semibold text-foreground">
+                          {product.price}
+                        </p>
 
-                          <span
-                            className={`rounded px-2 py-1 text-xs ${
-                              product.quantity === 0
-                                ? 'bg-red-100 text-red-600'
-                                : 'bg-green-100 text-green-600'
-                            }`}
-                          >
-                            Stock: {product.quantity}
-                          </span>
-                        </div>
+                        <span
+                          className={`mt-1 inline-flex rounded-md border px-2 py-1 text-xs ${
+                            product.quantity === 0
+                              ? 'border-border bg-accent text-muted-foreground'
+                              : 'border-primary/20 bg-accent text-foreground'
+                          }`}
+                        >
+                          {product.quantity === 0
+                            ? 'Out of stock'
+                            : `${product.quantity} in stock`}
+                        </span>
                       </div>
                     </div>
 
-                    {/* Product stats */}
-                    <div className="mt-3 grid grid-cols-3 border-t pt-3 text-center text-xs">
+                    <div className="grid grid-cols-3 border-t border-border bg-background/50 px-3 py-3 text-center">
                       <div>
-                        <p className="text-gray-500">Sold</p>
-                        <p className="mt-1 font-medium">{product.sold}</p>
+                        <p className="text-xs text-muted-foreground">Sold</p>
+                        <p className="mt-1 font-semibold text-foreground">
+                          {product.sold}
+                        </p>
                       </div>
 
-                      <div>
-                        <p className="text-gray-500">Rating</p>
-                        <p className="mt-1 font-medium">
+                      <div className="border-x border-border">
+                        <p className="text-xs text-muted-foreground">Rating</p>
+                        <p className="mt-1 font-semibold text-foreground">
                           {product.ratingsAverage?.toFixed(1) || '0.0'}
                         </p>
                       </div>
 
                       <div>
-                        <p className="text-gray-500">Featured</p>
-                        <p
-                          className={`mt-1 font-medium ${
-                            product.featured ? 'text-green-500' : 'text-red-500'
-                          }`}
-                        >
+                        <p className="text-xs text-muted-foreground">
+                          Featured
+                        </p>
+                        <p className="mt-1 font-semibold text-foreground">
                           {product.featured ? 'Yes' : 'No'}
                         </p>
                       </div>
                     </div>
 
-                    {/* Actions */}
-                    <div className="mt-3 flex gap-2 border-t pt-3">
+                    <div className="flex gap-2 border-t border-border p-3">
                       <Button
                         variant="secondary"
                         size="sm"
@@ -398,7 +419,8 @@ function ProductsTable() {
                         onClick={() => navigate(`${product._id}`)}
                       >
                         Edit
-                      </Button>{' '}
+                      </Button>
+
                       <Modal.Open
                         opens={`delete-product-mobile-${product._id}`}
                       >
@@ -411,6 +433,7 @@ function ProductsTable() {
                           Delete
                         </Button>
                       </Modal.Open>
+
                       <Modal.Window
                         name={`delete-product-mobile-${product._id}`}
                       >
@@ -422,27 +445,47 @@ function ProductsTable() {
                         />
                       </Modal.Window>
                     </div>
-                  </div>
+                  </article>
                 ))
               )}
             </div>
 
-            {/* ================= DESKTOP ================= */}
-            <div className="hidden lg:block">
+            {/* Desktop table */}
+            <div className="hidden overflow-x-auto rounded-xl border border-border lg:block">
               <DataTable
                 head={
                   <>
-                    <th className="px-4 py-3 text-left">Photo</th>
-                    <th className="px-4 py-3 text-left">Name</th>
-                    <th className="px-4 py-3 text-left">Category</th>
-                    <th className="px-4 py-3 text-left">Subcategory</th>
-                    <th className="px-4 py-3 text-left">Gender</th>
-                    <th className="px-4 py-3 text-left">Featured</th>
-                    <th className="px-4 py-3 text-center">Price</th>
-                    <th className="px-4 py-3 text-center">Stock</th>
-                    <th className="px-4 py-3 text-center">Sold</th>
-                    <th className="px-4 py-3 text-center">Rating</th>
-                    <th className="px-4 py-3 text-right">Actions</th>
+                    <th className="px-4 py-4 text-left font-semibold">Photo</th>
+                    <th className="px-4 py-4 text-left font-semibold">
+                      Product
+                    </th>
+                    <th className="px-4 py-4 text-left font-semibold">
+                      Category
+                    </th>
+                    <th className="px-4 py-4 text-left font-semibold">
+                      Subcategory
+                    </th>
+                    <th className="px-4 py-4 text-left font-semibold">
+                      Gender
+                    </th>
+                    <th className="px-4 py-4 text-left font-semibold">
+                      Featured
+                    </th>
+                    <th className="px-4 py-4 text-center font-semibold">
+                      Price
+                    </th>
+                    <th className="px-4 py-4 text-center font-semibold">
+                      Stock
+                    </th>
+                    <th className="px-4 py-4 text-center font-semibold">
+                      Sold
+                    </th>
+                    <th className="px-4 py-4 text-center font-semibold">
+                      Rating
+                    </th>
+                    <th className="px-4 py-4 text-right font-semibold">
+                      Actions
+                    </th>
                   </>
                 }
               >
@@ -450,50 +493,53 @@ function ProductsTable() {
                   <tr>
                     <td
                       colSpan={11}
-                      className="py-10 text-center text-gray-500"
+                      className="py-16 text-center text-muted-foreground"
                     >
-                      No products found
+                      No products found.
                     </td>
                   </tr>
                 ) : (
                   products.map((product) => (
-                    <tr key={product._id} className="border-b hover:bg-gray-50">
+                    <tr
+                      key={product._id}
+                      className="transition-colors hover:bg-accent/50"
+                    >
                       <td className="px-4 py-3">
                         <img
                           src={product.imageCover}
                           alt={product.name}
-                          className="h-14 w-14 rounded border object-cover"
+                          className="h-12 w-12 rounded-lg border border-border object-cover"
                         />
                       </td>
 
-                      <td className="max-w-50 truncate px-4 py-3 font-medium">
+                      <td className="max-w-48 truncate px-4 py-3 font-medium text-foreground">
                         {product.name}
                       </td>
 
-                      <td className="px-4 py-3">{product.category?.name}</td>
-
-                      <td className="px-4 py-3">{product.subcategory?.name}</td>
-
-                      <td className="px-4 py-3">{product.gender}</td>
-
-                      <td
-                        className={`px-4 py-3 ${
-                          product.featured ? 'text-green-400' : 'text-red-500'
-                        }`}
-                      >
-                        {String(product.featured)}
+                      <td className="px-4 py-3 text-muted-foreground">
+                        {product.category?.name || '—'}
                       </td>
 
-                      <td className="px-4 py-3 text-center">{product.price}</td>
+                      <td className="px-4 py-3 text-muted-foreground">
+                        {product.subcategory?.name || '—'}
+                      </td>
+
+                      <td className="px-4 py-3 capitalize text-muted-foreground">
+                        {product.gender}
+                      </td>
+
+                      <td className="px-4 py-3">
+                        <span className="rounded-md border border-border bg-accent px-2 py-1 text-xs text-foreground">
+                          {product.featured ? 'Featured' : 'Standard'}
+                        </span>
+                      </td>
+
+                      <td className="px-4 py-3 text-center font-medium">
+                        {product.price}
+                      </td>
 
                       <td className="px-4 py-3 text-center">
-                        <span
-                          className={`rounded px-2 py-1 text-xs ${
-                            product.quantity === 0
-                              ? 'bg-red-100 text-red-600'
-                              : 'bg-green-100 text-green-600'
-                          }`}
-                        >
+                        <span className="rounded-md border border-border bg-accent px-2 py-1 text-xs text-foreground">
                           {product.quantity}
                         </span>
                       </td>
@@ -501,7 +547,7 @@ function ProductsTable() {
                       <td className="px-4 py-3 text-center">{product.sold}</td>
 
                       <td className="px-4 py-3 text-center">
-                        {product.ratingsAverage?.toFixed(1)} (
+                        {product.ratingsAverage?.toFixed(1) || '0.0'} (
                         {product.ratingsQuantity})
                       </td>
 
@@ -514,6 +560,7 @@ function ProductsTable() {
                           >
                             Edit
                           </Button>
+
                           <Modal.Open
                             opens={`delete-product-desktop-${product._id}`}
                           >

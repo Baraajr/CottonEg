@@ -1,4 +1,4 @@
-import Checkout from '../features/orders/Checkou';
+import Checkout from '../features/orders/Checkout';
 
 function CheckoutPage() {
   return <Checkout />;

@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { FaCheck, FaHeart } from 'react-icons/fa';
+
 import useAddToCart from '../../hooks/useAddToCart';
 import useAddToWishlist from '../../hooks/useAddToWishlist';
 import Button from '../../ui/Button';
@@ -56,13 +57,14 @@ function ProductPurchase({ product, compact = false, showWishlist = true }) {
     );
   }, [variants, selectedColor, selectedSize]);
 
-  // Pick a readable check-mark color against light vs dark swatches
   const isLightColor = (hex) => {
     if (!hex) return true;
+
     const c = hex.replace('#', '');
     const r = parseInt(c.substring(0, 2), 16);
     const g = parseInt(c.substring(2, 4), 16);
     const b = parseInt(c.substring(4, 6), 16);
+
     return (r * 299 + g * 587 + b * 114) / 1000 > 175;
   };
 
@@ -72,59 +74,70 @@ function ProductPurchase({ product, compact = false, showWishlist = true }) {
       : 'high'
     : null;
 
-  return (
-    <div className="flex flex-col">
-      <h1
-        className={`font-semibold tracking-tight text-gray-900 ${
-          compact ? 'text-2xl' : 'text-3xl'
-        }`}
-      >
-        {product.name}
-      </h1>
+  const hasDiscount =
+    product.priceAfterDiscount && product.priceAfterDiscount < product.price;
 
-      <div className="mt-4 flex items-baseline gap-3">
-        <p
-          className={`font-semibold tabular-nums text-gray-900 ${
-            compact ? 'text-xl' : 'text-2xl'
+  return (
+    <div className="flex min-w-0 flex-col">
+      {/* Product Heading */}
+      <div className="border-b border-border pb-5">
+        <span className="text-[10px] font-medium uppercase tracking-[0.25em] text-muted-foreground">
+          CottonEg / Collection
+        </span>
+
+        <h1
+          className={`mt-3 font-display font-medium leading-tight tracking-tight text-foreground ${
+            compact ? 'text-2xl' : 'text-3xl xl:text-4xl'
           }`}
         >
-          $
-          {product.priceAfterDiscount &&
-          product.priceAfterDiscount < product.price
-            ? product.priceAfterDiscount
-            : product.price}
-        </p>
+          {product.name}
+        </h1>
 
-        {product.priceAfterDiscount &&
-          product.priceAfterDiscount < product.price && (
-            <p
-              className={`tabular-nums text-gray-400 line-through ${
-                compact ? 'text-sm' : 'text-base'
-              }`}
-            >
-              ${product.price}
-            </p>
+        {/* Price */}
+        <div className="mt-4 flex flex-wrap items-baseline gap-3">
+          <p
+            className={`font-medium tabular-nums text-foreground ${
+              compact ? 'text-xl' : 'text-2xl'
+            }`}
+          >
+            ${hasDiscount ? product.priceAfterDiscount : product.price}
+          </p>
+
+          {hasDiscount && (
+            <>
+              <p className="text-sm tabular-nums text-muted-foreground line-through">
+                ${product.price}
+              </p>
+
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                Sale
+              </span>
+            </>
           )}
+        </div>
       </div>
+
+      {/* Description */}
       {product.description && (
         <p
-          className={`text-[15px] leading-relaxed text-gray-600 ${
-            compact ? 'mt-4 line-clamp-3' : 'mt-4'
+          className={`text-sm leading-6 text-muted-foreground ${
+            compact ? 'mt-4' : 'mt-5'
           }`}
         >
           {product.description}
         </p>
       )}
 
-      {/* COLORS */}
+      {/* Colors */}
       <div className={compact ? 'mt-6' : 'mt-8'}>
-        <div className="mb-2.5 flex items-baseline gap-1.5">
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+        <div className="mb-3 flex items-baseline gap-2">
+          <h3 className="text-[11px] font-semibold uppercase tracking-[0.15em] text-foreground">
             Color
           </h3>
+
           {selectedColor && (
-            <span className="text-xs text-gray-400">
-              — {selectedColor.name}
+            <span className="text-xs text-muted-foreground">
+              {selectedColor.name}
             </span>
           )}
         </div>
@@ -148,9 +161,9 @@ function ProductPurchase({ product, compact = false, showWishlist = true }) {
                   setSelectedColor(color);
                   setSelectedSize(null);
                 }}
-                className={`relative h-9 w-9 rounded-full ring-1 ring-inset ring-black/10 transition-all duration-150 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 ${
+                className={`relative flex h-9 w-9 items-center justify-center rounded-full ring-1 ring-inset ring-border transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                   isSelected
-                    ? 'ring-2 ring-gray-900 ring-offset-2'
+                    ? 'ring-2 ring-primary ring-offset-2'
                     : 'hover:scale-105'
                 } ${
                   color.disabled
@@ -161,12 +174,12 @@ function ProductPurchase({ product, compact = false, showWishlist = true }) {
               >
                 {isSelected && (
                   <FaCheck
-                    className={`absolute inset-0 m-auto h-4 w-4 ${
-                      checkDark ? 'text-gray-900' : 'text-white'
+                    className={`h-3.5 w-3.5 ${
+                      checkDark ? 'text-black' : 'text-white'
                     }`}
-                    strokeWidth={2.5}
                   />
                 )}
+
                 {color.disabled && (
                   <span
                     className="pointer-events-none absolute inset-0 rounded-full"
@@ -182,15 +195,15 @@ function ProductPurchase({ product, compact = false, showWishlist = true }) {
         </div>
       </div>
 
-      {/* SIZES */}
+      {/* Sizes */}
       <div className="mt-6">
-        <h3 className="mb-2.5 text-xs font-semibold uppercase tracking-wide text-gray-500">
+        <h3 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.15em] text-foreground">
           Size
         </h3>
 
         <div className="flex flex-wrap gap-2">
           {availableSizes.length === 0 && (
-            <span className="text-sm text-gray-400">
+            <span className="text-xs text-muted-foreground">
               Select a color to see available sizes
             </span>
           )}
@@ -204,10 +217,10 @@ function ProductPurchase({ product, compact = false, showWishlist = true }) {
                 type="button"
                 aria-pressed={isSelected}
                 onClick={() => setSelectedSize(size)}
-                className={`min-w-11 rounded-md border px-3 py-1.5 text-sm font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 ${
+                className={`flex min-w-11 items-center justify-center border px-3 py-2 text-xs font-medium transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                   isSelected
-                    ? 'border-gray-900 bg-gray-900 text-white'
-                    : 'border-gray-300 bg-white text-gray-700 hover:border-gray-900'
+                    ? 'border-primary bg-primary text-primary-foreground'
+                    : 'border-border bg-background text-foreground hover:border-primary'
                 }`}
               >
                 {size}
@@ -217,48 +230,47 @@ function ProductPurchase({ product, compact = false, showWishlist = true }) {
         </div>
       </div>
 
-      {/* STOCK */}
-      <div className="mt-5 flex items-center gap-1.5">
+      {/* Stock */}
+      <div className="mt-5 flex min-h-5 items-center gap-2">
         {selectedVariant ? (
           <>
             <span
               className={`h-1.5 w-1.5 rounded-full ${
-                stockLevel === 'low' ? 'bg-amber-500' : 'bg-green-500'
+                stockLevel === 'low' ? 'bg-muted-foreground' : 'bg-foreground'
               }`}
             />
-            <p
-              className={`text-sm ${
-                stockLevel === 'low' ? 'text-amber-600' : 'text-green-600'
-              }`}
-            >
+
+            <p className="text-xs text-muted-foreground">
               {stockLevel === 'low'
                 ? `Only ${selectedVariant.quantity} left in stock`
                 : `${selectedVariant.quantity} in stock`}
             </p>
           </>
         ) : (
-          <p className="text-sm text-gray-500">Choose a color and size</p>
+          <p className="text-xs text-muted-foreground">
+            Choose a color and size
+          </p>
         )}
       </div>
 
-      {/* ACTIONS */}
-      <div className={`${compact ? 'mt-6' : 'mt-10'} flex gap-3`}>
+      {/* Actions */}
+      <div className={`${compact ? 'mt-6' : 'mt-8'} flex gap-3`}>
         {showWishlist && (
           <button
             type="button"
             disabled={isAddingToWishlist}
             aria-label="Add to wishlist"
             onClick={() => addToWishlist(product._id)}
-            className="flex items-center justify-center rounded-lg border border-gray-300 px-4 py-3 text-gray-700 transition-colors duration-150 hover:border-gray-900 hover:text-gray-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-900 focus-visible:ring-offset-2 disabled:opacity-50"
+            className="flex h-12 w-12 shrink-0 items-center justify-center border border-border text-foreground transition-colors duration-200 hover:border-primary hover:bg-accent disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <FaHeart className="h-4 w-4" strokeWidth={2} />
+            <FaHeart className="h-4 w-4" />
           </button>
         )}
 
         <Button
           type="button"
           variant="primary"
-          className="flex-1 rounded-lg"
+          className="min-h-12 flex-1 rounded-none"
           disabled={!selectedVariant}
           loading={isAddingToCart}
           onClick={() =>

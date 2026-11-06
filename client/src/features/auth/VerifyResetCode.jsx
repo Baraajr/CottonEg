@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
+import { FiShield } from 'react-icons/fi';
+
 import { verifyResetCode } from '../../services/auth';
 import Button from '../../ui/Button';
 
@@ -12,6 +14,7 @@ function VerifyResetCode() {
 
   const location = useLocation();
   const email = location.state?.email;
+
   useEffect(() => {
     if (!email) {
       toast.error('Email not found. Please try again.');
@@ -107,19 +110,30 @@ function VerifyResetCode() {
   if (!email) return null;
 
   return (
-    <div className="flex justify-center px-4 py-16">
-      <form onSubmit={handleSubmit} className="w-full max-w-md text-center">
-        <h1 className="mb-3 text-3xl font-light tracking-[0.3em]">
-          VERIFY CODE
+    <section className="flex min-h-[65vh] items-center justify-center bg-background px-4 py-10 text-foreground">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-md border border-border bg-surface px-5 py-8 text-center sm:px-8"
+      >
+        <div className="mx-auto flex h-14 w-14 items-center justify-center border border-border bg-background">
+          <FiShield size={23} className="text-foreground" />
+        </div>
+
+        <span className="section-label mt-6 block">Password recovery</span>
+
+        <h1 className="mt-2 font-display text-3xl sm:text-4xl">
+          Verify your code
         </h1>
 
-        <p className="mb-2 text-sm text-gray-600">
-          Enter the 6-digit code sent to your email
+        <p className="mx-auto mt-3 max-w-xs text-sm leading-6 text-muted-foreground">
+          Enter the 6-digit code sent to your email address.
         </p>
 
-        <p className="mb-8 text-sm font-medium break-all">{email}</p>
+        <p className="mt-3 break-all text-sm font-semibold text-foreground">
+          {email}
+        </p>
 
-        <div className="mb-8 flex justify-center gap-2">
+        <div className="my-7 flex justify-center gap-2 sm:gap-3">
           {code.map((digit, index) => (
             <input
               key={index}
@@ -133,7 +147,7 @@ function VerifyResetCode() {
               onKeyDown={(e) => handleKeyDown(e, index)}
               onPaste={handlePaste}
               disabled={verifyMutation.isPending}
-              className="h-12 w-12 border border-gray-300 rounded-md text-center text-lg font-medium outline-none focus:border-black focus:ring-1 focus:ring-black"
+              className="h-11 w-10 border border-border bg-background text-center text-lg font-semibold text-foreground outline-none transition-colors focus:border-foreground disabled:opacity-50 sm:h-13 sm:w-12"
             />
           ))}
         </div>
@@ -143,12 +157,12 @@ function VerifyResetCode() {
           fullWidth
           loading={verifyMutation.isPending}
           disabled={code.join('').length !== 6}
-          className="py-3 tracking-[0.25em]"
+          className="tracking-[0.2em]"
         >
           VERIFY
         </Button>
       </form>
-    </div>
+    </section>
   );
 }
 

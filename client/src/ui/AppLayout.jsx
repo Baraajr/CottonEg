@@ -8,29 +8,25 @@ const BOTTOM_NAV_HEIGHT = 72;
 
 function AppLayout() {
   const location = useLocation();
-
   const isHome = location.pathname === '/';
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen overflow-x-clip bg-background">
       <Header />
 
       <main
-        className="min-h-[calc(100vh)]"
+        className="min-h-screen min-w-0 md:pb-0!"
         style={{
-          paddingTop: isHome ? 0 : HEADER_HEIGHT, // make hero section below header and header transparent
-          paddingBottom: BOTTOM_NAV_HEIGHT,
+          paddingTop: isHome ? 0 : HEADER_HEIGHT,
+          paddingBottom: `var(--bottom-nav-height)`,
+          '--bottom-nav-height': `${BOTTOM_NAV_HEIGHT}px`,
         }}
       >
         <Outlet />
+        <Footer />
       </main>
 
-      <Footer />
-
-      <div
-        className="fixed inset-x-0 bottom-0 z-50 bg-white md:hidden"
-        style={{ height: BOTTOM_NAV_HEIGHT }}
-      >
+      <div className="fixed inset-x-0 bottom-0 z-50 h-18 border-t border-border bg-background md:hidden">
         <SmallScreenNav />
       </div>
     </div>
