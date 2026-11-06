@@ -6,7 +6,7 @@ import { RiDashboardLine } from 'react-icons/ri';
 import { IoIosSearch } from 'react-icons/io';
 import { FaCartShopping, FaHeart } from 'react-icons/fa6';
 import { HiOutlineMenu, HiOutlineX } from 'react-icons/hi';
-import { FiShoppingCart, FiUser } from 'react-icons/fi';
+import { FiMoon, FiShoppingCart, FiSun, FiUser } from 'react-icons/fi';
 import { CiHeart } from 'react-icons/ci';
 
 import useUser from '../hooks/useUser';
@@ -25,6 +25,10 @@ const MOTION = {
 };
 
 export default function Header() {
+  const [isDark, setIsDark] = useState(
+    () => localStorage.getItem('theme') === 'dark',
+  );
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeGender, setActiveGender] = useState(null);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -43,6 +47,15 @@ export default function Header() {
 
   const textColor = transparent ? 'text-white' : 'text-foreground';
   const iconColor = transparent ? 'text-white' : 'text-foreground';
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', isDark);
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  }, [isDark]);
+
+  function toggleTheme() {
+    setIsDark((prev) => !prev);
+  }
 
   useEffect(() => {
     const handleScroll = () => {
@@ -214,6 +227,19 @@ export default function Header() {
                 tooltip="Search"
               >
                 <IoIosSearch className={`h-5 w-5 ${iconColor}`} />
+              </IconButton>
+
+              <IconButton
+                onClick={toggleTheme}
+                tooltip={
+                  isDark ? 'Switch to light mode' : 'Switch to dark mode'
+                }
+              >
+                {isDark ? (
+                  <FiSun className={`h-5 w-5 ${iconColor}`} />
+                ) : (
+                  <FiMoon className={`h-5 w-5 ${iconColor}`} />
+                )}
               </IconButton>
 
               {user?.role === 'user' && (
